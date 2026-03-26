@@ -64,14 +64,13 @@
         .ping-good { color: #f59e0b; }
         .ping-bad { color: #ef4444; }
 
-        /* ISP Colors */
-        .isp-badge { padding: 2px 8px; border-radius: 6px; font-weight: 800; text-transform: uppercase; font-size: 7px; }
-        .isp-ooredoo { background: #ed1c24; color: white; }
-        .isp-mpt { background: #ffcc00; color: #000; }
-        .isp-telenor { background: #0076be; color: white; }
-        .isp-mytel { background: #fe6b00; color: white; }
-        .isp-wifi { background: #10b981; color: white; }
-        .isp-default { background: #64748b; color: white; }
+        /* ISP Multi-Color System */
+        .isp-badge { padding: 3px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; font-size: 7px; color: white; }
+        .isp-dtac { background: #0076be; }
+        .isp-true { background: #ed1c24; }
+        .isp-ais { background: #10b981; }
+        .isp-mix { background: linear-gradient(90deg, #ed1c24, #10b981, #0076be); }
+        .isp-default { background: #64748b; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen pb-32">
@@ -81,7 +80,7 @@
 
     <div class="header-sticky">
         <div class="marquee-container">
-            <div id="running-text" class="marquee-content italic uppercase tracking-wider italic">Loading...</div>
+            <div id="running-text" class="marquee-content italic uppercase tracking-wider">Loading...</div>
         </div>
 
         <nav class="bg-slate-900 text-white p-4 shadow-xl">
@@ -173,59 +172,50 @@
         <!-- Admin View -->
         <div id="admin-view" class="hidden space-y-6 animate-in">
             <h1 class="text-xl font-black">ADMIN CONTROL</h1>
-            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Running Text & Donate Settings -->
                 <div class="bg-white p-6 rounded-2xl border space-y-4">
-                    <h3 class="text-[10px] font-black uppercase">General & Donate Settings</h3>
-                    <input type="text" id="set-marquee" placeholder="Update Running Text" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-xs">
-                    
-                    <div class="border-t pt-4 space-y-3">
-                        <p class="text-[8px] font-bold text-slate-400">DONATE 1 (Logo, Name, Acc)</p>
-                        <input type="text" id="admin-dlogo1" placeholder="Logo URL 1" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
-                        <input type="text" id="admin-dname1" placeholder="Account Name 1" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
-                        <input type="text" id="admin-dacc1" placeholder="Account Number 1" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                    <h3 class="text-[10px] font-black uppercase">Donate & General</h3>
+                    <input type="text" id="set-marquee" placeholder="Running Text" class="w-full p-3 bg-slate-50 border rounded-xl text-xs">
+                    <div class="border-t pt-4 space-y-2">
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">Bank 1 Config</p>
+                        <input type="text" id="admin-dlogo1" placeholder="Logo Link" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                        <input type="text" id="admin-dname1" placeholder="Acc Name" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                        <input type="text" id="admin-dacc1" placeholder="Acc Number" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
                     </div>
-                    
-                    <div class="border-t pt-4 space-y-3">
-                        <p class="text-[8px] font-bold text-slate-400">DONATE 2 (Logo, Name, Acc)</p>
-                        <input type="text" id="admin-dlogo2" placeholder="Logo URL 2" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
-                        <input type="text" id="admin-dname2" placeholder="Account Name 2" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
-                        <input type="text" id="admin-dacc2" placeholder="Account Number 2" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                    <div class="border-t pt-4 space-y-2">
+                        <p class="text-[8px] font-bold text-slate-400 uppercase">Bank 2 Config</p>
+                        <input type="text" id="admin-dlogo2" placeholder="Logo Link" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                        <input type="text" id="admin-dname2" placeholder="Acc Name" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                        <input type="text" id="admin-dacc2" placeholder="Acc Number" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
                     </div>
-
-                    <button id="save-settings-btn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl text-xs">Save All Settings</button>
+                    <button id="save-settings-btn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl text-xs">Save Settings</button>
                 </div>
-
-                <!-- Server Entry -->
                 <div class="bg-white p-6 rounded-2xl border">
-                    <h3 class="text-[10px] font-black uppercase mb-4">Add or Edit Server</h3>
+                    <h3 class="text-[10px] font-black uppercase mb-4">Server Entry</h3>
                     <input type="hidden" id="edit-id" value="">
                     <div class="grid grid-cols-2 gap-3 mb-3">
-                        <input type="text" id="config-flag" placeholder="Flag (US, SG, MM)" class="p-3 bg-slate-50 border rounded-xl text-xs">
-                        <input type="text" id="config-title" placeholder="Server Name" class="p-3 bg-slate-50 border rounded-xl text-xs">
+                        <input type="text" id="config-flag" placeholder="Flag (US, SG, TH)" class="p-3 bg-slate-50 border rounded-xl text-xs">
+                        <input type="text" id="config-title" placeholder="Server Name (Exact)" class="p-3 bg-slate-50 border rounded-xl text-xs">
                     </div>
                     <div class="grid grid-cols-2 gap-3 mb-3">
-                        <input type="text" id="config-sim" placeholder="ISP (Ooredoo, MPT, Mytel, Telenor, Wifi)" class="p-3 bg-slate-50 border rounded-xl text-xs">
+                        <input type="text" id="config-sim" placeholder="ISP (TRUE, AIS, DTAC)" class="p-3 bg-slate-50 border rounded-xl text-xs">
                         <input type="date" id="config-expire" class="p-3 bg-slate-50 border rounded-xl text-xs">
                     </div>
                     <select id="config-type" class="w-full p-3 bg-slate-50 border rounded-xl text-xs font-bold mb-3">
                         <option value="V2RAY">V2RAY</option><option value="SSH">SSH</option>
                         <option value="TROJAN">TROJAN</option><option value="UDP">UDP</option>
                     </select>
-                    <textarea id="config-content" rows="3" placeholder="Paste Config Link" class="w-full p-3 bg-slate-50 border rounded-xl mb-3 text-[10px]"></textarea>
+                    <textarea id="config-content" rows="3" placeholder="Link Config" class="w-full p-3 bg-slate-50 border rounded-xl mb-3 text-[10px]"></textarea>
                     <input type="text" id="config-note" placeholder="Note (Optional)" class="w-full p-3 bg-slate-50 border rounded-xl mb-4 text-xs">
                     <button id="publish-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-xl">Publish Now</button>
                 </div>
             </div>
-            
             <div id="admin-list" class="space-y-2"></div>
         </div>
 
         <!-- User View -->
         <div id="user-view" class="space-y-6 animate-in">
-            <!-- Center Header Stats -->
-            <div class="bg-slate-950 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden flex flex-col items-center">
+            <div class="bg-slate-950 p-8 rounded-[2.5rem] text-white shadow-2xl relative flex flex-col items-center">
                 <div class="text-center mb-6">
                     <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-1">JK FREE VPN</h1>
                     <div id="server-clock" class="text-indigo-400 font-mono text-[9px] font-bold tracking-widest">...</div>
@@ -246,20 +236,15 @@
                 </div>
             </div>
 
-            <!-- Total Online Users Banner (Only visible when Online Tab selected) -->
             <div id="online-total-banner" class="hidden bg-indigo-600 p-4 rounded-2xl text-white flex justify-between items-center shadow-lg animate-in">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                        <i class="fas fa-users"></i>
-                    </div>
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-users"></i></div>
                     <div>
                         <p class="text-[8px] font-black uppercase tracking-widest opacity-80">Total Active Users</p>
                         <p id="online-total-count" class="text-xl font-black">0</p>
                     </div>
                 </div>
-                <div class="text-right">
-                    <span class="text-[7px] font-black bg-white/20 px-2 py-1 rounded-full uppercase">Real-time Data</span>
-                </div>
+                <div class="text-right"><span class="text-[7px] font-black bg-white/20 px-2 py-1 rounded-full uppercase italic">Real-time</span></div>
             </div>
 
             <div class="tab-grid p-1.5 bg-slate-200/50 rounded-xl">
@@ -275,11 +260,10 @@
         </div>
     </main>
 
-    <!-- Config Result -->
     <div id="config-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-[2rem] p-6 w-full max-w-xl shadow-2xl animate-in">
             <div class="flex justify-between items-center mb-4">
-                <h2 id="modal-title" class="text-sm font-black break-words pr-4 italic uppercase"></h2>
+                <h2 id="modal-title" class="text-sm font-black italic uppercase pr-4"></h2>
                 <button onclick="toggleModal('config-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button>
             </div>
             <div class="bg-slate-900 rounded-xl p-4 mb-6">
@@ -297,7 +281,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, Timestamp, increment, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, Timestamp, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -321,8 +305,6 @@
         let processingData = null;
         let quizSolution = 0;
         let isWriting = false;
-
-        // State storage for dynamic fields
         let serverPingState = {}; 
         let serverUserCountState = {};
 
@@ -334,22 +316,17 @@
 
         window.toggleModal = (id, show) => {
             const el = document.getElementById(id);
-            if (show) el.classList.remove('hidden');
-            else el.classList.add('hidden');
+            if (show) el.classList.remove('hidden'); else el.classList.add('hidden');
         };
 
         window.verifyAdmin = () => {
             if (document.getElementById('admin-password-input').value === ADMIN_PASS) {
                 localStorage.setItem('jkvpn_admin_session', 'active');
-                checkAdminSession();
-                toggleModal('admin-modal', false);
+                checkAdminSession(); toggleModal('admin-modal', false);
             } else { showNotify("Wrong Pass!"); }
         };
 
-        window.logoutAdmin = () => {
-            localStorage.removeItem('jkvpn_admin_session');
-            location.reload();
-        };
+        window.logoutAdmin = () => { localStorage.removeItem('jkvpn_admin_session'); location.reload(); };
 
         function checkAdminSession() {
             const isAdmin = localStorage.getItem('jkvpn_admin_session') === 'active';
@@ -367,21 +344,21 @@
             allConfigs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
                 .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
             document.getElementById('total-server-display').innerText = allConfigs.length;
-            
             allConfigs.forEach(c => {
                 if(!serverPingState[c.id]) serverPingState[c.id] = Math.floor(Math.random() * 50) + 30;
                 if(!serverUserCountState[c.id]) serverUserCountState[c.id] = Math.floor(Math.random() * 15) + 5;
             });
-
-            renderUI();
-            updateTotalOnline();
+            renderUI(); updateTotalOnline();
         });
 
         onSnapshot(statsDoc, (snap) => {
             if(snap.exists()){
                 const data = snap.data();
-                const today = new Date().toISOString().split('T')[0];
-                if(data.lastResetDay !== today) updateDoc(statsDoc, { daily: 0, lastResetDay: today });
+                const now = new Date();
+                const today = now.toISOString().split('T')[0];
+                if(data.lastResetDay !== today) {
+                    updateDoc(statsDoc, { daily: 0, lastResetDay: today });
+                }
                 document.getElementById('total-gen-display').innerText = (data.total || 0).toLocaleString();
                 document.getElementById('daily-gen-display').innerText = (data.daily || 0).toLocaleString();
             }
@@ -390,15 +367,13 @@
         onSnapshot(settingsDoc, (snap) => {
             if(snap.exists()){
                 const d = snap.data();
-                if(d.marquee) document.getElementById('running-text').innerText = d.marquee;
-                if(d.dname1) document.getElementById('d-name-1').innerText = d.dname1;
-                if(d.dacc1) document.getElementById('d-acc-1').innerText = d.dacc1;
-                if(d.dlogo1) document.getElementById('d-logo-1').src = d.dlogo1;
-                if(d.dname2) document.getElementById('d-name-2').innerText = d.dname2;
-                if(d.dacc2) document.getElementById('d-acc-2').innerText = d.dacc2;
-                if(d.dlogo2) document.getElementById('d-logo-2').src = d.dlogo2;
-
-                // Sync to admin inputs if admin logged in
+                document.getElementById('running-text').innerText = d.marquee || "JK VPN V4 - FAST & SECURE";
+                document.getElementById('d-name-1').innerText = d.dname1 || "KBZ PAY";
+                document.getElementById('d-acc-1').innerText = d.dacc1 || "09xxxxxxxxx";
+                document.getElementById('d-logo-1').src = d.dlogo1 || "";
+                document.getElementById('d-name-2').innerText = d.dname2 || "WAVE PAY";
+                document.getElementById('d-acc-2').innerText = d.dacc2 || "09xxxxxxxxx";
+                document.getElementById('d-logo-2').src = d.dlogo2 || "";
                 if(localStorage.getItem('jkvpn_admin_session') === 'active') {
                     document.getElementById('set-marquee').value = d.marquee || "";
                     document.getElementById('admin-dlogo1').value = d.dlogo1 || "";
@@ -411,34 +386,31 @@
             }
         });
 
-        // Smart UI Refresh for Dynamic Fields
+        // Ping update loop
         setInterval(() => {
             allConfigs.forEach(c => {
-                const fluctuation = Math.floor(Math.random() * 10) - 5;
-                serverPingState[c.id] = Math.max(12, (serverPingState[c.id] || 40) + fluctuation);
-                
+                const fluctuation = Math.floor(Math.random() * 8) - 4;
+                serverPingState[c.id] = Math.max(15, (serverPingState[c.id] || 40) + fluctuation);
                 const pingEl = document.getElementById(`ping-val-${c.id}`);
                 if(pingEl) {
                     pingEl.innerText = `${serverPingState[c.id]}ms`;
                     pingEl.className = serverPingState[c.id] > 150 ? 'ping-bad' : (serverPingState[c.id] > 80 ? 'ping-good' : 'ping-excellent');
                 }
             });
-        }, 5000);
+        }, 6000);
 
         setInterval(() => {
             allConfigs.forEach(c => {
                 const drift = Math.floor(Math.random() * 3) - 1;
                 serverUserCountState[c.id] = Math.max(2, (serverUserCountState[c.id] || 10) + drift);
-                
-                const userEl = document.getElementById(`user-val-${c.id}`);
+                const userEl = document.getElementById(`user-val-${item.id}`);
                 if(userEl) userEl.innerText = `${serverUserCountState[c.id]} Active`;
             });
             updateTotalOnline();
-        }, 120000); // 2 minutes
+        }, 120000);
 
         function updateTotalOnline() {
-            let total = 0;
-            allConfigs.forEach(c => total += (serverUserCountState[c.id] || 0));
+            let total = 0; allConfigs.forEach(c => total += (serverUserCountState[c.id] || 0));
             document.getElementById('online-total-count').innerText = total.toLocaleString();
         }
 
@@ -452,15 +424,14 @@
                 dname2: document.getElementById('admin-dname2').value,
                 dacc2: document.getElementById('admin-dacc2').value
             };
-            await setDoc(settingsDoc, payload, { merge: true });
-            showNotify("Settings Saved!");
+            await setDoc(settingsDoc, payload, { merge: true }); showNotify("Settings Saved!");
         };
 
         document.getElementById('publish-btn').onclick = async () => {
             const id = document.getElementById('edit-id').value;
             const payload = {
                 flag: document.getElementById('config-flag').value.toUpperCase(),
-                title: document.getElementById('config-title').value,
+                title: document.getElementById('config-title').value, // Use raw value for case sensitivity
                 sim: document.getElementById('config-sim').value,
                 type: document.getElementById('config-type').value,
                 content: document.getElementById('config-content').value,
@@ -469,11 +440,8 @@
                 lastResetDate: new Date().toISOString().split('T')[0]
             };
             if(!payload.title || !payload.content) return showNotify("Required fields empty!");
-            if(id) {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id), payload);
-            } else {
-                await addDoc(configsCol, { ...payload, dailyCount: 0, createdAt: Timestamp.now() });
-            }
+            if(id) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id), payload); }
+            else { await addDoc(configsCol, { ...payload, dailyCount: 0, createdAt: Timestamp.now() }); }
             document.getElementById('edit-id').value = "";
             document.querySelectorAll('#admin-view input:not([type=password]), #admin-view textarea').forEach(i => i.value = "");
             showNotify("Success!");
@@ -511,17 +479,12 @@
         document.getElementById('verify-quiz-btn').onclick = async () => {
             const ans = parseInt(document.getElementById('quiz-answer').value);
             if (ans !== quizSolution) return showNotify("Incorrect answer!");
-            if (isWriting) return;
-            isWriting = true;
-            toggleModal('quiz-modal', false);
+            if (isWriting) return; isWriting = true; toggleModal('quiz-modal', false);
             try {
                 const sRef = doc(db, 'artifacts', appId, 'public', 'data', 'configs', processingData.id);
                 await updateDoc(sRef, { dailyCount: (processingData.actualDaily >= 0) ? increment(1) : 1, lastResetDate: processingData.today });
                 await updateDoc(statsDoc, { total: increment(1), daily: increment(1) });
-                
-                serverUserCountState[processingData.id]++;
-                updateTotalOnline();
-
+                serverUserCountState[processingData.id]++; updateTotalOnline();
                 toggleModal('success-modal', true);
                 document.getElementById('show-config-btn').onclick = () => {
                     toggleModal('success-modal', false);
@@ -530,11 +493,11 @@
                     document.getElementById('modal-copy-btn').onclick = () => {
                         const t = document.createElement('textarea'); t.value = processingData.content;
                         document.body.appendChild(t); t.select(); document.execCommand('copy');
-                        document.body.removeChild(t); showNotify("Config Copied!");
+                        document.body.removeChild(t); showNotify("Copied!");
                     };
                     toggleModal('config-modal', true);
                 };
-            } catch (e) { showNotify("Server error!"); } finally { isWriting = false; }
+            } catch (e) { showNotify("Error!"); } finally { isWriting = false; }
         };
 
         const tabs = ['ALL', 'V2RAY', 'SSH', 'UDP', 'TROJAN', 'ONLINE'];
@@ -544,10 +507,7 @@
                 document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-all', 'active-v2ray', 'active-ssh', 'active-udp', 'active-trojan', 'active-online'));
                 const map = { 'ALL': 'active-all', 'V2RAY': 'active-v2ray', 'SSH': 'active-ssh', 'UDP': 'active-udp', 'TROJAN': 'active-trojan', 'ONLINE': 'active-online' };
                 document.getElementById(`tab-${t}`).classList.add(map[t]);
-                
-                // Show/Hide Online Banner
                 document.getElementById('online-total-banner').classList.toggle('hidden', t !== 'ONLINE');
-                
                 renderUI();
             };
         });
@@ -558,12 +518,12 @@
         }
 
         function getISPClass(isp) {
-            const val = (isp || '').toLowerCase();
-            if(val.includes('ooredoo')) return 'isp-ooredoo';
-            if(val.includes('mpt')) return 'isp-mpt';
-            if(val.includes('mytel')) return 'isp-mytel';
-            if(val.includes('telenor') || val.includes('atom')) return 'isp-telenor';
-            if(val.includes('wifi')) return 'isp-wifi';
+            const v = (isp || '').toLowerCase();
+            const count = (v.match(/dtac|true|ais/g) || []).length;
+            if(count >= 3) return 'isp-mix';
+            if(v.includes('dtac')) return 'isp-dtac';
+            if(v.includes('true')) return 'isp-true';
+            if(v.includes('ais')) return 'isp-ais';
             return 'isp-default';
         }
 
@@ -586,7 +546,6 @@
                 if(expiryDate) expiryDate.setHours(0,0,0,0);
                 const isExpired = expiryDate && expiryDate < now;
                 const diff = expiryDate ? Math.ceil((expiryDate - now) / 86400000) : null;
-
                 const curPing = serverPingState[item.id] || 40;
                 const curUsers = serverUserCountState[item.id] || 10;
 
@@ -595,7 +554,7 @@
                         <div class="flex items-center gap-3 mb-4">
                             <div class="flag-circle">${getFlag(item.flag)}</div>
                             <div class="min-w-0 flex-1">
-                                <h3 class="text-[11px] font-black text-slate-900 leading-tight italic break-words uppercase">${item.title}</h3>
+                                <h3 class="text-[11px] font-black text-slate-900 leading-tight italic break-words">${item.title}</h3>
                                 <div class="flex items-center gap-1.5 mt-0.5">
                                     <span class="${isExpired ? 'bg-rose-500' : 'dot-online'} rounded-full w-1.5 h-1.5 inline-block"></span>
                                     <p class="text-[7px] font-black uppercase tracking-tighter ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">
@@ -607,23 +566,23 @@
                         </div>
                         <div class="space-y-1.5 mb-5 text-[9px] flex-grow">
                             <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
-                                <span class="text-slate-400 font-black uppercase text-[7px]">ISP Support:</span> 
+                                <span class="text-slate-400 font-black uppercase text-[7px]">ISP:</span> 
                                 <span class="isp-badge ${getISPClass(item.sim)}">${item.sim || 'Universal'}</span>
                             </div>
                             <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
-                                <span class="text-slate-400 font-black uppercase text-[7px]">User Stats:</span> 
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Users:</span> 
                                 <span id="user-val-${item.id}" class="font-black text-indigo-600">${curUsers} Active</span>
                             </div>
                             <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
-                                <span class="text-slate-400 font-black uppercase text-[7px]">Expiry Date:</span> 
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Expiry:</span> 
                                 <span class="font-black ${isExpired ? 'text-rose-500' : 'text-slate-700'}">${item.expire || 'Life Time'}</span>
                             </div>
                             <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
-                                <span class="text-slate-400 font-black uppercase text-[7px]">Days Left:</span> 
-                                <span class="font-black ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">${isExpired ? '0' : (diff !== null ? diff : '∞')}</span>
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Left:</span> 
+                                <span class="font-black ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">${isExpired ? '0' : (diff !== null ? diff : '∞')}d</span>
                             </div>
                             <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl">
-                                <span class="text-slate-400 font-black uppercase text-[7px]">Limit Progress:</span> 
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Limit:</span> 
                                 <span class="px-2 py-0.5 rounded-full text-[8px] font-black ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}">${daily} / ${SERVER_LIMIT}</span>
                             </div>
                             ${item.note ? `
@@ -633,7 +592,7 @@
                         </div>
                         <button onclick="startGen('${item.id}', '${item.title}', '${item.content}', ${item.dailyCount || 0}, '${item.lastResetDate}', ${isExpired})" 
                                 class="w-full py-3 ${isExpired ? 'bg-slate-200 text-slate-400' : (isFull ? 'bg-rose-500 text-white' : 'bg-slate-900 text-white')} rounded-xl font-black text-[9px] uppercase tracking-tighter">
-                            ${isExpired ? 'Service Off' : (isFull ? 'Full Slot' : 'Get Connection')}
+                            ${isExpired ? 'OFF' : (isFull ? 'FULL' : 'Get Connection')}
                         </button>
                     </div>
                 `;
@@ -642,10 +601,7 @@
                     const encoded = encodeURIComponent(JSON.stringify(item));
                     list.innerHTML += `
                         <div class="bg-white p-3 rounded-xl flex justify-between items-center border text-[10px]">
-                            <div class="flex flex-col">
-                                <span class="font-bold uppercase">${item.title}</span>
-                                <span class="text-[7px] text-slate-400">ISP: ${item.sim} | TYPE: ${item.type}</span>
-                            </div>
+                            <span class="font-bold">${item.title}</span>
                             <div class="flex gap-1">
                                 <button onclick="editConfig('${encoded}')" class="bg-indigo-50 text-indigo-600 p-1.5 rounded-lg"><i class="fas fa-edit"></i></button>
                                 <button onclick="deleteConfig('${item.id}')" class="bg-rose-50 text-rose-500 p-1.5 rounded-lg"><i class="fas fa-trash"></i></button>
@@ -655,7 +611,6 @@
                 }
             });
         }
-
         setInterval(() => { document.getElementById('server-clock').innerText = new Date().toLocaleString(); }, 1000);
         window.addEventListener('load', async () => { await signInAnonymously(auth); checkAdminSession(); });
     </script>
