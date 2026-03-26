@@ -68,7 +68,7 @@
 <body class="bg-slate-50 text-slate-900 min-h-screen pb-32">
 
     <!-- Notification -->
-    <div id="notification" class="fixed top-24 right-4 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[100] hidden animate-in border-l-4 border-amber-500"></div>
+    <div id="notification" class="fixed top-24 right-4 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[110] hidden animate-in border-l-4 border-amber-500"></div>
 
     <div class="header-sticky">
         <div class="marquee-container">
@@ -110,6 +110,31 @@
             </div>
         </div>
 
+        <!-- Quiz Modal -->
+        <div id="quiz-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[60] hidden">
+            <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center">
+                <div class="mb-4 text-slate-400 font-bold uppercase text-[10px] tracking-widest">Anti-Bot Verification</div>
+                <h2 class="text-3xl font-black mb-6" id="quiz-question">0 + 0 = ?</h2>
+                <input type="number" id="quiz-answer" placeholder="Enter Answer" class="w-full p-5 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none mb-6 text-center text-2xl font-black">
+                <div class="flex gap-3">
+                    <button onclick="toggleModal('quiz-modal', false)" class="flex-1 py-4 font-bold text-slate-500">Cancel</button>
+                    <button id="verify-quiz-btn" class="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg">Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="success-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[70] hidden">
+            <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center">
+                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-4xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-slate-900 mb-2">Generate Account Successfully</h2>
+                <p class="text-slate-500 text-sm mb-8">Your high speed VPN configuration is ready to use.</p>
+                <button id="show-config-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-2xl shadow-lg">View Config</button>
+            </div>
+        </div>
+
         <!-- Donate Modal -->
         <div id="donate-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
             <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-md shadow-2xl animate-in relative">
@@ -137,13 +162,12 @@
             </div>
         </div>
 
-        <!-- Admin View -->
+        <!-- Admin Panel -->
         <div id="admin-view" class="hidden space-y-8 animate-in">
             <div class="flex justify-between items-center border-b pb-4">
                 <h1 class="text-3xl font-black tracking-tighter">ADMIN PANEL</h1>
                 <button onclick="location.reload()" class="bg-slate-200 px-4 py-2 rounded-xl text-xs font-bold">Refresh</button>
             </div>
-
             <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm space-y-6">
                 <div>
                     <label class="block text-xs font-black text-indigo-500 uppercase mb-2">Marquee Text</label>
@@ -152,7 +176,6 @@
                         <button id="update-marquee-btn" class="bg-indigo-600 text-white font-bold px-6 rounded-2xl">Update</button>
                     </div>
                 </div>
-                
                 <div class="pt-4 border-t grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div class="col-span-full text-xs font-black text-amber-500 uppercase">Donate Settings</div>
                     <input type="text" id="set-dname1" placeholder="KPay Name" class="p-4 bg-slate-50 border rounded-2xl">
@@ -164,7 +187,6 @@
                     <button id="update-donate-btn" class="col-span-full bg-amber-500 text-white font-black py-4 rounded-2xl">Save Donate Settings</button>
                 </div>
             </div>
-
             <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm">
                 <h3 class="text-xs font-black text-indigo-500 uppercase mb-4">Server Creation</h3>
                 <input type="hidden" id="edit-id" value="">
@@ -196,7 +218,6 @@
                     <h1 class="text-4xl md:text-5xl font-black italic tracking-tighter uppercase mb-2">JK FREE VPN</h1>
                     <div id="server-clock" class="text-indigo-400 font-mono text-xs font-bold tracking-widest uppercase">...</div>
                 </div>
-                
                 <div class="flex flex-row justify-between gap-4">
                     <div class="stat-card p-4 rounded-3xl text-center">
                         <p class="text-[9px] uppercase font-black text-indigo-300 mb-1">Servers</p>
@@ -225,7 +246,7 @@
         </div>
     </main>
 
-    <!-- Config Modal -->
+    <!-- Config Result Modal -->
     <div id="config-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
         <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-2xl shadow-2xl animate-in">
             <div class="flex justify-between items-center mb-6">
@@ -247,7 +268,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, Timestamp, increment, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, Timestamp, increment, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -268,16 +289,20 @@
 
         let allConfigs = [];
         let currentFilter = 'ALL';
-        let isGenerating = false; // logic: တစ်ခါနှိပ်ရင် တစ်ခါပဲ အလုပ်လုပ်ဖို့
+        let processingData = null;
+        let quizSolution = 0;
+        let isWriting = false;
 
         function showNotify(msg) {
             const n = document.getElementById('notification');
-            n.innerText = msg; n.classList.remove('hidden'); setTimeout(() => n.classList.add('hidden'), 3000);
+            n.innerText = msg; n.classList.remove('hidden'); 
+            setTimeout(() => n.classList.add('hidden'), 3000);
         }
 
         window.toggleModal = (id, show) => {
-            document.getElementById(id).classList.toggle('hidden', !show);
-            if(!show) isGenerating = false; // Modal ပိတ်ရင် flag ပြန်ဖြုတ်မယ်
+            const el = document.getElementById(id);
+            if (show) el.classList.remove('hidden');
+            else el.classList.add('hidden');
         };
 
         window.verifyAdmin = () => {
@@ -307,16 +332,6 @@
         const statsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'global');
         const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'main');
 
-        // Logic: Realtime Reset Check (Midnight Reset)
-        const checkMidnightReset = async (data) => {
-            const today = new Date().toISOString().split('T')[0];
-            if(data.lastResetDay !== today){
-                await updateDoc(statsDoc, { daily: 0, lastResetDay: today });
-                // Note: Server တစ်ခုချင်းစီရဲ့ dailyCount ကို Reset လုပ်ဖို့အတွက် logic
-                // Server တွေ အများကြီးဆိုရင် နှေးနိုင်လို့ user က နှိပ်တဲ့အချိန်မှာပဲ Reset လုပ်တဲ့ logic ကို သုံးထားပါတယ် (အောက်က viewConfig မှာ ကြည့်ပါ)
-            }
-        };
-
         onSnapshot(configsCol, (snap) => {
             allConfigs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
                 .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
@@ -327,7 +342,8 @@
         onSnapshot(statsDoc, (snap) => {
             if(snap.exists()){
                 const data = snap.data();
-                checkMidnightReset(data);
+                const today = new Date().toISOString().split('T')[0];
+                if(data.lastResetDay !== today) updateDoc(statsDoc, { daily: 0, lastResetDay: today });
                 document.getElementById('total-gen-display').innerText = (data.total || 0).toLocaleString();
                 document.getElementById('daily-gen-display').innerText = (data.daily || 0).toLocaleString();
             }
@@ -343,14 +359,6 @@
                 if(d.dname2) document.getElementById('d-name-2').innerText = d.dname2;
                 if(d.dacc2) document.getElementById('d-acc-2').innerText = d.dacc2;
                 if(d.dlogo2) document.getElementById('d-logo-2').src = d.dlogo2;
-
-                document.getElementById('set-marquee').value = d.marquee || "";
-                document.getElementById('set-dname1').value = d.dname1 || "";
-                document.getElementById('set-dacc1').value = d.dacc1 || "";
-                document.getElementById('set-dlogo1').value = d.dlogo1 || "";
-                document.getElementById('set-dname2').value = d.dname2 || "";
-                document.getElementById('set-dacc2').value = d.dacc2 || "";
-                document.getElementById('set-dlogo2').value = d.dlogo2 || "";
             }
         });
 
@@ -380,7 +388,7 @@
                 note: document.getElementById('config-note').value,
                 lastResetDate: new Date().toISOString().split('T')[0]
             };
-            if(!payload.title || !payload.content) return showNotify("Check inputs!");
+            if(!payload.title || !payload.content) return showNotify("Fill title & content!");
             if(id) {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id), payload);
             } else {
@@ -388,7 +396,7 @@
             }
             document.getElementById('edit-id').value = "";
             document.querySelectorAll('#admin-view input, #admin-view textarea').forEach(i => i.value = "");
-            showNotify("Success!");
+            showNotify("Published!");
         };
 
         window.deleteConfig = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id)); };
@@ -406,43 +414,62 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // Logic: View Config & Increment (Fixed)
-        window.viewConfig = async (id, title, content, currentDaily, lastResetDate, expired) => {
-            if (expired) return showNotify("Server Offline / Expired!");
-            if (isGenerating) return; // တစ်ခါနှိပ်ရင် တစ်ခါပဲ လုပ်ဖို့
-            
+        // Generation Workflow
+        window.startGen = (id, title, content, daily, lastDate, expired) => {
+            if (expired) return showNotify("Server Offline!");
             const today = new Date().toISOString().split('T')[0];
-            // Check midnight reset for this specific server
-            const finalDailyCount = (lastResetDate === today) ? currentDaily : 0;
-            
-            if (finalDailyCount >= SERVER_LIMIT) return showNotify("Server is Full!");
+            const actualDaily = (lastDate === today) ? daily : 0;
+            if (actualDaily >= SERVER_LIMIT) return showNotify("Server Full!");
 
-            isGenerating = true; // Lock the button
+            processingData = { id, title, content, actualDaily, today };
+            const n1 = Math.floor(Math.random() * 10) + 1;
+            const n2 = Math.floor(Math.random() * 10) + 1;
+            quizSolution = n1 + n2;
+            document.getElementById('quiz-question').innerText = `${n1} + ${n2} = ?`;
+            document.getElementById('quiz-answer').value = '';
+            toggleModal('quiz-modal', true);
+        };
+
+        document.getElementById('verify-quiz-btn').onclick = async () => {
+            const ans = parseInt(document.getElementById('quiz-answer').value);
+            if (ans !== quizSolution) return showNotify("Wrong Answer!");
+            if (isWriting) return;
+
+            isWriting = true;
+            toggleModal('quiz-modal', false);
 
             try {
-                // Update specific server stats
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id), { 
-                    dailyCount: (lastResetDate === today) ? increment(1) : 1, 
-                    lastResetDate: today 
+                // DB Update
+                const sRef = doc(db, 'artifacts', appId, 'public', 'data', 'configs', processingData.id);
+                await updateDoc(sRef, { 
+                    dailyCount: (processingData.actualDaily >= 0) ? increment(1) : 1,
+                    lastResetDate: processingData.today 
                 });
-                
-                // Update global stats
                 await updateDoc(statsDoc, { total: increment(1), daily: increment(1) });
 
-                // UI display
-                document.getElementById('modal-title').innerText = title;
-                document.getElementById('modal-content').innerText = content;
-                document.getElementById('modal-copy-btn').onclick = () => {
-                    const el = document.createElement('textarea'); 
-                    el.value = content; document.body.appendChild(el);
-                    el.select(); document.execCommand('copy'); 
-                    document.body.removeChild(el); 
-                    showNotify("Config Copied!");
+                // Show Success Message
+                toggleModal('success-modal', true);
+                
+                document.getElementById('show-config-btn').onclick = () => {
+                    toggleModal('success-modal', false);
+                    document.getElementById('modal-title').innerText = processingData.title;
+                    document.getElementById('modal-content').innerText = processingData.content;
+                    document.getElementById('modal-copy-btn').onclick = () => {
+                        const t = document.createElement('textarea');
+                        t.value = processingData.content;
+                        document.body.appendChild(t);
+                        t.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(t);
+                        showNotify("Config Copied!");
+                    };
+                    toggleModal('config-modal', true);
                 };
-                toggleModal('config-modal', true);
-            } catch (err) {
-                console.error(err);
-                isGenerating = false;
+            } catch (e) {
+                console.error(e);
+                showNotify("Error occurred!");
+            } finally {
+                isWriting = false;
             }
         };
 
@@ -457,9 +484,9 @@
             };
         });
 
-        function getFlagEmoji(flag) {
-            if(!flag || flag.length !== 2) return '🌐';
-            return flag.toUpperCase().split('').map(char => String.fromCodePoint(char.charCodeAt(0) + 127397)).join('');
+        function getFlag(f) {
+            if(!f || f.length !== 2) return '🌐';
+            return f.toUpperCase().split('').map(c => String.fromCodePoint(c.charCodeAt(0) + 127397)).join('');
         }
 
         function renderUI() {
@@ -470,34 +497,24 @@
             const filtered = currentFilter === 'ALL' ? allConfigs : allConfigs.filter(c => c.type === currentFilter);
 
             filtered.forEach(item => {
-                // Logic: Daily Count calculation based on date
-                const dailyCount = item.lastResetDate === today ? (item.dailyCount || 0) : 0;
-                const isFull = dailyCount >= SERVER_LIMIT;
-                
-                const now = new Date();
-                now.setHours(0,0,0,0);
-                const expiryDate = item.expire ? new Date(item.expire) : null;
-                if(expiryDate) expiryDate.setHours(0,0,0,0);
-                
-                const isExpired = expiryDate && expiryDate < now;
-                const diffTime = expiryDate ? (expiryDate - now) : null;
-                const diffDays = diffTime !== null ? Math.ceil(diffTime / (1000 * 60 * 60 * 24)) : null;
-
-                let capBadgeClass = 'bg-emerald-100 text-emerald-600';
-                if (isFull) capBadgeClass = 'bg-rose-100 text-rose-600 font-black';
-                else if (dailyCount >= 20) capBadgeClass = 'bg-amber-100 text-amber-600 font-bold';
-                else if (dailyCount >= 1) capBadgeClass = 'bg-indigo-100 text-indigo-600 font-bold';
+                const daily = item.lastResetDate === today ? (item.dailyCount || 0) : 0;
+                const isFull = daily >= SERVER_LIMIT;
+                const now = new Date(); now.setHours(0,0,0,0);
+                const expiry = item.expire ? new Date(item.expire) : null;
+                if(expiry) expiry.setHours(0,0,0,0);
+                const isExpired = expiry && expiry < now;
+                const diff = expiry ? Math.ceil((expiry - now) / 86400000) : null;
 
                 grid.innerHTML += `
                     <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 flex flex-col transition-all ${isExpired ? 'opacity-60 grayscale-[0.5]' : (isFull ? 'border-rose-400' : 'hover:shadow-2xl')} animate-in">
                         <div class="flex items-center gap-4 mb-5">
-                            <div class="flag-circle">${getFlagEmoji(item.flag)}</div>
+                            <div class="flag-circle">${getFlag(item.flag)}</div>
                             <div class="min-w-0 flex-1">
                                 <h3 class="text-[14px] font-black text-slate-900 leading-tight uppercase italic break-words">${item.title}</h3>
                                 <div class="flex items-center gap-2 mt-1">
                                     <span class="${isExpired ? 'dot-offline' : 'dot-online'}"></span>
                                     <p class="text-[9px] font-black uppercase tracking-widest ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">
-                                        ${isExpired ? 'Offline / Expired' : 'Active Online'}
+                                        ${isExpired ? 'Offline' : 'Active'}
                                     </p>
                                 </div>
                             </div>
@@ -509,30 +526,24 @@
                                 <span class="font-bold text-indigo-700 uppercase text-[10px]">${item.sim || 'Universal'}</span>
                             </div>
                             <div class="flex justify-between bg-slate-50 p-2.5 rounded-2xl">
-                                <span class="text-slate-400 font-black uppercase text-[8px]">Expires On:</span> 
-                                <span class="font-black text-[10px] ${isExpired ? 'text-rose-500' : 'text-slate-700'}">
-                                    ${item.expire || 'No Limit'}
-                                </span>
+                                <span class="text-slate-400 font-black uppercase text-[8px]">Expired Date:</span> 
+                                <span class="font-black text-[10px] ${isExpired ? 'text-rose-500' : 'text-slate-700'}">${item.expire || 'No Limit'}</span>
                             </div>
                             <div class="flex justify-between bg-slate-50 p-2.5 rounded-2xl">
-                                <span class="text-slate-400 font-black uppercase text-[8px]">Status:</span> 
-                                <span class="font-black text-[10px] ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">
-                                    ${isExpired ? 'EXPIRED' : (diffDays !== null ? diffDays + ' Days Left' : 'LIFE TIME')}
-                                </span>
+                                <span class="text-slate-400 font-black uppercase text-[8px]">Days Left:</span> 
+                                <span class="font-black text-[10px] ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">${isExpired ? 'EXPIRED' : (diff !== null ? diff + ' Days' : 'LIFE TIME')}</span>
                             </div>
                             <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-2xl">
                                 <span class="text-slate-400 font-black uppercase text-[8px]">Capacity:</span> 
-                                <span class="px-3 py-1 rounded-full text-[10px] ${capBadgeClass}">
-                                    ${dailyCount} / ${SERVER_LIMIT}
-                                </span>
+                                <span class="px-3 py-1 rounded-full text-[10px] ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}">${daily} / ${SERVER_LIMIT}</span>
                             </div>
                             <div class="bg-amber-50 p-2.5 rounded-2xl text-amber-700 italic text-[9px] break-words border border-amber-100">
                                 <i class="fas fa-info-circle mr-1"></i> ${item.note || 'High Speed Connection'}
                             </div>
                         </div>
-                        <button onclick="viewConfig('${item.id}', '${item.title}', '${item.content}', ${dailyCount}, '${item.lastResetDate}', ${isExpired})" 
-                                class="w-full py-4 ${isExpired ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : (isFull ? 'bg-rose-500 text-white shadow-rose-200' : 'bg-slate-900 text-white hover:bg-indigo-600')} rounded-[1.5rem] font-black text-[11px] transition shadow-lg active:scale-95">
-                            ${isExpired ? 'SERVER OFFLINE' : (isFull ? 'SERVER IS FULL' : 'GENERATE CONFIG')}
+                        <button onclick="startGen('${item.id}', '${item.title}', '${item.content}', ${item.dailyCount || 0}, '${item.lastResetDate}', ${isExpired})" 
+                                class="w-full py-4 ${isExpired ? 'bg-slate-200 text-slate-400' : (isFull ? 'bg-rose-500 text-white' : 'bg-slate-900 text-white')} rounded-[1.5rem] font-black text-[11px] transition shadow-lg active:scale-95">
+                            ${isExpired ? 'OFFLINE' : (isFull ? 'FULL' : 'GENERATE CONFIG')}
                         </button>
                     </div>
                 `;
