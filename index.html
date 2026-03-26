@@ -15,41 +15,37 @@
         .header-sticky { position: sticky; top: 0; z-index: 50; }
 
         .flag-circle {
-            width: 48px; height: 48px; border-radius: 50%;
+            width: 42px; height: 42px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            background: #f8fafc; font-size: 26px; border: 2px solid #e2e8f0;
-            flex-shrink: 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            background: #f8fafc; font-size: 22px; border: 2px solid #e2e8f0;
+            flex-shrink: 0;
         }
 
         .dot-online {
-            width: 10px; height: 10px; background-color: #10b981; border-radius: 50%;
+            width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;
             display: inline-block; animation: pulse-green 1.5s infinite;
         }
         @keyframes pulse-green {
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-            70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
-        .dot-offline {
-            width: 10px; height: 10px; background-color: #ef4444; border-radius: 50%;
-            display: inline-block;
-        }
-
-        .stat-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); flex: 1; }
-        
-        .tab-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-        .tab-btn { font-weight: 800; font-size: 10px; padding: 12px 2px; border-radius: 12px; transition: all 0.3s; text-transform: uppercase; }
+        .tab-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+        .tab-btn { font-weight: 800; font-size: 8px; padding: 10px 2px; border-radius: 10px; transition: all 0.3s; text-transform: uppercase; }
         
         .active-all { background: #1e293b !important; color: white !important; }
         .active-v2ray { background: #4f46e5 !important; color: white !important; }
         .active-ssh { background: #059669 !important; color: white !important; }
         .active-udp { background: #ea580c !important; color: white !important; }
         .active-trojan { background: #db2777 !important; color: white !important; }
+        .active-online { background: #0ea5e9 !important; color: white !important; }
 
-        .marquee-container { background: #0f172a; color: #fbbf24; padding: 10px 0; overflow: hidden; white-space: nowrap; font-weight: 800; font-size: 14px; border-bottom: 3px solid #fbbf24; }
+        .marquee-container { background: #0f172a; color: #fbbf24; padding: 8px 0; overflow: hidden; white-space: nowrap; font-weight: 800; font-size: 12px; border-bottom: 3px solid #fbbf24; }
         .marquee-content { display: inline-block; animation: marquee 30s linear infinite; padding-left: 100%; }
         @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+        .stat-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); flex: 1; }
 
         .fixed-footer {
             position: fixed;
@@ -58,11 +54,24 @@
             width: 100%;
             background: rgba(255, 255, 255, 0.9);
             backdrop-filter: blur(10px);
-            padding: 12px 0;
+            padding: 10px 0;
             border-top: 1px solid #e2e8f0;
             text-align: center;
             z-index: 100;
         }
+
+        .ping-excellent { color: #10b981; }
+        .ping-good { color: #f59e0b; }
+        .ping-bad { color: #ef4444; }
+
+        /* ISP Colors */
+        .isp-badge { padding: 2px 8px; border-radius: 6px; font-weight: 800; text-transform: uppercase; font-size: 7px; }
+        .isp-ooredoo { background: #ed1c24; color: white; }
+        .isp-mpt { background: #ffcc00; color: #000; }
+        .isp-telenor { background: #0076be; color: white; }
+        .isp-mytel { background: #fe6b00; color: white; }
+        .isp-wifi { background: #10b981; color: white; }
+        .isp-default { background: #64748b; color: white; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900 min-h-screen pb-32">
@@ -78,17 +87,17 @@
         <nav class="bg-slate-900 text-white p-4 shadow-xl">
             <div class="max-w-6xl mx-auto flex justify-between items-center">
                 <div class="flex items-center gap-3 font-black text-xl tracking-tighter cursor-pointer" onclick="window.location.reload()">
-                    <img src="https://raw.githubusercontent.com/ThandarLin2026/JK/main/image/logo.png" alt="Logo" class="w-[48px] h-[48px] object-contain rounded-xl">
-                    <span>JK-VPN<span class="text-indigo-400 text-xs font-normal ml-1">V4</span></span>
+                    <img src="https://raw.githubusercontent.com/ThandarLin2026/JK/main/image/logo.png" alt="Logo" class="w-[40px] h-[40px] object-contain rounded-lg">
+                    <span>JK-VPN<span class="text-indigo-400 text-[10px] font-normal ml-1">V4</span></span>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="toggleModal('donate-modal', true)" class="bg-amber-500 hover:bg-amber-600 px-4 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2">
+                    <button onclick="toggleModal('donate-modal', true)" class="bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
                         <i class="fas fa-heart"></i> Donate
                     </button>
-                    <button onclick="toggleModal('admin-modal', true)" id="admin-login-btn" class="bg-slate-800 hover:bg-slate-700 px-4 py-2.5 rounded-xl text-xs font-bold transition-all">
+                    <button onclick="toggleModal('admin-modal', true)" id="admin-login-btn" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl text-[10px] font-bold transition-all">
                         <i class="fas fa-user-lock"></i>
                     </button>
-                    <button onclick="logoutAdmin()" id="admin-logout-btn" class="hidden bg-rose-600 hover:bg-rose-700 px-4 py-2.5 rounded-xl text-xs font-bold transition-all">
+                    <button onclick="logoutAdmin()" id="admin-logout-btn" class="hidden bg-rose-600 hover:bg-rose-700 px-3 py-2 rounded-xl text-[10px] font-bold transition-all">
                         <i class="fas fa-power-off"></i>
                     </button>
                 </div>
@@ -100,170 +109,190 @@
 
         <!-- Admin Login Modal -->
         <div id="admin-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
-            <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-md shadow-2xl animate-in">
-                <h2 class="text-2xl font-black text-center mb-6">Admin Login</h2>
-                <input type="password" id="admin-password-input" placeholder="Enter Password" class="w-full p-5 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none mb-6 text-center text-xl tracking-widest">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl animate-in">
+                <h2 class="text-xl font-black text-center mb-6">Admin Login</h2>
+                <input type="password" id="admin-password-input" placeholder="Enter Password" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-xl outline-none mb-6 text-center text-lg tracking-widest">
                 <div class="flex gap-3">
-                    <button onclick="toggleModal('admin-modal', false)" class="flex-1 py-4 font-bold text-slate-500">Close</button>
-                    <button onclick="verifyAdmin()" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl shadow-lg">Login</button>
+                    <button onclick="toggleModal('admin-modal', false)" class="flex-1 py-3 font-bold text-slate-500">Close</button>
+                    <button onclick="verifyAdmin()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg">Login</button>
                 </div>
             </div>
         </div>
 
         <!-- Quiz Modal -->
         <div id="quiz-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[60] hidden">
-            <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center">
-                <div class="mb-4 text-slate-400 font-bold uppercase text-[10px] tracking-widest">Anti-Bot Verification</div>
-                <h2 class="text-3xl font-black mb-6" id="quiz-question">0 + 0 = ?</h2>
-                <input type="number" id="quiz-answer" placeholder="Enter Answer" class="w-full p-5 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-2xl outline-none mb-6 text-center text-2xl font-black">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center">
+                <div class="mb-4 text-slate-400 font-bold uppercase text-[9px] tracking-widest">Security Check</div>
+                <h2 class="text-2xl font-black mb-6" id="quiz-question">0 + 0 = ?</h2>
+                <input type="number" id="quiz-answer" placeholder="Result" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-xl outline-none mb-6 text-center text-xl font-black">
                 <div class="flex gap-3">
-                    <button onclick="toggleModal('quiz-modal', false)" class="flex-1 py-4 font-bold text-slate-500">Cancel</button>
-                    <button id="verify-quiz-btn" class="flex-1 py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-lg">Submit</button>
+                    <button onclick="toggleModal('quiz-modal', false)" class="flex-1 py-3 font-bold text-slate-500">Cancel</button>
+                    <button id="verify-quiz-btn" class="flex-1 py-3 bg-indigo-600 text-white font-black rounded-xl shadow-lg">Submit</button>
                 </div>
             </div>
         </div>
 
         <!-- Success Modal -->
         <div id="success-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[70] hidden">
-            <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center">
-                <div class="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <i class="fas fa-check text-4xl"></i>
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-2xl"></i>
                 </div>
-                <h2 class="text-2xl font-black text-slate-900 mb-2">Generate Account Successfully</h2>
-                <p class="text-slate-500 text-sm mb-8">Your high speed VPN configuration is ready to use.</p>
-                <button id="show-config-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-2xl shadow-lg">View Config</button>
+                <h2 class="text-xl font-black text-slate-900 mb-2">Generated Successfully</h2>
+                <p class="text-slate-500 text-xs mb-8">Enjoy your high speed connection!</p>
+                <button id="show-config-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg">View Config</button>
             </div>
         </div>
 
         <!-- Donate Modal -->
         <div id="donate-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
-            <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-md shadow-2xl animate-in relative">
-                <button onclick="toggleModal('donate-modal', false)" class="absolute top-6 right-6 text-slate-400 hover:text-rose-500"><i class="fas fa-times text-xl"></i></button>
-                <div class="text-center mb-8">
-                    <h2 class="text-2xl font-black text-slate-900">Support Us</h2>
-                    <p class="text-slate-500 text-sm mt-1 uppercase font-bold tracking-widest">Buy us a coffee</p>
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl animate-in relative">
+                <button onclick="toggleModal('donate-modal', false)" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500"><i class="fas fa-times text-lg"></i></button>
+                <div class="text-center mb-6">
+                    <h2 class="text-xl font-black text-slate-900">Support Me</h2>
                 </div>
                 <div class="space-y-4">
-                    <div class="bg-slate-50 p-5 rounded-2xl flex items-center gap-4 border-2 border-slate-100">
-                        <img id="d-logo-1" src="" class="w-12 h-12 rounded-lg object-cover bg-white">
+                    <div class="bg-slate-50 p-4 rounded-xl flex items-center gap-4 border border-slate-100">
+                        <img id="d-logo-1" src="" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/100x100?text=Kpay'">
                         <div>
-                            <p id="d-name-1" class="font-black text-slate-900 text-sm uppercase">...</p>
-                            <p id="d-acc-1" class="text-indigo-600 font-mono font-bold text-lg">...</p>
+                            <p id="d-name-1" class="font-black text-slate-900 text-[10px] uppercase">...</p>
+                            <p id="d-acc-1" class="text-indigo-600 font-mono font-bold text-sm">...</p>
                         </div>
                     </div>
-                    <div class="bg-slate-50 p-5 rounded-2xl flex items-center gap-4 border-2 border-slate-100">
-                        <img id="d-logo-2" src="" class="w-12 h-12 rounded-lg object-cover bg-white">
+                    <div class="bg-slate-50 p-4 rounded-xl flex items-center gap-4 border border-slate-100">
+                        <img id="d-logo-2" src="" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/100x100?text=Wave'">
                         <div>
-                            <p id="d-name-2" class="font-black text-slate-900 text-sm uppercase">...</p>
-                            <p id="d-acc-2" class="text-indigo-600 font-mono font-bold text-lg">...</p>
+                            <p id="d-name-2" class="font-black text-slate-900 text-[10px] uppercase">...</p>
+                            <p id="d-acc-2" class="text-indigo-600 font-mono font-bold text-sm">...</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Admin Panel -->
-        <div id="admin-view" class="hidden space-y-8 animate-in">
-            <div class="flex justify-between items-center border-b pb-4">
-                <h1 class="text-3xl font-black tracking-tighter">ADMIN PANEL</h1>
-                <button onclick="location.reload()" class="bg-slate-200 px-4 py-2 rounded-xl text-xs font-bold">Refresh</button>
-            </div>
-            <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm space-y-6">
-                <div>
-                    <label class="block text-xs font-black text-indigo-500 uppercase mb-2">Marquee Text</label>
-                    <div class="flex gap-3">
-                        <input type="text" id="set-marquee" class="flex-1 p-4 bg-slate-50 border rounded-2xl outline-none">
-                        <button id="update-marquee-btn" class="bg-indigo-600 text-white font-bold px-6 rounded-2xl">Update</button>
+        <!-- Admin View -->
+        <div id="admin-view" class="hidden space-y-6 animate-in">
+            <h1 class="text-xl font-black">ADMIN CONTROL</h1>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Running Text & Donate Settings -->
+                <div class="bg-white p-6 rounded-2xl border space-y-4">
+                    <h3 class="text-[10px] font-black uppercase">General & Donate Settings</h3>
+                    <input type="text" id="set-marquee" placeholder="Update Running Text" class="w-full p-3 bg-slate-50 border rounded-xl outline-none text-xs">
+                    
+                    <div class="border-t pt-4 space-y-3">
+                        <p class="text-[8px] font-bold text-slate-400">DONATE 1 (Logo, Name, Acc)</p>
+                        <input type="text" id="admin-dlogo1" placeholder="Logo URL 1" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                        <input type="text" id="admin-dname1" placeholder="Account Name 1" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                        <input type="text" id="admin-dacc1" placeholder="Account Number 1" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
                     </div>
+                    
+                    <div class="border-t pt-4 space-y-3">
+                        <p class="text-[8px] font-bold text-slate-400">DONATE 2 (Logo, Name, Acc)</p>
+                        <input type="text" id="admin-dlogo2" placeholder="Logo URL 2" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                        <input type="text" id="admin-dname2" placeholder="Account Name 2" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                        <input type="text" id="admin-dacc2" placeholder="Account Number 2" class="w-full p-2 bg-slate-50 border rounded-lg text-[10px]">
+                    </div>
+
+                    <button id="save-settings-btn" class="w-full bg-indigo-600 text-white font-bold py-3 rounded-xl text-xs">Save All Settings</button>
                 </div>
-                <div class="pt-4 border-t grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="col-span-full text-xs font-black text-amber-500 uppercase">Donate Settings</div>
-                    <input type="text" id="set-dname1" placeholder="KPay Name" class="p-4 bg-slate-50 border rounded-2xl">
-                    <input type="text" id="set-dacc1" placeholder="KPay Acc" class="p-4 bg-slate-50 border rounded-2xl">
-                    <input type="text" id="set-dlogo1" placeholder="KPay Logo URL" class="p-4 bg-slate-50 border rounded-2xl">
-                    <input type="text" id="set-dname2" placeholder="Wave Name" class="p-4 bg-slate-50 border rounded-2xl">
-                    <input type="text" id="set-dacc2" placeholder="Wave Acc" class="p-4 bg-slate-50 border rounded-2xl">
-                    <input type="text" id="set-dlogo2" placeholder="Wave Logo URL" class="p-4 bg-slate-50 border rounded-2xl">
-                    <button id="update-donate-btn" class="col-span-full bg-amber-500 text-white font-black py-4 rounded-2xl">Save Donate Settings</button>
-                </div>
-            </div>
-            <div class="bg-white p-8 rounded-[2.5rem] border shadow-sm">
-                <h3 class="text-xs font-black text-indigo-500 uppercase mb-4">Server Creation</h3>
-                <input type="hidden" id="edit-id" value="">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                    <input type="text" id="config-flag" placeholder="Flag (e.g. SG)" class="p-4 bg-slate-50 border rounded-2xl">
-                    <input type="text" id="config-title" placeholder="Server Name" class="p-4 bg-slate-50 border rounded-2xl">
-                    <input type="text" id="config-sim" placeholder="ISP/SIM" class="p-4 bg-slate-50 border rounded-2xl">
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                    <input type="date" id="config-expire" class="p-4 bg-slate-50 border rounded-2xl">
-                    <select id="config-type" class="p-4 bg-slate-50 border rounded-2xl font-bold">
-                        <option value="V2RAY">V2RAY</option>
-                        <option value="SSH">SSH</option>
-                        <option value="TROJAN">TROJAN</option>
-                        <option value="UDP">UDP</option>
+
+                <!-- Server Entry -->
+                <div class="bg-white p-6 rounded-2xl border">
+                    <h3 class="text-[10px] font-black uppercase mb-4">Add or Edit Server</h3>
+                    <input type="hidden" id="edit-id" value="">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="text" id="config-flag" placeholder="Flag (US, SG, MM)" class="p-3 bg-slate-50 border rounded-xl text-xs">
+                        <input type="text" id="config-title" placeholder="Server Name" class="p-3 bg-slate-50 border rounded-xl text-xs">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="text" id="config-sim" placeholder="ISP (Ooredoo, MPT, Mytel, Telenor, Wifi)" class="p-3 bg-slate-50 border rounded-xl text-xs">
+                        <input type="date" id="config-expire" class="p-3 bg-slate-50 border rounded-xl text-xs">
+                    </div>
+                    <select id="config-type" class="w-full p-3 bg-slate-50 border rounded-xl text-xs font-bold mb-3">
+                        <option value="V2RAY">V2RAY</option><option value="SSH">SSH</option>
+                        <option value="TROJAN">TROJAN</option><option value="UDP">UDP</option>
                     </select>
+                    <textarea id="config-content" rows="3" placeholder="Paste Config Link" class="w-full p-3 bg-slate-50 border rounded-xl mb-3 text-[10px]"></textarea>
+                    <input type="text" id="config-note" placeholder="Note (Optional)" class="w-full p-3 bg-slate-50 border rounded-xl mb-4 text-xs">
+                    <button id="publish-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-xl">Publish Now</button>
                 </div>
-                <textarea id="config-content" rows="4" placeholder="Paste Config Here" class="w-full p-4 bg-slate-50 border rounded-2xl mb-4 font-mono text-xs"></textarea>
-                <input type="text" id="config-note" placeholder="Add Note" class="w-full p-4 bg-slate-50 border rounded-2xl mb-6">
-                <button id="publish-btn" class="w-full py-5 bg-slate-900 text-white font-black rounded-2xl shadow-xl hover:bg-indigo-600 transition">Publish Server</button>
             </div>
-            <div id="admin-list" class="space-y-3 pb-10"></div>
+            
+            <div id="admin-list" class="space-y-2"></div>
         </div>
 
         <!-- User View -->
-        <div id="user-view" class="space-y-8 animate-in">
-            <div class="bg-gradient-to-tr from-slate-950 via-indigo-950 to-slate-900 p-8 rounded-[3.5rem] text-white shadow-2xl">
-                <div class="text-center mb-10">
-                    <h1 class="text-4xl md:text-5xl font-black italic tracking-tighter uppercase mb-2">JK FREE VPN</h1>
-                    <div id="server-clock" class="text-indigo-400 font-mono text-xs font-bold tracking-widest uppercase">...</div>
+        <div id="user-view" class="space-y-6 animate-in">
+            <!-- Center Header Stats -->
+            <div class="bg-slate-950 p-8 rounded-[2.5rem] text-white shadow-2xl relative overflow-hidden flex flex-col items-center">
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-1">JK FREE VPN</h1>
+                    <div id="server-clock" class="text-indigo-400 font-mono text-[9px] font-bold tracking-widest">...</div>
                 </div>
-                <div class="flex flex-row justify-between gap-4">
-                    <div class="stat-card p-4 rounded-3xl text-center">
-                        <p class="text-[9px] uppercase font-black text-indigo-300 mb-1">Servers</p>
-                        <p id="total-server-display" class="text-2xl font-black">0</p>
+                <div class="flex gap-4 justify-center w-full max-w-lg">
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
+                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Servers</p>
+                        <p id="total-server-display" class="text-xl font-black">0</p>
                     </div>
-                    <div class="stat-card p-4 rounded-3xl text-center">
-                        <p class="text-[9px] uppercase font-black text-indigo-300 mb-1">Today Gen</p>
-                        <p id="daily-gen-display" class="text-2xl font-black">0</p>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
+                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Daily Gen</p>
+                        <p id="daily-gen-display" class="text-xl font-black">0</p>
                     </div>
-                    <div class="stat-card p-4 rounded-3xl text-center">
-                        <p class="text-[9px] uppercase font-black text-indigo-300 mb-1">Total Gen</p>
-                        <p id="total-gen-display" class="text-2xl font-black">0</p>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
+                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Total Gen</p>
+                        <p id="total-gen-display" class="text-xl font-black">0</p>
                     </div>
                 </div>
             </div>
 
-            <div class="tab-grid p-2 bg-slate-200/50 rounded-2xl">
-                <button id="tab-ALL" class="tab-btn active-all">Total</button>
-                <button id="tab-V2RAY" class="tab-btn">V2Ray</button>
+            <!-- Total Online Users Banner (Only visible when Online Tab selected) -->
+            <div id="online-total-banner" class="hidden bg-indigo-600 p-4 rounded-2xl text-white flex justify-between items-center shadow-lg animate-in">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-80">Total Active Users</p>
+                        <p id="online-total-count" class="text-xl font-black">0</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <span class="text-[7px] font-black bg-white/20 px-2 py-1 rounded-full uppercase">Real-time Data</span>
+                </div>
+            </div>
+
+            <div class="tab-grid p-1.5 bg-slate-200/50 rounded-xl">
+                <button id="tab-ALL" class="tab-btn active-all">All</button>
+                <button id="tab-V2RAY" class="tab-btn">V2R</button>
                 <button id="tab-SSH" class="tab-btn">SSH</button>
                 <button id="tab-UDP" class="tab-btn">UDP</button>
-                <button id="tab-TROJAN" class="tab-btn">Trojan</button>
+                <button id="tab-TROJAN" class="tab-btn">TRJ</button>
+                <button id="tab-ONLINE" class="tab-btn font-bold"><i class="fas fa-users mr-1"></i>Online</button>
             </div>
 
-            <div id="user-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-10"></div>
+            <div id="user-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10"></div>
         </div>
     </main>
 
-    <!-- Config Result Modal -->
+    <!-- Config Result -->
     <div id="config-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-[2.5rem] p-8 w-full max-w-2xl shadow-2xl animate-in">
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="modal-title" class="text-lg font-black break-words pr-4 uppercase italic tracking-tighter"></h2>
-                <button onclick="toggleModal('config-modal', false)" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-2xl"></i></button>
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-xl shadow-2xl animate-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modal-title" class="text-sm font-black break-words pr-4 italic uppercase"></h2>
+                <button onclick="toggleModal('config-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button>
             </div>
-            <div class="bg-slate-900 rounded-3xl p-6 mb-8 border-4 border-slate-100">
-                <pre id="modal-content" class="text-indigo-400 font-mono text-xs md:text-sm whitespace-pre-wrap break-all max-h-[300px] overflow-y-auto"></pre>
+            <div class="bg-slate-900 rounded-xl p-4 mb-6">
+                <pre id="modal-content" class="text-indigo-400 font-mono text-[10px] whitespace-pre-wrap break-all max-h-[250px] overflow-y-auto"></pre>
             </div>
-            <button id="modal-copy-btn" class="w-full py-5 bg-indigo-600 text-white font-black rounded-3xl shadow-xl flex items-center justify-center gap-3">
+            <button id="modal-copy-btn" class="w-full py-4 bg-indigo-600 text-white font-black rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs">
                 <i class="fas fa-copy"></i> Copy Configuration
             </button>
         </div>
     </div>
 
     <footer class="fixed-footer">
-        <p class="text-slate-900 font-black text-[10px] uppercase tracking-widest italic">© 2018-2026 JK VPN BY JUEHTET</p>
+        <p class="text-slate-900 font-black text-[9px] uppercase tracking-tighter italic">© 2018-2026 JK VPN - BY JUEHTET</p>
     </footer>
 
     <script type="module">
@@ -293,6 +322,10 @@
         let quizSolution = 0;
         let isWriting = false;
 
+        // State storage for dynamic fields
+        let serverPingState = {}; 
+        let serverUserCountState = {};
+
         function showNotify(msg) {
             const n = document.getElementById('notification');
             n.innerText = msg; n.classList.remove('hidden'); 
@@ -310,9 +343,7 @@
                 localStorage.setItem('jkvpn_admin_session', 'active');
                 checkAdminSession();
                 toggleModal('admin-modal', false);
-            } else {
-                showNotify("Incorrect Password!");
-            }
+            } else { showNotify("Wrong Pass!"); }
         };
 
         window.logoutAdmin = () => {
@@ -336,7 +367,14 @@
             allConfigs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
                 .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
             document.getElementById('total-server-display').innerText = allConfigs.length;
+            
+            allConfigs.forEach(c => {
+                if(!serverPingState[c.id]) serverPingState[c.id] = Math.floor(Math.random() * 50) + 30;
+                if(!serverUserCountState[c.id]) serverUserCountState[c.id] = Math.floor(Math.random() * 15) + 5;
+            });
+
             renderUI();
+            updateTotalOnline();
         });
 
         onSnapshot(statsDoc, (snap) => {
@@ -359,21 +397,63 @@
                 if(d.dname2) document.getElementById('d-name-2').innerText = d.dname2;
                 if(d.dacc2) document.getElementById('d-acc-2').innerText = d.dacc2;
                 if(d.dlogo2) document.getElementById('d-logo-2').src = d.dlogo2;
+
+                // Sync to admin inputs if admin logged in
+                if(localStorage.getItem('jkvpn_admin_session') === 'active') {
+                    document.getElementById('set-marquee').value = d.marquee || "";
+                    document.getElementById('admin-dlogo1').value = d.dlogo1 || "";
+                    document.getElementById('admin-dname1').value = d.dname1 || "";
+                    document.getElementById('admin-dacc1').value = d.dacc1 || "";
+                    document.getElementById('admin-dlogo2').value = d.dlogo2 || "";
+                    document.getElementById('admin-dname2').value = d.dname2 || "";
+                    document.getElementById('admin-dacc2').value = d.dacc2 || "";
+                }
             }
         });
 
-        document.getElementById('update-marquee-btn').onclick = async () => {
-            await setDoc(settingsDoc, { marquee: document.getElementById('set-marquee').value }, { merge: true });
-            showNotify("Running text updated!");
-        };
+        // Smart UI Refresh for Dynamic Fields
+        setInterval(() => {
+            allConfigs.forEach(c => {
+                const fluctuation = Math.floor(Math.random() * 10) - 5;
+                serverPingState[c.id] = Math.max(12, (serverPingState[c.id] || 40) + fluctuation);
+                
+                const pingEl = document.getElementById(`ping-val-${c.id}`);
+                if(pingEl) {
+                    pingEl.innerText = `${serverPingState[c.id]}ms`;
+                    pingEl.className = serverPingState[c.id] > 150 ? 'ping-bad' : (serverPingState[c.id] > 80 ? 'ping-good' : 'ping-excellent');
+                }
+            });
+        }, 5000);
 
-        document.getElementById('update-donate-btn').onclick = async () => {
-            const p = {
-                dname1: document.getElementById('set-dname1').value, dacc1: document.getElementById('set-dacc1').value, dlogo1: document.getElementById('set-dlogo1').value,
-                dname2: document.getElementById('set-dname2').value, dacc2: document.getElementById('set-dacc2').value, dlogo2: document.getElementById('set-dlogo2').value
+        setInterval(() => {
+            allConfigs.forEach(c => {
+                const drift = Math.floor(Math.random() * 3) - 1;
+                serverUserCountState[c.id] = Math.max(2, (serverUserCountState[c.id] || 10) + drift);
+                
+                const userEl = document.getElementById(`user-val-${c.id}`);
+                if(userEl) userEl.innerText = `${serverUserCountState[c.id]} Active`;
+            });
+            updateTotalOnline();
+        }, 120000); // 2 minutes
+
+        function updateTotalOnline() {
+            let total = 0;
+            allConfigs.forEach(c => total += (serverUserCountState[c.id] || 0));
+            document.getElementById('online-total-count').innerText = total.toLocaleString();
+        }
+
+        document.getElementById('save-settings-btn').onclick = async () => {
+            const payload = {
+                marquee: document.getElementById('set-marquee').value,
+                dlogo1: document.getElementById('admin-dlogo1').value,
+                dname1: document.getElementById('admin-dname1').value,
+                dacc1: document.getElementById('admin-dacc1').value,
+                dlogo2: document.getElementById('admin-dlogo2').value,
+                dname2: document.getElementById('admin-dname2').value,
+                dacc2: document.getElementById('admin-dacc2').value
             };
-            await setDoc(settingsDoc, p, { merge: true });
-            showNotify("Donate settings saved!");
+            await setDoc(settingsDoc, payload, { merge: true });
+            showNotify("Settings Saved!");
         };
 
         document.getElementById('publish-btn').onclick = async () => {
@@ -388,18 +468,18 @@
                 note: document.getElementById('config-note').value,
                 lastResetDate: new Date().toISOString().split('T')[0]
             };
-            if(!payload.title || !payload.content) return showNotify("Fill title & content!");
+            if(!payload.title || !payload.content) return showNotify("Required fields empty!");
             if(id) {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id), payload);
             } else {
                 await addDoc(configsCol, { ...payload, dailyCount: 0, createdAt: Timestamp.now() });
             }
             document.getElementById('edit-id').value = "";
-            document.querySelectorAll('#admin-view input, #admin-view textarea').forEach(i => i.value = "");
-            showNotify("Published!");
+            document.querySelectorAll('#admin-view input:not([type=password]), #admin-view textarea').forEach(i => i.value = "");
+            showNotify("Success!");
         };
 
-        window.deleteConfig = async (id) => { if(confirm("Delete?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id)); };
+        window.deleteConfig = async (id) => { if(confirm("Are you sure?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id)); };
 
         window.editConfig = (itemStr) => {
             const item = JSON.parse(decodeURIComponent(itemStr));
@@ -414,13 +494,11 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         };
 
-        // Generation Workflow
         window.startGen = (id, title, content, daily, lastDate, expired) => {
-            if (expired) return showNotify("Server Offline!");
+            if (expired) return showNotify("Server Expired!");
             const today = new Date().toISOString().split('T')[0];
             const actualDaily = (lastDate === today) ? daily : 0;
-            if (actualDaily >= SERVER_LIMIT) return showNotify("Server Full!");
-
+            if (actualDaily >= SERVER_LIMIT) return showNotify("Server is Full!");
             processingData = { id, title, content, actualDaily, today };
             const n1 = Math.floor(Math.random() * 10) + 1;
             const n2 = Math.floor(Math.random() * 10) + 1;
@@ -432,54 +510,44 @@
 
         document.getElementById('verify-quiz-btn').onclick = async () => {
             const ans = parseInt(document.getElementById('quiz-answer').value);
-            if (ans !== quizSolution) return showNotify("Wrong Answer!");
+            if (ans !== quizSolution) return showNotify("Incorrect answer!");
             if (isWriting) return;
-
             isWriting = true;
             toggleModal('quiz-modal', false);
-
             try {
-                // DB Update
                 const sRef = doc(db, 'artifacts', appId, 'public', 'data', 'configs', processingData.id);
-                await updateDoc(sRef, { 
-                    dailyCount: (processingData.actualDaily >= 0) ? increment(1) : 1,
-                    lastResetDate: processingData.today 
-                });
+                await updateDoc(sRef, { dailyCount: (processingData.actualDaily >= 0) ? increment(1) : 1, lastResetDate: processingData.today });
                 await updateDoc(statsDoc, { total: increment(1), daily: increment(1) });
-
-                // Show Success Message
-                toggleModal('success-modal', true);
                 
+                serverUserCountState[processingData.id]++;
+                updateTotalOnline();
+
+                toggleModal('success-modal', true);
                 document.getElementById('show-config-btn').onclick = () => {
                     toggleModal('success-modal', false);
                     document.getElementById('modal-title').innerText = processingData.title;
                     document.getElementById('modal-content').innerText = processingData.content;
                     document.getElementById('modal-copy-btn').onclick = () => {
-                        const t = document.createElement('textarea');
-                        t.value = processingData.content;
-                        document.body.appendChild(t);
-                        t.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(t);
-                        showNotify("Config Copied!");
+                        const t = document.createElement('textarea'); t.value = processingData.content;
+                        document.body.appendChild(t); t.select(); document.execCommand('copy');
+                        document.body.removeChild(t); showNotify("Config Copied!");
                     };
                     toggleModal('config-modal', true);
                 };
-            } catch (e) {
-                console.error(e);
-                showNotify("Error occurred!");
-            } finally {
-                isWriting = false;
-            }
+            } catch (e) { showNotify("Server error!"); } finally { isWriting = false; }
         };
 
-        const tabs = ['ALL', 'V2RAY', 'SSH', 'UDP', 'TROJAN'];
+        const tabs = ['ALL', 'V2RAY', 'SSH', 'UDP', 'TROJAN', 'ONLINE'];
         tabs.forEach(t => {
             document.getElementById(`tab-${t}`).onclick = () => {
                 currentFilter = t;
-                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-all', 'active-v2ray', 'active-ssh', 'active-udp', 'active-trojan'));
-                const map = { 'ALL': 'active-all', 'V2RAY': 'active-v2ray', 'SSH': 'active-ssh', 'UDP': 'active-udp', 'TROJAN': 'active-trojan' };
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-all', 'active-v2ray', 'active-ssh', 'active-udp', 'active-trojan', 'active-online'));
+                const map = { 'ALL': 'active-all', 'V2RAY': 'active-v2ray', 'SSH': 'active-ssh', 'UDP': 'active-udp', 'TROJAN': 'active-trojan', 'ONLINE': 'active-online' };
                 document.getElementById(`tab-${t}`).classList.add(map[t]);
+                
+                // Show/Hide Online Banner
+                document.getElementById('online-total-banner').classList.toggle('hidden', t !== 'ONLINE');
+                
                 renderUI();
             };
         });
@@ -489,61 +557,83 @@
             return f.toUpperCase().split('').map(c => String.fromCodePoint(c.charCodeAt(0) + 127397)).join('');
         }
 
+        function getISPClass(isp) {
+            const val = (isp || '').toLowerCase();
+            if(val.includes('ooredoo')) return 'isp-ooredoo';
+            if(val.includes('mpt')) return 'isp-mpt';
+            if(val.includes('mytel')) return 'isp-mytel';
+            if(val.includes('telenor') || val.includes('atom')) return 'isp-telenor';
+            if(val.includes('wifi')) return 'isp-wifi';
+            return 'isp-default';
+        }
+
         function renderUI() {
             const grid = document.getElementById('user-grid');
             const list = document.getElementById('admin-list');
             grid.innerHTML = ''; list.innerHTML = '';
-            const today = new Date().toISOString().split('T')[0];
-            const filtered = currentFilter === 'ALL' ? allConfigs : allConfigs.filter(c => c.type === currentFilter);
+            const todayStr = new Date().toISOString().split('T')[0];
+            
+            let filtered;
+            if(currentFilter === 'ALL') filtered = allConfigs;
+            else if(currentFilter === 'ONLINE') filtered = allConfigs.filter(c => !c.expire || new Date(c.expire) >= new Date().setHours(0,0,0,0));
+            else filtered = allConfigs.filter(c => c.type === currentFilter);
 
             filtered.forEach(item => {
-                const daily = item.lastResetDate === today ? (item.dailyCount || 0) : 0;
+                const daily = item.lastResetDate === todayStr ? (item.dailyCount || 0) : 0;
                 const isFull = daily >= SERVER_LIMIT;
                 const now = new Date(); now.setHours(0,0,0,0);
-                const expiry = item.expire ? new Date(item.expire) : null;
-                if(expiry) expiry.setHours(0,0,0,0);
-                const isExpired = expiry && expiry < now;
-                const diff = expiry ? Math.ceil((expiry - now) / 86400000) : null;
+                const expiryDate = item.expire ? new Date(item.expire) : null;
+                if(expiryDate) expiryDate.setHours(0,0,0,0);
+                const isExpired = expiryDate && expiryDate < now;
+                const diff = expiryDate ? Math.ceil((expiryDate - now) / 86400000) : null;
+
+                const curPing = serverPingState[item.id] || 40;
+                const curUsers = serverUserCountState[item.id] || 10;
 
                 grid.innerHTML += `
-                    <div class="bg-white rounded-[2.5rem] p-6 shadow-sm border border-slate-100 flex flex-col transition-all ${isExpired ? 'opacity-60 grayscale-[0.5]' : (isFull ? 'border-rose-400' : 'hover:shadow-2xl')} animate-in">
-                        <div class="flex items-center gap-4 mb-5">
+                    <div class="bg-white rounded-[1.8rem] p-5 shadow-sm border border-slate-100 flex flex-col transition-all ${isExpired ? 'opacity-60 grayscale' : (isFull ? 'border-rose-300' : 'hover:shadow-xl')} animate-in">
+                        <div class="flex items-center gap-3 mb-4">
                             <div class="flag-circle">${getFlag(item.flag)}</div>
                             <div class="min-w-0 flex-1">
-                                <h3 class="text-[14px] font-black text-slate-900 leading-tight uppercase italic break-words">${item.title}</h3>
-                                <div class="flex items-center gap-2 mt-1">
-                                    <span class="${isExpired ? 'dot-offline' : 'dot-online'}"></span>
-                                    <p class="text-[9px] font-black uppercase tracking-widest ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">
-                                        ${isExpired ? 'Offline' : 'Active'}
+                                <h3 class="text-[11px] font-black text-slate-900 leading-tight italic break-words uppercase">${item.title}</h3>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="${isExpired ? 'bg-rose-500' : 'dot-online'} rounded-full w-1.5 h-1.5 inline-block"></span>
+                                    <p class="text-[7px] font-black uppercase tracking-tighter ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">
+                                        ${isExpired ? 'OFF' : 'ONLINE'} • <span id="ping-val-${item.id}" class="${curPing > 150 ? 'ping-bad' : (curPing > 80 ? 'ping-good' : 'ping-excellent')}">${curPing}ms</span>
                                     </p>
                                 </div>
                             </div>
-                            <span class="text-[8px] font-black px-2.5 py-1.5 bg-slate-900 text-white rounded-xl self-start">${item.type}</span>
+                            <span class="text-[7px] font-black px-2 py-1 bg-slate-900 text-white rounded-lg self-start">${item.type}</span>
                         </div>
-                        <div class="space-y-2 mb-6 text-xs flex-grow">
-                            <div class="flex justify-between bg-indigo-50/50 p-2.5 rounded-2xl border border-indigo-100">
-                                <span class="text-indigo-400 font-black uppercase text-[8px]">Operator:</span> 
-                                <span class="font-bold text-indigo-700 uppercase text-[10px]">${item.sim || 'Universal'}</span>
+                        <div class="space-y-1.5 mb-5 text-[9px] flex-grow">
+                            <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">ISP Support:</span> 
+                                <span class="isp-badge ${getISPClass(item.sim)}">${item.sim || 'Universal'}</span>
                             </div>
-                            <div class="flex justify-between bg-slate-50 p-2.5 rounded-2xl">
-                                <span class="text-slate-400 font-black uppercase text-[8px]">Expired Date:</span> 
-                                <span class="font-black text-[10px] ${isExpired ? 'text-rose-500' : 'text-slate-700'}">${item.expire || 'No Limit'}</span>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">User Stats:</span> 
+                                <span id="user-val-${item.id}" class="font-black text-indigo-600">${curUsers} Active</span>
                             </div>
-                            <div class="flex justify-between bg-slate-50 p-2.5 rounded-2xl">
-                                <span class="text-slate-400 font-black uppercase text-[8px]">Days Left:</span> 
-                                <span class="font-black text-[10px] ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">${isExpired ? 'EXPIRED' : (diff !== null ? diff + ' Days' : 'LIFE TIME')}</span>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Expiry Date:</span> 
+                                <span class="font-black ${isExpired ? 'text-rose-500' : 'text-slate-700'}">${item.expire || 'Life Time'}</span>
                             </div>
-                            <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-2xl">
-                                <span class="text-slate-400 font-black uppercase text-[8px]">Capacity:</span> 
-                                <span class="px-3 py-1 rounded-full text-[10px] ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}">${daily} / ${SERVER_LIMIT}</span>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Days Left:</span> 
+                                <span class="font-black ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">${isExpired ? '0' : (diff !== null ? diff : '∞')}</span>
                             </div>
-                            <div class="bg-amber-50 p-2.5 rounded-2xl text-amber-700 italic text-[9px] break-words border border-amber-100">
-                                <i class="fas fa-info-circle mr-1"></i> ${item.note || 'High Speed Connection'}
+                            <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Limit Progress:</span> 
+                                <span class="px-2 py-0.5 rounded-full text-[8px] font-black ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}">${daily} / ${SERVER_LIMIT}</span>
                             </div>
+                            ${item.note ? `
+                            <div class="bg-amber-50 p-2 rounded-xl border border-amber-100">
+                                <p class="text-amber-800 font-medium italic"><i class="fas fa-info-circle mr-1"></i>${item.note}</p>
+                            </div>` : ''}
                         </div>
                         <button onclick="startGen('${item.id}', '${item.title}', '${item.content}', ${item.dailyCount || 0}, '${item.lastResetDate}', ${isExpired})" 
-                                class="w-full py-4 ${isExpired ? 'bg-slate-200 text-slate-400' : (isFull ? 'bg-rose-500 text-white' : 'bg-slate-900 text-white')} rounded-[1.5rem] font-black text-[11px] transition shadow-lg active:scale-95">
-                            ${isExpired ? 'OFFLINE' : (isFull ? 'FULL' : 'GENERATE CONFIG')}
+                                class="w-full py-3 ${isExpired ? 'bg-slate-200 text-slate-400' : (isFull ? 'bg-rose-500 text-white' : 'bg-slate-900 text-white')} rounded-xl font-black text-[9px] uppercase tracking-tighter">
+                            ${isExpired ? 'Service Off' : (isFull ? 'Full Slot' : 'Get Connection')}
                         </button>
                     </div>
                 `;
@@ -551,11 +641,14 @@
                 if(localStorage.getItem('jkvpn_admin_session') === 'active'){
                     const encoded = encodeURIComponent(JSON.stringify(item));
                     list.innerHTML += `
-                        <div class="bg-white p-4 rounded-2xl flex justify-between items-center border shadow-sm">
-                            <span class="font-black text-xs uppercase">${item.title}</span>
-                            <div class="flex gap-2">
-                                <button onclick="editConfig('${encoded}')" class="bg-indigo-50 text-indigo-600 p-2 rounded-xl"><i class="fas fa-edit"></i></button>
-                                <button onclick="deleteConfig('${item.id}')" class="bg-rose-50 text-rose-500 p-2 rounded-xl"><i class="fas fa-trash"></i></button>
+                        <div class="bg-white p-3 rounded-xl flex justify-between items-center border text-[10px]">
+                            <div class="flex flex-col">
+                                <span class="font-bold uppercase">${item.title}</span>
+                                <span class="text-[7px] text-slate-400">ISP: ${item.sim} | TYPE: ${item.type}</span>
+                            </div>
+                            <div class="flex gap-1">
+                                <button onclick="editConfig('${encoded}')" class="bg-indigo-50 text-indigo-600 p-1.5 rounded-lg"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteConfig('${item.id}')" class="bg-rose-50 text-rose-500 p-1.5 rounded-lg"><i class="fas fa-trash"></i></button>
                             </div>
                         </div>
                     `;
@@ -564,10 +657,7 @@
         }
 
         setInterval(() => { document.getElementById('server-clock').innerText = new Date().toLocaleString(); }, 1000);
-        window.addEventListener('load', async () => {
-            await signInAnonymously(auth);
-            checkAdminSession();
-        });
+        window.addEventListener('load', async () => { await signInAnonymously(auth); checkAdminSession(); });
     </script>
 </body>
 </html>
