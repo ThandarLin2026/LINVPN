@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JK VPN V4 - Admin Enhanced Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .animate-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .header-sticky { position: sticky; top: 0; z-index: 50; }
+
+        .flag-circle {
+            width: 42px; height: 42px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: #f8fafc; font-size: 22px; border: 2px solid #e2e8f0;
+            flex-shrink: 0;
+        }
+
+        .dot-online {
+            width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;
+            display: inline-block; animation: pulse-green 1.5s infinite;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        .tab-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; }
+        .tab-btn { font-weight: 800; font-size: 8px; padding: 10px 2px; border-radius: 10px; transition: all 0.3s; text-transform: uppercase; }
+        
+        .active-all { background: #1e293b !important; color: white !important; }
+        .active-v2ray { background: #4f46e5 !important; color: white !important; }
+        .active-ssh { background: #059669 !important; color: white !important; }
+        .active-udp { background: #ea580c !important; color: white !important; }
+        .active-trojan { background: #db2777 !important; color: white !important; }
+        .active-online { background: #0ea5e9 !important; color: white !important; }
+
+        .marquee-container { background: #0f172a; color: #fbbf24; padding: 8px 0; overflow: hidden; white-space: nowrap; font-weight: 800; font-size: 12px; border-bottom: 3px solid #fbbf24; }
+        .marquee-content { display: inline-block; animation: marquee 30s linear infinite; padding-left: 100%; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+        .stat-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); flex: 1; }
+
+        .fixed-footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 10px 0;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+            z-index: 100;
+        }
+
+        .ping-excellent { color: #10b981; }
+        .ping-good { color: #f59e0b; }
+        .ping-bad { color: #ef4444; }
+
+        .isp-badge { padding: 3px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; font-size: 7px; color: white; display: flex; align-items: center; gap: 4px; }
+        .isp-dtac { background: #0076be; }
+        .isp-true { background: #ed1c24; }
+        .isp-ais { background: #10b981; }
+        .isp-mix { background: linear-gradient(90deg, #ed1c24, #10b981, #0076be); }
+        .isp-default { background: #64748b; }
+        .isp-logo-img { width: 10px; height: 10px; border-radius: 2px; object-fit: cover; background: white; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen pb-32">
+
+    <div id="notification" class="fixed top-24 right-4 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[110] hidden animate-in border-l-4 border-amber-500"></div>
+
+    <div class="header-sticky">
+        <div class="marquee-container">
+            <div id="running-text" class="marquee-content italic uppercase tracking-wider">Loading...</div>
+        </div>
+
+        <nav class="bg-slate-900 text-white p-4 shadow-xl">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3 font-black text-xl tracking-tighter cursor-pointer" onclick="window.location.reload()">
+                    <img src="https://raw.githubusercontent.com/ThandarLin2026/JK/main/image/logo.png" alt="Logo" class="w-[40px] h-[40px] object-contain rounded-lg">
+                    <span>JK-VPN<span class="text-indigo-400 text-[10px] font-normal ml-1">V4</span></span>
+                </div>
+                <div class="flex gap-2">
+                    <a id="contact-link" href="#" target="_blank" class="bg-sky-500 hover:bg-sky-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
+                        <i class="fas fa-paper-plane"></i> Contact
+                    </a>
+                    <button onclick="toggleModal('donate-modal', true)" class="bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
+                        <i class="fas fa-heart"></i> Donate
+                    </button>
+                    <button onclick="toggleModal('admin-modal', true)" id="admin-login-btn" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl text-[10px] font-bold transition-all">
+                        <i class="fas fa-user-lock"></i>
+                    </button>
+                    <button onclick="logoutAdmin()" id="admin-logout-btn" class="hidden bg-rose-600 hover:bg-rose-700 px-3 py-2 rounded-xl text-[10px] font-bold transition-all">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <main class="max-w-6xl mx-auto p-4 md:p-8">
+
+        <!-- Admin Login Modal -->
+        <div id="admin-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl animate-in">
+                <h2 class="text-xl font-black text-center mb-6">Admin Login</h2>
+                <input type="password" id="admin-password-input" placeholder="Enter Password" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-xl outline-none mb-6 text-center text-lg tracking-widest">
+                <div class="flex gap-3">
+                    <button onclick="toggleModal('admin-modal', false)" class="flex-1 py-3 font-bold text-slate-500">Close</button>
+                    <button onclick="verifyAdmin()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg">Login</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Modal -->
+        <div id="quiz-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[60] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center">
+                <div class="mb-4 text-slate-400 font-bold uppercase text-[9px] tracking-widest">Security Check</div>
+                <h2 class="text-2xl font-black mb-6" id="quiz-question">0 + 0 = ?</h2>
+                <input type="number" id="quiz-answer" placeholder="Result" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-xl outline-none mb-6 text-center text-xl font-black">
+                <div class="flex gap-3">
+                    <button onclick="toggleModal('quiz-modal', false)" class="flex-1 py-3 font-bold text-slate-500">Cancel</button>
+                    <button id="verify-quiz-btn" class="flex-1 py-3 bg-indigo-600 text-white font-black rounded-xl shadow-lg">Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="success-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[70] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-black text-slate-900 mb-2">Generated Successfully</h2>
+                <p class="text-slate-500 text-xs mb-8">Enjoy your high speed connection!</p>
+                <button id="show-config-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg">View Config</button>
+            </div>
+        </div>
+
+        <!-- Donate Modal -->
+        <div id="donate-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl animate-in relative">
+                <button onclick="toggleModal('donate-modal', false)" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500"><i class="fas fa-times text-lg"></i></button>
+                <div class="text-center mb-6"><h2 class="text-xl font-black text-slate-900">Support Me</h2></div>
+                <div class="space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-xl flex items-center gap-4 border border-slate-100">
+                        <img id="d-logo-1" src="" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/100x100?text=Bank'">
+                        <div>
+                            <p id="d-name-1" class="font-black text-slate-900 text-[10px] uppercase">...</p>
+                            <p id="d-acc-1" class="text-indigo-600 font-mono font-bold text-sm">...</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl flex items-center gap-4 border border-slate-100">
+                        <img id="d-logo-2" src="" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/100x100?text=Bank'">
+                        <div>
+                            <p id="d-name-2" class="font-black text-slate-900 text-[10px] uppercase">...</p>
+                            <p id="d-acc-2" class="text-indigo-600 font-mono font-bold text-sm">...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin View -->
+        <div id="admin-view" class="hidden space-y-6 animate-in">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-black uppercase italic">Admin Dashboard</h1>
+                <span class="text-[9px] font-black bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">MASTER CONTROL</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Config Section -->
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm space-y-4">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest px-1">App Settings</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" id="set-marquee" placeholder="Running Text" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold italic">
+                        <input type="text" id="set-contact" placeholder="Contact Link (Telegram/FB)" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase">Bank 1</p>
+                            <input type="text" id="admin-dlogo1" placeholder="Logo Link" class="w-full p-2 bg-slate-50 border border-slate-100 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dname1" placeholder="Name" class="w-full p-2 bg-slate-50 border border-slate-100 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dacc1" placeholder="Acc No" class="w-full p-2 bg-slate-50 border border-slate-100 rounded-lg text-[10px]">
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[8px] font-bold text-slate-400 uppercase">Bank 2</p>
+                            <input type="text" id="admin-dlogo2" placeholder="Logo Link" class="w-full p-2 bg-slate-50 border border-slate-100 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dname2" placeholder="Name" class="w-full p-2 bg-slate-50 border border-slate-100 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dacc2" placeholder="Acc No" class="w-full p-2 bg-slate-50 border border-slate-100 rounded-lg text-[10px]">
+                        </div>
+                    </div>
+                    <button id="save-settings-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl text-xs hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-100">Save Global Settings</button>
+                </div>
+
+                <!-- Server Entry Section -->
+                <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 px-1">Server Entry</h3>
+                    <input type="hidden" id="edit-id" value="">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="text" id="config-flag" placeholder="Flag (US, SG, TH)" class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold uppercase">
+                        <input type="text" id="config-title" placeholder="Server Name (Exact)" class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="text" id="config-sim" placeholder="ISP (TRUE, AIS, DTAC)" class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold uppercase">
+                        <input type="text" id="config-isp-logo" placeholder="ISP Logo Link" class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="date" id="config-expire" class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-bold w-full">
+                        <select id="config-type" class="p-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-black">
+                            <option value="V2RAY">V2RAY</option><option value="SSH">SSH</option>
+                            <option value="TROJAN">TROJAN</option><option value="UDP">UDP</option>
+                        </select>
+                    </div>
+                    <textarea id="config-content" rows="3" placeholder="Paste Config Link Here" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl mb-3 text-[10px] font-mono"></textarea>
+                    <input type="text" id="config-note" placeholder="Special Note (Optional)" class="w-full p-3 bg-slate-50 border border-slate-100 rounded-xl mb-4 text-xs font-medium italic">
+                    <button id="publish-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-xl hover:bg-black transition-all shadow-xl">Publish Config</button>
+                </div>
+            </div>
+
+            <!-- Admin Server List -->
+            <div class="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
+                <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest mb-4 px-1">Manage Published Servers</h3>
+                <div id="admin-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </div>
+        </div>
+
+        <!-- User View -->
+        <div id="user-view" class="space-y-6 animate-in">
+            <div class="bg-slate-950 p-8 rounded-[2.5rem] text-white shadow-2xl relative flex flex-col items-center">
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-1">JK FREE VPN</h1>
+                    <div id="server-clock" class="text-indigo-400 font-mono text-[9px] font-bold tracking-widest">...</div>
+                </div>
+                <div class="flex gap-4 justify-center w-full max-w-lg">
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
+                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Servers</p>
+                        <p id="total-server-display" class="text-xl font-black">0</p>
+                    </div>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
+                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Daily Gen</p>
+                        <p id="daily-gen-display" class="text-xl font-black">0</p>
+                    </div>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
+                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Total Gen</p>
+                        <p id="total-gen-display" class="text-xl font-black">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="online-total-banner" class="hidden bg-indigo-600 p-4 rounded-2xl text-white flex justify-between items-center shadow-lg animate-in">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-users"></i></div>
+                    <div>
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-80">Total Active Users</p>
+                        <p id="online-total-count" class="text-xl font-black">0</p>
+                    </div>
+                </div>
+                <div class="text-right"><span class="text-[7px] font-black bg-white/20 px-2 py-1 rounded-full uppercase italic">Real-time</span></div>
+            </div>
+
+            <div class="tab-grid p-1.5 bg-slate-200/50 rounded-xl">
+                <button id="tab-ALL" class="tab-btn active-all">All</button>
+                <button id="tab-V2RAY" class="tab-btn">V2R</button>
+                <button id="tab-SSH" class="tab-btn">SSH</button>
+                <button id="tab-UDP" class="tab-btn">UDP</button>
+                <button id="tab-TROJAN" class="tab-btn">TRJ</button>
+                <button id="tab-ONLINE" class="tab-btn font-bold"><i class="fas fa-users mr-1"></i>Online</button>
+            </div>
+
+            <div id="user-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10"></div>
+        </div>
+    </main>
+
+    <div id="config-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-xl shadow-2xl animate-in">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modal-title" class="text-sm font-black italic uppercase pr-4"></h2>
+                <button onclick="toggleModal('config-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="bg-slate-900 rounded-xl p-4 mb-6">
+                <pre id="modal-content" class="text-indigo-400 font-mono text-[10px] whitespace-pre-wrap break-all max-h-[250px] overflow-y-auto"></pre>
+            </div>
+            <button id="modal-copy-btn" class="w-full py-4 bg-indigo-600 text-white font-black rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs">
+                <i class="fas fa-copy"></i> Copy Configuration
+            </button>
+        </div>
+    </div>
+
+    <footer class="fixed-footer">
+        <p class="text-slate-900 font-black text-[9px] uppercase tracking-tighter italic">© 2018-2026 JK VPN - BY JUEHTET</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, Timestamp, increment, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // Firebase Configuration (Using provided API keys)
+        const firebaseConfig = {
+            apiKey: "AIzaSyChinW5tTi6cpFHLjiecWBaD-LTArNXJu0",
+            authDomain: "jkvpn-generator.firebaseapp.com",
+            projectId: "jkvpn-generator",
+            storageBucket: "jkvpn-generator.firebasestorage.app",
+            messagingSenderId: "859082016268",
+            appId: "1:859082016268:web:a2c04fa13cf422b3299029"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = "jkvpn-v4-main";
+        const ADMIN_PASS = "JueHtet19991";
+        const SERVER_LIMIT = 30;
+
+        let allConfigs = [];
+        let currentFilter = 'ALL';
+        let processingData = null;
+        let quizSolution = 0;
+        let isWriting = false;
+        let serverPingState = {}; 
+        let serverUserCountState = {};
+
+        function showNotify(msg) {
+            const n = document.getElementById('notification');
+            n.innerText = msg; n.classList.remove('hidden'); 
+            setTimeout(() => n.classList.add('hidden'), 3000);
+        }
+
+        window.toggleModal = (id, show) => {
+            const el = document.getElementById(id);
+            if (show) el.classList.remove('hidden'); else el.classList.add('hidden');
+        };
+
+        window.verifyAdmin = () => {
+            if (document.getElementById('admin-password-input').value === ADMIN_PASS) {
+                localStorage.setItem('jkvpn_admin_session', 'active');
+                checkAdminSession(); toggleModal('admin-modal', false);
+                renderUI();
+            } else { showNotify("Wrong Pass!"); }
+        };
+
+        window.logoutAdmin = () => { localStorage.removeItem('jkvpn_admin_session'); location.reload(); };
+
+        function checkAdminSession() {
+            const isAdmin = localStorage.getItem('jkvpn_admin_session') === 'active';
+            document.getElementById('admin-view').classList.toggle('hidden', !isAdmin);
+            document.getElementById('user-view').classList.toggle('hidden', isAdmin);
+            document.getElementById('admin-login-btn').classList.toggle('hidden', isAdmin);
+            document.getElementById('admin-logout-btn').classList.toggle('hidden', !isAdmin);
+        }
+
+        const configsCol = collection(db, 'artifacts', appId, 'public', 'data', 'configs');
+        const statsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'global');
+        const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'main');
+
+        onSnapshot(configsCol, (snap) => {
+            allConfigs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            document.getElementById('total-server-display').innerText = allConfigs.length;
+            allConfigs.forEach(c => {
+                if(!serverPingState[c.id]) serverPingState[c.id] = Math.floor(Math.random() * 50) + 30;
+                if(!serverUserCountState[c.id]) serverUserCountState[c.id] = Math.floor(Math.random() * 15) + 5;
+            });
+            renderUI(); 
+            updateTotalOnline();
+        });
+
+        onSnapshot(statsDoc, (snap) => {
+            if(snap.exists()){
+                const data = snap.data();
+                const today = new Date().toISOString().split('T')[0];
+                if(data.lastResetDay !== today) { updateDoc(statsDoc, { daily: 0, lastResetDay: today }); }
+                document.getElementById('total-gen-display').innerText = (data.total || 0).toLocaleString();
+                document.getElementById('daily-gen-display').innerText = (data.daily || 0).toLocaleString();
+            }
+        });
+
+        onSnapshot(settingsDoc, (snap) => {
+            if(snap.exists()){
+                const d = snap.data();
+                document.getElementById('running-text').innerText = d.marquee || "JK VPN V4 - FAST & SECURE";
+                document.getElementById('contact-link').href = d.contact || "#";
+                
+                document.getElementById('d-name-1').innerText = d.dname1 || "KBZ PAY";
+                document.getElementById('d-acc-1').innerText = d.dacc1 || "09xxxxxxxxx";
+                document.getElementById('d-logo-1').src = d.dlogo1 || "";
+                document.getElementById('d-name-2').innerText = d.dname2 || "WAVE PAY";
+                document.getElementById('d-acc-2').innerText = d.dacc2 || "09xxxxxxxxx";
+                document.getElementById('d-logo-2').src = d.dlogo2 || "";
+
+                if(localStorage.getItem('jkvpn_admin_session') === 'active') {
+                    document.getElementById('set-marquee').value = d.marquee || "";
+                    document.getElementById('set-contact').value = d.contact || "";
+                    document.getElementById('admin-dlogo1').value = d.dlogo1 || "";
+                    document.getElementById('admin-dname1').value = d.dname1 || "";
+                    document.getElementById('admin-dacc1').value = d.dacc1 || "";
+                    document.getElementById('admin-dlogo2').value = d.dlogo2 || "";
+                    document.getElementById('admin-dname2').value = d.dname2 || "";
+                    document.getElementById('admin-dacc2').value = d.dacc2 || "";
+                }
+            }
+        });
+
+        function updateTotalOnline() {
+            let total = 0; allConfigs.forEach(c => total += (serverUserCountState[c.id] || 0));
+            document.getElementById('online-total-count').innerText = total.toLocaleString();
+        }
+
+        document.getElementById('save-settings-btn').onclick = async () => {
+            const payload = {
+                marquee: document.getElementById('set-marquee').value,
+                contact: document.getElementById('set-contact').value,
+                dlogo1: document.getElementById('admin-dlogo1').value,
+                dname1: document.getElementById('admin-dname1').value,
+                dacc1: document.getElementById('admin-dacc1').value,
+                dlogo2: document.getElementById('admin-dlogo2').value,
+                dname2: document.getElementById('admin-dname2').value,
+                dacc2: document.getElementById('admin-dacc2').value
+            };
+            await setDoc(settingsDoc, payload, { merge: true }); 
+            showNotify("Settings Saved!");
+        };
+
+        document.getElementById('publish-btn').onclick = async () => {
+            const id = document.getElementById('edit-id').value;
+            const payload = {
+                flag: document.getElementById('config-flag').value.toUpperCase(),
+                title: document.getElementById('config-title').value, 
+                sim: document.getElementById('config-sim').value,
+                ispLogo: document.getElementById('config-isp-logo').value,
+                type: document.getElementById('config-type').value,
+                content: document.getElementById('config-content').value,
+                expire: document.getElementById('config-expire').value,
+                note: document.getElementById('config-note').value,
+                lastResetDate: new Date().toISOString().split('T')[0]
+            };
+            if(!payload.title || !payload.content) return showNotify("Required fields empty!");
+            
+            try {
+                if(id) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id), payload); }
+                else { await addDoc(configsCol, { ...payload, dailyCount: 0, createdAt: Timestamp.now() }); }
+                document.getElementById('edit-id').value = "";
+                ['config-flag', 'config-title', 'config-sim', 'config-isp-logo', 'config-expire', 'config-content', 'config-note'].forEach(fid => {
+                    document.getElementById(fid).value = "";
+                });
+                showNotify("Server Published!");
+            } catch (e) { showNotify("Publish Failed!"); }
+        };
+
+        window.deleteConfig = async (id) => { 
+            if(confirm("Confirm Delete Server?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id));
+                showNotify("Deleted!");
+            }
+        };
+
+        window.editConfig = (itemStr) => {
+            const item = JSON.parse(decodeURIComponent(itemStr));
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('config-flag').value = item.flag || "";
+            document.getElementById('config-title').value = item.title || "";
+            document.getElementById('config-sim').value = item.sim || "";
+            document.getElementById('config-isp-logo').value = item.ispLogo || "";
+            document.getElementById('config-expire').value = item.expire || "";
+            document.getElementById('config-type').value = item.type || "V2RAY";
+            document.getElementById('config-content').value = item.content || "";
+            document.getElementById('config-note').value = item.note || "";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showNotify("Editing: " + item.title);
+        };
+
+        window.startGen = (id, title, content, daily, lastDate, expired) => {
+            if (expired) return showNotify("Server Expired!");
+            const today = new Date().toISOString().split('T')[0];
+            const actualDaily = (lastDate === today) ? daily : 0;
+            if (actualDaily >= SERVER_LIMIT) return showNotify("Server is Full!");
+            processingData = { id, title, content, actualDaily, today };
+            const n1 = Math.floor(Math.random() * 10) + 1;
+            const n2 = Math.floor(Math.random() * 10) + 1;
+            quizSolution = n1 + n2;
+            document.getElementById('quiz-question').innerText = `${n1} + ${n2} = ?`;
+            document.getElementById('quiz-answer').value = '';
+            toggleModal('quiz-modal', true);
+        };
+
+        document.getElementById('verify-quiz-btn').onclick = async () => {
+            const ans = parseInt(document.getElementById('quiz-answer').value);
+            if (ans !== quizSolution) return showNotify("Incorrect answer!");
+            if (isWriting) return; isWriting = true; toggleModal('quiz-modal', false);
+            try {
+                const sRef = doc(db, 'artifacts', appId, 'public', 'data', 'configs', processingData.id);
+                await updateDoc(sRef, { dailyCount: increment(1), lastResetDate: processingData.today });
+                await updateDoc(statsDoc, { total: increment(1), daily: increment(1) });
+                toggleModal('success-modal', true);
+                document.getElementById('show-config-btn').onclick = () => {
+                    toggleModal('success-modal', false);
+                    document.getElementById('modal-title').innerText = processingData.title;
+                    document.getElementById('modal-content').innerText = processingData.content;
+                    document.getElementById('modal-copy-btn').onclick = () => {
+                        const t = document.createElement('textarea'); t.value = processingData.content;
+                        document.body.appendChild(t); t.select(); document.execCommand('copy');
+                        document.body.removeChild(t); showNotify("Copied!");
+                    };
+                    toggleModal('config-modal', true);
+                };
+            } catch (e) { showNotify("Error!"); } finally { isWriting = false; }
+        };
+
+        const tabs = ['ALL', 'V2RAY', 'SSH', 'UDP', 'TROJAN', 'ONLINE'];
+        tabs.forEach(t => {
+            document.getElementById(`tab-${t}`).onclick = () => {
+                currentFilter = t;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-all', 'active-v2ray', 'active-ssh', 'active-udp', 'active-trojan', 'active-online'));
+                const map = { 'ALL': 'active-all', 'V2RAY': 'active-v2ray', 'SSH': 'active-ssh', 'UDP': 'active-udp', 'TROJAN': 'active-trojan', 'ONLINE': 'active-online' };
+                document.getElementById(`tab-${t}`).classList.add(map[t]);
+                document.getElementById('online-total-banner').classList.toggle('hidden', t !== 'ONLINE');
+                renderUI();
+            };
+        });
+
+        function getFlag(f) {
+            if(!f || f.length !== 2) return '🌐';
+            return f.toUpperCase().split('').map(c => String.fromCodePoint(c.charCodeAt(0) + 127397)).join('');
+        }
+
+        function getISPClass(isp) {
+            const v = (isp || '').toLowerCase();
+            const count = (v.match(/dtac|true|ais/g) || []).length;
+            if(count >= 3) return 'isp-mix';
+            if(v.includes('dtac')) return 'isp-dtac';
+            if(v.includes('true')) return 'isp-true';
+            if(v.includes('ais')) return 'isp-ais';
+            return 'isp-default';
+        }
+
+        function renderUI() {
+            const grid = document.getElementById('user-grid');
+            const adminList = document.getElementById('admin-list');
+            grid.innerHTML = ''; adminList.innerHTML = '';
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            const isAdmin = localStorage.getItem('jkvpn_admin_session') === 'active';
+
+            if(isAdmin) {
+                allConfigs.forEach(item => {
+                    const encoded = encodeURIComponent(JSON.stringify(item));
+                    adminList.innerHTML += `
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 flex justify-between items-center transition-all hover:border-indigo-300">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-slate-200 text-lg flex-shrink-0">${getFlag(item.flag)}</div>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] font-black text-slate-900 truncate uppercase leading-tight">${item.title}</p>
+                                    <p class="text-[8px] font-bold text-slate-400 tracking-wider">${item.type} • ${item.sim || 'Universal'}</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editConfig('${encoded}')" class="w-8 h-8 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-all"><i class="fas fa-edit text-[10px]"></i></button>
+                                <button onclick="deleteConfig('${item.id}')" class="w-8 h-8 flex items-center justify-center bg-rose-100 text-rose-500 rounded-lg hover:bg-rose-500 hover:text-white transition-all"><i class="fas fa-trash text-[10px]"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            let filtered;
+            if(currentFilter === 'ALL') filtered = allConfigs;
+            else if(currentFilter === 'ONLINE') filtered = allConfigs.filter(c => !c.expire || new Date(c.expire) >= new Date().setHours(0,0,0,0));
+            else filtered = allConfigs.filter(c => c.type === currentFilter);
+
+            filtered.forEach(item => {
+                const daily = item.lastResetDate === todayStr ? (item.dailyCount || 0) : 0;
+                const isFull = daily >= SERVER_LIMIT;
+                const now = new Date(); now.setHours(0,0,0,0);
+                const expiryDate = item.expire ? new Date(item.expire) : null;
+                if(expiryDate) expiryDate.setHours(0,0,0,0);
+                const isExpired = expiryDate && expiryDate < now;
+                const diff = expiryDate ? Math.ceil((expiryDate - now) / 86400000) : null;
+                const curPing = serverPingState[item.id] || 40;
+                const curUsers = serverUserCountState[item.id] || 10;
+
+                grid.innerHTML += `
+                    <div class="bg-white rounded-[1.8rem] p-5 shadow-sm border border-slate-100 flex flex-col transition-all ${isExpired ? 'opacity-60 grayscale' : (isFull ? 'border-rose-300' : 'hover:shadow-xl')} animate-in">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="flag-circle">${getFlag(item.flag)}</div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-[11px] font-black text-slate-900 leading-tight italic break-words">${item.title}</h3>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="${isExpired ? 'bg-rose-500' : 'dot-online'} rounded-full w-1.5 h-1.5 inline-block"></span>
+                                    <p class="text-[7px] font-black uppercase tracking-tighter ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">
+                                        ${isExpired ? 'OFF' : 'ONLINE'} • <span id="ping-val-${item.id}" class="${curPing > 150 ? 'ping-bad' : (curPing > 80 ? 'ping-good' : 'ping-excellent')}">${curPing}ms</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="text-[7px] font-black px-2 py-1 bg-slate-900 text-white rounded-lg self-start">${item.type}</span>
+                        </div>
+                        <div class="space-y-1.5 mb-5 text-[9px] flex-grow">
+                            <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">ISP:</span> 
+                                <span class="isp-badge ${getISPClass(item.sim)}">
+                                    ${item.ispLogo ? `<img src="${item.ispLogo}" class="isp-logo-img">` : ''}
+                                    ${item.sim || 'Universal'}
+                                </span>
+                            </div>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Users:</span> 
+                                <span id="user-val-${item.id}" class="font-black text-indigo-600">${curUsers} Active</span>
+                            </div>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Expiry:</span> 
+                                <span class="font-black ${isExpired ? 'text-rose-500' : 'text-slate-700'}">${item.expire || 'Life Time'}</span>
+                            </div>
+                            <div class="flex justify-between bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Left:</span> 
+                                <span class="font-black ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">${isExpired ? '0' : (diff !== null ? diff : '∞')}d</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl">
+                                <span class="text-slate-400 font-black uppercase text-[7px]">Limit:</span> 
+                                <span class="px-2 py-0.5 rounded-full text-[8px] font-black ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}">${daily} / ${SERVER_LIMIT}</span>
+                            </div>
+                            ${item.note ? `<div class="bg-amber-50 p-2 rounded-xl border border-amber-100"><p class="text-amber-800 font-medium italic"><i class="fas fa-info-circle mr-1"></i>${item.note}</p></div>` : ''}
+                        </div>
+                        <button onclick="startGen('${item.id}', '${item.title}', '${item.content}', ${item.dailyCount || 0}, '${item.lastResetDate}', ${isExpired})" 
+                                class="w-full py-3 ${isExpired ? 'bg-slate-200 text-slate-400 cursor-not-allowed' : (isFull ? 'bg-rose-500 text-white' : 'bg-slate-900 text-white hover:bg-black')} rounded-xl font-black text-[9px] uppercase tracking-tighter transition-all">
+                            ${isExpired ? 'EXPIRED' : (isFull ? 'LIMIT FULL' : 'Get Config')}
+                        </button>
+                    </div>
+                `;
+            });
+        }
+        
+        setInterval(() => { document.getElementById('server-clock').innerText = new Date().toLocaleString(); }, 1000);
+        window.addEventListener('load', async () => { 
+            await signInAnonymously(auth); 
+            checkAdminSession(); 
+        });
+    </script>
+</body>
+</html>
+
