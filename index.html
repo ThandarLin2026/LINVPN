@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JK VPN V4 - 30+ Themes Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #0f172a;
+            --accent: #4f46e5;
+            --border: #e2e8f0;
+        }
+
+        /* 30+ Themes Palette */
+        .theme-light { --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a; --accent: #4f46e5; --border: #e2e8f0; }
+        .theme-dark { --bg-color: #020617; --card-bg: #1e293b; --text-main: #f8fafc; --accent: #6366f1; --border: #334155; }
+        .theme-midnight { --bg-color: #0f172a; --card-bg: #1e1b4b; --text-main: #e0e7ff; --accent: #818cf8; --border: #312e81; }
+        .theme-emerald { --bg-color: #064e3b; --card-bg: #065f46; --text-main: #ecfdf5; --accent: #10b981; --border: #064e3b; }
+        .theme-rose { --bg-color: #4c0519; --card-bg: #881337; --text-main: #fff1f2; --accent: #fb7185; --border: #4c0519; }
+        .theme-amber { --bg-color: #451a03; --card-bg: #78350f; --text-main: #fffbeb; --accent: #fbbf24; --border: #451a03; }
+        .theme-slate { --bg-color: #334155; --card-bg: #475569; --text-main: #f1f5f9; --accent: #94a3b8; --border: #1e293b; }
+        .theme-ocean { --bg-color: #0c4a6e; --card-bg: #075985; --text-main: #f0f9ff; --accent: #38bdf8; --border: #0c4a6e; }
+        .theme-purple { --bg-color: #4c1d95; --card-bg: #5b21b6; --text-main: #f5f3ff; --accent: #a78bfa; --border: #4c1d95; }
+        .theme-forest { --bg-color: #14532d; --card-bg: #166534; --text-main: #f0fdf4; --accent: #4ade80; --border: #14532d; }
+        .theme-wine { --bg-color: #701a75; --card-bg: #86198f; --text-main: #fdf4ff; --accent: #e879f9; --border: #701a75; }
+        .theme-coffee { --bg-color: #3e2723; --card-bg: #4e342e; --text-main: #efebe9; --accent: #a1887f; --border: #3e2723; }
+        .theme-gold { --bg-color: #1a1a1a; --card-bg: #2a2a2a; --text-main: #d4af37; --accent: #ffd700; --border: #333333; }
+        .theme-neon { --bg-color: #000000; --card-bg: #111111; --text-main: #39ff14; --accent: #39ff14; --border: #222222; }
+        .theme-sky { --bg-color: #e0f2fe; --card-bg: #ffffff; --text-main: #0369a1; --accent: #0ea5e9; --border: #bae6fd; }
+        .theme-mint { --bg-color: #ecfdf5; --card-bg: #ffffff; --text-main: #047857; --accent: #10b981; --border: #a7f3d0; }
+        .theme-lava { --bg-color: #450a0a; --card-bg: #7f1d1d; --text-main: #fef2f2; --accent: #f87171; --border: #450a0a; }
+        .theme-nord { --bg-color: #2e3440; --card-bg: #3b4252; --text-main: #eceff4; --accent: #88c0d0; --border: #434c5e; }
+        .theme-dracula { --bg-color: #282a36; --card-bg: #44475a; --text-main: #f8f8f2; --accent: #bd93f9; --border: #6272a4; }
+        .theme-cyber { --bg-color: #000b1e; --card-bg: #001a3d; --text-main: #00fff2; --accent: #ff00ff; --border: #00fff2; }
+        .theme-sakura { --bg-color: #fff1f2; --card-bg: #ffffff; --text-main: #be123c; --accent: #fda4af; --border: #fecdd3; }
+        .theme-desert { --bg-color: #fef3c7; --card-bg: #ffffff; --text-main: #92400e; --accent: #d97706; --border: #fde68a; }
+        .theme-grape { --bg-color: #2e1065; --card-bg: #4c1d95; --text-main: #ede9fe; --accent: #8b5cf6; --border: #2e1065; }
+        .theme-teal { --bg-color: #134e4a; --card-bg: #115e59; --text-main: #f0fdfa; --accent: #2dd4bf; --border: #134e4a; }
+        .theme-coal { --bg-color: #171717; --card-bg: #262626; --text-main: #d4d4d4; --accent: #737373; --border: #404040; }
+        .theme-copper { --bg-color: #431407; --card-bg: #7c2d12; --text-main: #fff7ed; --accent: #fb923c; --border: #431407; }
+        .theme-olive { --bg-color: #365314; --card-bg: #3f6212; --text-main: #f7fee7; --accent: #a3e635; --border: #365314; }
+        .theme-blood { --bg-color: #450a0a; --card-bg: #991b1b; --text-main: #fef2f2; --accent: #ef4444; --border: #450a0a; }
+        .theme-royal { --bg-color: #1e1b4b; --card-bg: #312e81; --text-main: #e0e7ff; --accent: #fbbf24; --border: #1e1b4b; }
+        .theme-void { --bg-color: #000000; --card-bg: #0a0a0a; --text-main: #ffffff; --accent: #ffffff; --border: #333333; }
+        .theme-candy { --bg-color: #fdf2f8; --card-bg: #ffffff; --text-main: #db2777; --accent: #f472b6; --border: #fbcfe8; }
+
+        body { background-color: var(--bg-color); color: var(--text-main); }
+        .server-card { background-color: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); }
+        .input-box { background-color: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); }
+
+        .animate-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .header-sticky { position: sticky; top: 0; z-index: 50; }
+
+        .flag-circle {
+            width: 42px; height: 42px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: #f8fafc; font-size: 22px; border: 2px solid #e2e8f0;
+            flex-shrink: 0; color: #000;
+        }
+
+        .dot-online {
+            width: 8px; height: 8px; background-color: #10b981; border-radius: 50%;
+            display: inline-block; animation: pulse-green 1.5s infinite;
+        }
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        /* Fixed Tab Styling */
+        .tab-grid-container {
+            position: sticky;
+            top: 104px; /* Marquee + Nav height (approx 24+80=104) */
+            z-index: 45;
+            padding: 8px 16px;
+            background: var(--bg-color);
+            margin: -8px -16px 16px -16px;
+        }
+        .tab-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px; padding: 6px; border-radius: 16px; background: rgba(0,0,0,0.05); backdrop-filter: blur(10px); }
+        .tab-btn { font-weight: 800; font-size: 8px; padding: 10px 2px; border-radius: 10px; transition: all 0.3s; text-transform: uppercase; background: rgba(0,0,0,0.1); color: var(--text-main); }
+        
+        .active-all { background: #1e293b !important; color: white !important; }
+        .active-v2ray { background: #4f46e5 !important; color: white !important; }
+        .active-ssh { background: #059669 !important; color: white !important; }
+        .active-udp { background: #ea580c !important; color: white !important; }
+        .active-trojan { background: #db2777 !important; color: white !important; }
+        .active-online { background: #0ea5e9 !important; color: white !important; }
+
+        .marquee-container { background: #0f172a; color: #fbbf24; padding: 8px 0; overflow: hidden; white-space: nowrap; font-weight: 800; font-size: 12px; border-bottom: 3px solid #fbbf24; }
+        .marquee-content { display: inline-block; animation: marquee 30s linear infinite; padding-left: 100%; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+        .stat-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); flex: 1; }
+
+        .fixed-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: var(--card-bg); backdrop-filter: blur(10px);
+            padding: 10px 0; border-top: 1px solid var(--border); text-align: center; z-index: 40;
+        }
+
+        .ping-excellent { color: #10b981; }
+        .ping-good { color: #f59e0b; }
+        .ping-bad { color: #ef4444; }
+
+        .isp-badge { padding: 3px 10px; border-radius: 6px; font-weight: 800; text-transform: uppercase; font-size: 7px; color: white; display: flex; align-items: center; gap: 4px; }
+        .isp-dtac { background: #0076be; }
+        .isp-true { background: #ed1c24; }
+        .isp-ais { background: #10b981; }
+        .isp-mix { background: linear-gradient(90deg, #ed1c24, #10b981, #0076be); }
+        .isp-default { background: #64748b; }
+        .isp-logo-img { width: 10px; height: 10px; border-radius: 2px; object-fit: cover; background: white; }
+
+        .theme-fab {
+            position: fixed; bottom: 80px; right: 20px; z-index: 100;
+            width: 55px; height: 55px; border-radius: 50%;
+            background: var(--accent); color: white; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3); cursor: pointer; transition: all 0.3s;
+        }
+        .theme-menu {
+            position: fixed; bottom: 145px; right: 20px; z-index: 100;
+            background: var(--card-bg); border-radius: 25px; padding: 15px;
+            display: none; grid-template-columns: repeat(4, 1fr); gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border: 2px solid var(--accent); animation: fadeIn 0.3s ease; max-height: 350px; overflow-y: auto;
+        }
+        .theme-opt { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 3px solid rgba(0,0,0,0.1); transition: all 0.2s; position: relative; }
+        .theme-opt:hover { transform: scale(1.15); }
+        .theme-opt.active::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px; text-shadow: 0 0 2px black; }
+
+        /* Color States */
+        .status-badge-blue { background: #3b82f6; color: white; }
+        .status-badge-green { background: #10b981; color: white; }
+        .status-badge-red { background: #ef4444; color: white; }
+        .status-badge-orange { background: #f59e0b; color: white; }
+
+    </style>
+</head>
+<body class="theme-light min-h-screen pb-32">
+
+    <div id="notification" class="fixed top-24 right-4 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[110] hidden animate-in border-l-4 border-amber-500"></div>
+
+    <div id="theme-menu" class="theme-menu">
+        <div onclick="setTheme('light')" class="theme-opt bg-slate-200" title="Light"></div>
+        <div onclick="setTheme('dark')" class="theme-opt bg-slate-800" title="Dark"></div>
+        <div onclick="setTheme('midnight')" class="theme-opt bg-indigo-950" title="Midnight"></div>
+        <div onclick="setTheme('emerald')" class="theme-opt bg-emerald-800" title="Emerald"></div>
+        <div onclick="setTheme('rose')" class="theme-opt bg-rose-800" title="Rose"></div>
+        <div onclick="setTheme('amber')" class="theme-opt bg-amber-800" title="Amber"></div>
+        <div onclick="setTheme('slate')" class="theme-opt bg-slate-600" title="Slate"></div>
+        <div onclick="setTheme('ocean')" class="theme-opt bg-sky-800" title="Ocean"></div>
+        <div onclick="setTheme('purple')" class="theme-opt bg-purple-700" title="Purple"></div>
+        <div onclick="setTheme('forest')" class="theme-opt bg-green-900" title="Forest"></div>
+        <div onclick="setTheme('wine')" class="theme-opt bg-fuchsia-900" title="Wine"></div>
+        <div onclick="setTheme('coffee')" class="theme-opt bg-stone-800" title="Coffee"></div>
+        <div onclick="setTheme('gold')" class="theme-opt bg-yellow-600" title="Gold"></div>
+        <div onclick="setTheme('neon')" class="theme-opt bg-lime-500" title="Neon"></div>
+        <div onclick="setTheme('sky')" class="theme-opt bg-sky-300" title="Sky"></div>
+        <div onclick="setTheme('mint')" class="theme-opt bg-emerald-300" title="Mint"></div>
+        <div onclick="setTheme('lava')" class="theme-opt bg-red-900" title="Lava"></div>
+        <div onclick="setTheme('nord')" class="theme-opt bg-slate-500" title="Nord"></div>
+        <div onclick="setTheme('dracula')" class="theme-opt bg-indigo-900" title="Dracula"></div>
+        <div onclick="setTheme('cyber')" class="theme-opt bg-cyan-900" title="Cyber"></div>
+        <div onclick="setTheme('sakura')" class="theme-opt bg-pink-300" title="Sakura"></div>
+        <div onclick="setTheme('desert')" class="theme-opt bg-orange-200" title="Desert"></div>
+        <div onclick="setTheme('grape')" class="theme-opt bg-violet-950" title="Grape"></div>
+        <div onclick="setTheme('teal')" class="theme-opt bg-teal-800" title="Teal"></div>
+        <div onclick="setTheme('coal')" class="theme-opt bg-neutral-800" title="Coal"></div>
+        <div onclick="setTheme('copper')" class="theme-opt bg-orange-900" title="Copper"></div>
+        <div onclick="setTheme('olive')" class="theme-opt bg-lime-900" title="Olive"></div>
+        <div onclick="setTheme('blood')" class="theme-opt bg-red-600" title="Blood"></div>
+        <div onclick="setTheme('royal')" class="theme-opt bg-blue-900" title="Royal"></div>
+        <div onclick="setTheme('void')" class="theme-opt bg-black" title="Void"></div>
+        <div onclick="setTheme('candy')" class="theme-opt bg-pink-400" title="Candy"></div>
+    </div>
+    <div class="theme-fab" onclick="toggleThemeMenu()">
+        <i class="fas fa-palette text-xl"></i>
+    </div>
+
+    <div class="header-sticky">
+        <div class="marquee-container">
+            <div id="running-text" class="marquee-content italic uppercase tracking-wider">Loading...</div>
+        </div>
+
+        <nav class="bg-slate-900 text-white p-4 shadow-xl">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3 font-black text-xl tracking-tighter cursor-pointer" onclick="window.location.reload()">
+                    <img src="https://raw.githubusercontent.com/ThandarLin2026/JK/main/image/logo.png" alt="Logo" class="w-[40px] h-[40px] object-contain rounded-lg">
+                    <span>JK-VPN<span class="text-indigo-400 text-[10px] font-normal ml-1">V4</span></span>
+                </div>
+                <div class="flex gap-2">
+                    <a id="contact-link" href="#" target="_blank" class="bg-sky-500 hover:bg-sky-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
+                        <i class="fas fa-paper-plane"></i> Contact
+                    </a>
+                    <button onclick="toggleModal('donate-modal', true)" class="bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
+                        <i class="fas fa-heart"></i> Donate
+                    </button>
+                    <button onclick="toggleModal('admin-modal', true)" id="admin-login-btn" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl text-[10px] font-bold transition-all">
+                        <i class="fas fa-user-lock"></i>
+                    </button>
+                    <button onclick="logoutAdmin()" id="admin-logout-btn" class="hidden bg-rose-600 hover:bg-rose-700 px-3 py-2 rounded-xl text-[10px] font-bold transition-all">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <main class="max-w-6xl mx-auto p-4 md:p-8">
+
+        <div id="admin-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[120] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl animate-in text-slate-900">
+                <h2 class="text-xl font-black text-center mb-6">Admin Login</h2>
+                <input type="password" id="admin-password-input" placeholder="Enter Password" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-xl outline-none mb-6 text-center text-lg tracking-widest">
+                <div class="flex gap-3">
+                    <button onclick="toggleModal('admin-modal', false)" class="flex-1 py-3 font-bold text-slate-500">Close</button>
+                    <button onclick="verifyAdmin()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg">Login</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="quiz-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[120] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center text-slate-900">
+                <div class="mb-4 text-slate-400 font-bold uppercase text-[9px] tracking-widest">Security Check</div>
+                <h2 class="text-2xl font-black mb-6" id="quiz-question">0 + 0 = ?</h2>
+                <input type="number" id="quiz-answer" placeholder="Result" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-xl outline-none mb-6 text-center text-xl font-black">
+                <div class="flex gap-3">
+                    <button onclick="toggleModal('quiz-modal', false)" class="flex-1 py-3 font-bold text-slate-500">Cancel</button>
+                    <button id="verify-quiz-btn" class="flex-1 py-3 bg-indigo-600 text-white font-black rounded-xl shadow-lg">Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="success-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[130] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center text-slate-900">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-black text-slate-900 mb-2">Generated Successfully</h2>
+                <p class="text-slate-500 text-xs mb-8">Enjoy your high speed connection!</p>
+                <button id="show-config-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg">View Config</button>
+            </div>
+        </div>
+
+        <div id="donate-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 z-[120] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl animate-in relative text-slate-900">
+                <button onclick="toggleModal('donate-modal', false)" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500"><i class="fas fa-times text-lg"></i></button>
+                <div class="text-center mb-6"><h2 class="text-xl font-black text-slate-900">Support Me</h2></div>
+                <div class="space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-xl flex items-center gap-4 border border-slate-100">
+                        <img id="d-logo-1" src="" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/100x100?text=Bank'">
+                        <div>
+                            <p id="d-name-1" class="font-black text-slate-900 text-[10px] uppercase">...</p>
+                            <p id="d-acc-1" class="text-indigo-600 font-mono font-bold text-sm">...</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl flex items-center gap-4 border border-slate-100">
+                        <img id="d-logo-2" src="" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/100x100?text=Bank'">
+                        <div>
+                            <p id="d-name-2" class="font-black text-slate-900 text-[10px] uppercase">...</p>
+                            <p id="d-acc-2" class="text-indigo-600 font-mono font-bold text-sm">...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-view" class="hidden space-y-6 animate-in">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-black uppercase italic">Admin Dashboard</h1>
+                <span class="text-[9px] font-black bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">MASTER CONTROL</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="server-card p-6 rounded-[2rem] shadow-sm space-y-4">
+                    <h3 class="text-[10px] font-black uppercase opacity-60 tracking-widest px-1">App Settings</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="text" id="set-marquee" placeholder="Running Text" class="input-box w-full p-3 rounded-xl text-xs font-bold italic">
+                        <input type="text" id="set-contact" placeholder="Contact Link" class="input-box w-full p-3 rounded-xl text-xs font-bold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <p class="text-[8px] font-bold opacity-60 uppercase">Bank 1</p>
+                            <input type="text" id="admin-dlogo1" placeholder="Logo Link" class="input-box w-full p-2 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dname1" placeholder="Name" class="input-box w-full p-2 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dacc1" placeholder="Acc No" class="input-box w-full p-2 rounded-lg text-[10px]">
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[8px] font-bold opacity-60 uppercase">Bank 2</p>
+                            <input type="text" id="admin-dlogo2" placeholder="Logo Link" class="input-box w-full p-2 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dname2" placeholder="Name" class="input-box w-full p-2 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dacc2" placeholder="Acc No" class="input-box w-full p-2 rounded-lg text-[10px]">
+                        </div>
+                    </div>
+                    <button id="save-settings-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl text-xs hover:bg-indigo-700 transition-all shadow-lg">Save Global Settings</button>
+                </div>
+
+                <div class="server-card p-6 rounded-[2rem] shadow-sm">
+                    <h3 class="text-[10px] font-black uppercase opacity-60 tracking-widest mb-4 px-1">Server Entry</h3>
+                    <input type="hidden" id="edit-id" value="">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="text" id="config-flag" placeholder="Flag (US, SG, TH)" class="input-box p-3 rounded-xl text-xs font-bold uppercase">
+                        <input type="text" id="config-title" placeholder="Server Name" class="input-box p-3 rounded-xl text-xs font-bold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="text" id="config-sim" placeholder="ISP (TRUE, AIS, DTAC)" class="input-box p-3 rounded-xl text-xs font-bold uppercase">
+                        <input type="text" id="config-isp-logo" placeholder="ISP Logo Link" class="input-box p-3 rounded-xl text-xs font-bold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="date" id="config-expire" class="input-box p-3 rounded-xl text-xs font-bold w-full">
+                        <select id="config-type" class="input-box p-3 rounded-xl text-xs font-black">
+                            <option value="V2RAY">V2RAY</option><option value="SSH">SSH</option>
+                            <option value="TROJAN">TROJAN</option><option value="UDP">UDP</option>
+                        </select>
+                    </div>
+                    <textarea id="config-content" rows="3" placeholder="Paste Config Link Here" class="input-box w-full p-3 rounded-xl mb-3 text-[10px] font-mono"></textarea>
+                    <input type="text" id="config-note" placeholder="Special Note (Optional)" class="input-box w-full p-3 rounded-xl mb-4 text-xs font-medium italic">
+                    <button id="publish-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-xl hover:bg-black transition-all shadow-xl">Publish Config</button>
+                </div>
+            </div>
+
+            <div class="server-card p-6 rounded-[2rem] shadow-sm">
+                <h3 class="text-[10px] font-black uppercase opacity-60 tracking-widest mb-4 px-1">Manage Published Servers</h3>
+                <div id="admin-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </div>
+        </div>
+
+        <div id="user-view" class="space-y-6 animate-in">
+            <div class="bg-slate-950 p-8 rounded-[2.5rem] text-white shadow-2xl relative flex flex-col items-center">
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-1">JK FREE VPN</h1>
+                    <div id="server-clock" class="text-indigo-400 font-mono text-[9px] font-bold tracking-widest">...</div>
+                </div>
+                <div class="flex gap-4 justify-center w-full max-w-lg">
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
+                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Servers</p>
+                        <p id="total-server-display" class="text-xl font-black">0</p>
+                    </div>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
+                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Daily Gen</p>
+                        <p id="daily-gen-display" class="text-xl font-black">0</p>
+                    </div>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
+                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Total Gen</p>
+                        <p id="total-gen-display" class="text-xl font-black">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="online-total-banner" class="hidden bg-indigo-600 p-4 rounded-2xl text-white flex justify-between items-center shadow-lg animate-in">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-users"></i></div>
+                    <div>
+                        <p class="text-[8px] font-black uppercase tracking-widest opacity-80">Total Active Users</p>
+                        <p id="online-total-count" class="text-xl font-black">0</p>
+                    </div>
+                </div>
+                <div class="text-right"><span class="text-[7px] font-black bg-white/20 px-2 py-1 rounded-full uppercase italic">Real-time</span></div>
+            </div>
+
+            <!-- Fixed Tabs Wrapper -->
+            <div class="tab-grid-container">
+                <div class="tab-grid">
+                    <button id="tab-ALL" class="tab-btn active-all">All</button>
+                    <button id="tab-V2RAY" class="tab-btn">V2R</button>
+                    <button id="tab-SSH" class="tab-btn">SSH</button>
+                    <button id="tab-UDP" class="tab-btn">UDP</button>
+                    <button id="tab-TROJAN" class="tab-btn">TRJ</button>
+                    <button id="tab-ONLINE" class="tab-btn font-bold"><i class="fas fa-users mr-1"></i>Online</button>
+                </div>
+            </div>
+
+            <div id="user-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10"></div>
+        </div>
+    </main>
+
+    <div id="config-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[150] hidden">
+        <div class="bg-white rounded-[2rem] p-6 w-full max-w-xl shadow-2xl animate-in text-slate-900">
+            <div class="flex justify-between items-center mb-4">
+                <h2 id="modal-title" class="text-sm font-black italic uppercase pr-4"></h2>
+                <button onclick="toggleModal('config-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button>
+            </div>
+            <div class="bg-slate-900 rounded-xl p-4 mb-6">
+                <pre id="modal-content" class="text-indigo-400 font-mono text-[10px] whitespace-pre-wrap break-all max-h-[250px] overflow-y-auto"></pre>
+            </div>
+            <button id="modal-copy-btn" class="w-full py-4 bg-indigo-600 text-white font-black rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs">
+                <i class="fas fa-copy"></i> Copy Configuration
+            </button>
+        </div>
+    </div>
+
+    <footer class="fixed-footer">
+        <p class="font-black text-[9px] uppercase tracking-tighter italic">© 2018-2026 JK VPN - BY JUEHTET</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, Timestamp, increment, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyChinW5tTi6cpFHLjiecWBaD-LTArNXJu0",
+            authDomain: "jkvpn-generator.firebaseapp.com",
+            projectId: "jkvpn-generator",
+            storageBucket: "jkvpn-generator.firebasestorage.app",
+            messagingSenderId: "859082016268",
+            appId: "1:859082016268:web:a2c04fa13cf422b3299029"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = "jkvpn-v4-main";
+        const ADMIN_PASS = "JueHtet19991";
+        const SERVER_LIMIT = 30;
+
+        let allConfigs = [];
+        let currentFilter = 'ALL';
+        let processingData = null;
+        let quizSolution = 0;
+        let isWriting = false;
+        let serverPingState = {}; 
+        let serverUserCountState = {};
+
+        // Theme Switcher Functions
+        window.toggleThemeMenu = () => {
+            const menu = document.getElementById('theme-menu');
+            menu.style.display = (menu.style.display === 'grid' ? 'none' : 'grid');
+        };
+
+        window.setTheme = (theme) => {
+            document.body.className = 'theme-' + theme + ' min-h-screen pb-32';
+            localStorage.setItem('jkvpn_theme', theme);
+            document.querySelectorAll('.theme-opt').forEach(opt => {
+                opt.classList.toggle('active', opt.title.toLowerCase() === theme);
+            });
+            document.getElementById('theme-menu').style.display = 'none';
+            // Update container bg color on theme change to match sticky header
+            const tabContainer = document.querySelector('.tab-grid-container');
+            if(tabContainer) tabContainer.style.background = getComputedStyle(document.body).backgroundColor;
+        };
+
+        // Init Theme
+        const savedTheme = localStorage.getItem('jkvpn_theme') || 'light';
+        setTheme(savedTheme);
+
+        function showNotify(msg) {
+            const n = document.getElementById('notification');
+            n.innerText = msg; n.classList.remove('hidden'); 
+            setTimeout(() => n.classList.add('hidden'), 3000);
+        }
+
+        window.toggleModal = (id, show) => {
+            const el = document.getElementById(id);
+            if (show) el.classList.remove('hidden'); else el.classList.add('hidden');
+        };
+
+        window.verifyAdmin = () => {
+            if (document.getElementById('admin-password-input').value === ADMIN_PASS) {
+                localStorage.setItem('jkvpn_admin_session', 'active');
+                checkAdminSession(); toggleModal('admin-modal', false);
+                renderUI();
+            } else { showNotify("Wrong Pass!"); }
+        };
+
+        window.logoutAdmin = () => { localStorage.removeItem('jkvpn_admin_session'); location.reload(); };
+
+        function checkAdminSession() {
+            const isAdmin = localStorage.getItem('jkvpn_admin_session') === 'active';
+            document.getElementById('admin-view').classList.toggle('hidden', !isAdmin);
+            document.getElementById('user-view').classList.toggle('hidden', isAdmin);
+            document.getElementById('admin-login-btn').classList.toggle('hidden', isAdmin);
+            document.getElementById('admin-logout-btn').classList.toggle('hidden', !isAdmin);
+        }
+
+        const configsCol = collection(db, 'artifacts', appId, 'public', 'data', 'configs');
+        const statsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'global');
+        const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'main');
+
+        onSnapshot(configsCol, (snap) => {
+            allConfigs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            document.getElementById('total-server-display').innerText = allConfigs.length;
+            allConfigs.forEach(c => {
+                if(!serverPingState[c.id]) serverPingState[c.id] = Math.floor(Math.random() * 50) + 30;
+                if(!serverUserCountState[c.id]) serverUserCountState[c.id] = Math.floor(Math.random() * 15) + 5;
+            });
+            renderUI(); 
+            updateTotalOnline();
+        });
+
+        // 5s Auto Ping Update (Smooth)
+        setInterval(() => {
+            allConfigs.forEach(c => {
+                const variation = Math.floor(Math.random() * 10) - 5;
+                serverPingState[c.id] = Math.max(20, Math.min(300, (serverPingState[c.id] || 40) + variation));
+                const pEl = document.getElementById(`ping-val-${c.id}`);
+                if(pEl) {
+                    pEl.innerText = `${serverPingState[c.id]}ms`;
+                    pEl.className = serverPingState[c.id] > 150 ? 'ping-bad' : (serverPingState[c.id] > 80 ? 'ping-good' : 'ping-excellent');
+                }
+            });
+        }, 5000);
+
+        // 15m Active Users Update
+        setInterval(() => {
+            allConfigs.forEach(c => {
+                serverUserCountState[c.id] = Math.floor(Math.random() * 20) + 3;
+                const uEl = document.getElementById(`user-val-${c.id}`);
+                if(uEl) uEl.innerText = `${serverUserCountState[c.id]} Active`;
+            });
+            updateTotalOnline();
+        }, 900000);
+
+        onSnapshot(statsDoc, (snap) => {
+            if(snap.exists()){
+                const data = snap.data();
+                const today = new Date().toISOString().split('T')[0];
+                if(data.lastResetDay !== today) { updateDoc(statsDoc, { daily: 0, lastResetDay: today }); }
+                document.getElementById('total-gen-display').innerText = (data.total || 0).toLocaleString();
+                document.getElementById('daily-gen-display').innerText = (data.daily || 0).toLocaleString();
+            }
+        });
+
+        onSnapshot(settingsDoc, (snap) => {
+            if(snap.exists()){
+                const d = snap.data();
+                document.getElementById('running-text').innerText = d.marquee || "JK VPN V4 - FAST & SECURE";
+                document.getElementById('contact-link').href = d.contact || "#";
+                
+                document.getElementById('d-name-1').innerText = d.dname1 || "KBZ PAY";
+                document.getElementById('d-acc-1').innerText = d.dacc1 || "09xxxxxxxxx";
+                document.getElementById('d-logo-1').src = d.dlogo1 || "";
+                document.getElementById('d-name-2').innerText = d.dname2 || "WAVE PAY";
+                document.getElementById('d-acc-2').innerText = d.dacc2 || "09xxxxxxxxx";
+                document.getElementById('d-logo-2').src = d.dlogo2 || "";
+
+                if(localStorage.getItem('jkvpn_admin_session') === 'active') {
+                    document.getElementById('set-marquee').value = d.marquee || "";
+                    document.getElementById('set-contact').value = d.contact || "";
+                    document.getElementById('admin-dlogo1').value = d.dlogo1 || "";
+                    document.getElementById('admin-dname1').value = d.dname1 || "";
+                    document.getElementById('admin-dacc1').value = d.dacc1 || "";
+                    document.getElementById('admin-dlogo2').value = d.dlogo2 || "";
+                    document.getElementById('admin-dname2').value = d.dname2 || "";
+                    document.getElementById('admin-dacc2').value = d.dacc2 || "";
+                }
+            }
+        });
+
+        function updateTotalOnline() {
+            let total = 0; allConfigs.forEach(c => total += (serverUserCountState[c.id] || 0));
+            const countEl = document.getElementById('online-total-count');
+            if(countEl) countEl.innerText = total.toLocaleString();
+        }
+
+        document.getElementById('save-settings-btn').onclick = async () => {
+            const payload = {
+                marquee: document.getElementById('set-marquee').value,
+                contact: document.getElementById('set-contact').value,
+                dlogo1: document.getElementById('admin-dlogo1').value,
+                dname1: document.getElementById('admin-dname1').value,
+                dacc1: document.getElementById('admin-dacc1').value,
+                dlogo2: document.getElementById('admin-dlogo2').value,
+                dname2: document.getElementById('admin-dname2').value,
+                dacc2: document.getElementById('admin-dacc2').value
+            };
+            await setDoc(settingsDoc, payload, { merge: true }); 
+            showNotify("Settings Saved!");
+        };
+
+        document.getElementById('publish-btn').onclick = async () => {
+            const id = document.getElementById('edit-id').value;
+            const payload = {
+                flag: document.getElementById('config-flag').value.toUpperCase(),
+                title: document.getElementById('config-title').value, 
+                sim: document.getElementById('config-sim').value,
+                ispLogo: document.getElementById('config-isp-logo').value,
+                type: document.getElementById('config-type').value,
+                content: document.getElementById('config-content').value,
+                expire: document.getElementById('config-expire').value,
+                note: document.getElementById('config-note').value,
+                lastResetDate: new Date().toISOString().split('T')[0]
+            };
+            if(!payload.title || !payload.content) return showNotify("Required fields empty!");
+            
+            try {
+                if(id) { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id), payload); }
+                else { await addDoc(configsCol, { ...payload, dailyCount: 0, createdAt: Timestamp.now() }); }
+                document.getElementById('edit-id').value = "";
+                ['config-flag', 'config-title', 'config-sim', 'config-isp-logo', 'config-expire', 'config-content', 'config-note'].forEach(fid => {
+                    document.getElementById(fid).value = "";
+                });
+                showNotify("Server Published!");
+            } catch (e) { showNotify("Publish Failed!"); }
+        };
+
+        window.deleteConfig = async (id) => { 
+            if(confirm("Confirm Delete Server?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id));
+                showNotify("Deleted!");
+            }
+        };
+
+        window.editConfig = (itemStr) => {
+            const item = JSON.parse(decodeURIComponent(itemStr));
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('config-flag').value = item.flag || "";
+            document.getElementById('config-title').value = item.title || "";
+            document.getElementById('config-sim').value = item.sim || "";
+            document.getElementById('config-isp-logo').value = item.ispLogo || "";
+            document.getElementById('config-expire').value = item.expire || "";
+            document.getElementById('config-type').value = item.type || "V2RAY";
+            document.getElementById('config-content').value = item.content || "";
+            document.getElementById('config-note').value = item.note || "";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showNotify("Editing: " + item.title);
+        };
+
+        window.startGen = (id, title, content, daily, lastDate, expired) => {
+            if (expired) return showNotify("Server Expired!");
+            const today = new Date().toISOString().split('T')[0];
+            const actualDaily = (lastDate === today) ? daily : 0;
+            if (actualDaily >= SERVER_LIMIT) return showNotify("Server is Full!");
+            processingData = { id, title, content, actualDaily, today };
+            const n1 = Math.floor(Math.random() * 10) + 1;
+            const n2 = Math.floor(Math.random() * 10) + 1;
+            quizSolution = n1 + n2;
+            document.getElementById('quiz-question').innerText = `${n1} + ${n2} = ?`;
+            document.getElementById('quiz-answer').value = '';
+            toggleModal('quiz-modal', true);
+        };
+
+        document.getElementById('verify-quiz-btn').onclick = async () => {
+            const ans = parseInt(document.getElementById('quiz-answer').value);
+            if (ans !== quizSolution) return showNotify("Incorrect answer!");
+            if (isWriting) return; isWriting = true; toggleModal('quiz-modal', false);
+            try {
+                const sRef = doc(db, 'artifacts', appId, 'public', 'data', 'configs', processingData.id);
+                await updateDoc(sRef, { dailyCount: increment(1), lastResetDate: processingData.today });
+                await updateDoc(statsDoc, { total: increment(1), daily: increment(1) });
+                toggleModal('success-modal', true);
+                document.getElementById('show-config-btn').onclick = () => {
+                    toggleModal('success-modal', false);
+                    document.getElementById('modal-title').innerText = processingData.title;
+                    document.getElementById('modal-content').innerText = processingData.content;
+                    document.getElementById('modal-copy-btn').onclick = () => {
+                        const t = document.createElement('textarea'); t.value = processingData.content;
+                        document.body.appendChild(t); t.select(); document.execCommand('copy');
+                        document.body.removeChild(t); showNotify("Copied!");
+                    };
+                    toggleModal('config-modal', true);
+                };
+            } catch (e) { showNotify("Error!"); } finally { isWriting = false; }
+        };
+
+        const tabs = ['ALL', 'V2RAY', 'SSH', 'UDP', 'TROJAN', 'ONLINE'];
+        tabs.forEach(t => {
+            const btn = document.getElementById(`tab-${t}`);
+            if(btn) btn.onclick = () => {
+                currentFilter = t;
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active-all', 'active-v2ray', 'active-ssh', 'active-udp', 'active-trojan', 'active-online'));
+                const map = { 'ALL': 'active-all', 'V2RAY': 'active-v2ray', 'SSH': 'active-ssh', 'UDP': 'active-udp', 'TROJAN': 'active-trojan', 'ONLINE': 'active-online' };
+                btn.classList.add(map[t]);
+                const banner = document.getElementById('online-total-banner');
+                if(banner) banner.classList.toggle('hidden', t !== 'ONLINE');
+                renderUI();
+            };
+        });
+
+        function getFlag(f) {
+            if(!f || f.length !== 2) return '🌐';
+            return f.toUpperCase().split('').map(c => String.fromCodePoint(c.charCodeAt(0) + 127397)).join('');
+        }
+
+        function getISPClass(isp) {
+            const v = (isp || '').toLowerCase();
+            const count = (v.match(/dtac|true|ais/g) || []).length;
+            if(count >= 3) return 'isp-mix';
+            if(v.includes('dtac')) return 'isp-dtac';
+            if(v.includes('true')) return 'isp-true';
+            if(v.includes('ais')) return 'isp-ais';
+            return 'isp-default';
+        }
+
+        function renderUI() {
+            const grid = document.getElementById('user-grid');
+            const adminList = document.getElementById('admin-list');
+            if(!grid) return; grid.innerHTML = ''; if(adminList) adminList.innerHTML = '';
+            
+            const todayStr = new Date().toISOString().split('T')[0];
+            const isAdmin = localStorage.getItem('jkvpn_admin_session') === 'active';
+
+            if(isAdmin && adminList) {
+                allConfigs.forEach(item => {
+                    const encoded = encodeURIComponent(JSON.stringify(item));
+                    adminList.innerHTML += `
+                        <div class="server-card p-4 rounded-2xl flex justify-between items-center transition-all">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center border border-slate-200 text-lg flex-shrink-0">${getFlag(item.flag)}</div>
+                                <div class="min-w-0">
+                                    <p class="text-[10px] font-black truncate uppercase leading-tight">${item.title}</p>
+                                    <p class="text-[8px] font-bold opacity-60 tracking-wider">${item.type} • ${item.sim || 'Universal'}</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="editConfig('${encoded}')" class="w-8 h-8 flex items-center justify-center bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-600 hover:text-white transition-all"><i class="fas fa-edit text-[10px]"></i></button>
+                                <button onclick="deleteConfig('${item.id}')" class="w-8 h-8 flex items-center justify-center bg-rose-100 text-rose-500 rounded-lg hover:bg-rose-500 hover:text-white transition-all"><i class="fas fa-trash text-[10px]"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            let filtered;
+            if(currentFilter === 'ALL') filtered = allConfigs;
+            else if(currentFilter === 'ONLINE') filtered = allConfigs.filter(c => !c.expire || new Date(c.expire) >= new Date().setHours(0,0,0,0));
+            else filtered = allConfigs.filter(c => c.type === currentFilter);
+
+            filtered.forEach(item => {
+                const daily = item.lastResetDate === todayStr ? (item.dailyCount || 0) : 0;
+                const isFull = daily >= SERVER_LIMIT;
+                const expiryDate = item.expire ? new Date(item.expire) : null;
+                const isExpired = expiryDate && expiryDate < new Date().setHours(0,0,0,0);
+                const diff = expiryDate ? Math.ceil((expiryDate - new Date().setHours(0,0,0,0)) / 86400000) : null;
+                const curPing = serverPingState[item.id] || 40;
+                const curUsers = serverUserCountState[item.id] || 10;
+
+                // User Count Color Logic
+                let userColorClass = 'status-badge-blue';
+                if(curUsers > 15) userColorClass = 'status-badge-orange';
+                if(curUsers > 25) userColorClass = 'status-badge-red';
+                if(curUsers <= 10) userColorClass = 'status-badge-green';
+
+                // Days Left Color Logic
+                let daysColorClass = 'text-emerald-500';
+                if(diff !== null) {
+                    if(diff <= 3) daysColorClass = 'text-rose-500';
+                    else if(diff <= 7) daysColorClass = 'text-amber-500';
+                }
+
+                grid.innerHTML += `
+                    <div class="server-card rounded-[1.8rem] p-5 shadow-sm flex flex-col transition-all ${isExpired ? 'opacity-60 grayscale' : (isFull ? 'border-rose-400' : 'hover:shadow-2xl')} animate-in">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="flag-circle">${getFlag(item.flag)}</div>
+                            <div class="min-w-0 flex-1">
+                                <h3 class="text-[11px] font-black leading-tight italic break-words">${item.title}</h3>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="${isExpired ? 'bg-rose-500' : 'dot-online'} rounded-full w-1.5 h-1.5 inline-block"></span>
+                                    <p class="text-[7px] font-black uppercase tracking-tighter ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">
+                                        ${isExpired ? 'OFF' : 'ONLINE'} • <span id="ping-val-${item.id}" class="${curPing > 150 ? 'ping-bad' : (curPing > 80 ? 'ping-good' : 'ping-excellent')}">${curPing}ms</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="text-[7px] font-black px-2 py-1 bg-slate-900 text-white rounded-lg self-start">${item.type}</span>
+                        </div>
+                        <div class="space-y-1.5 mb-5 text-[9px] flex-grow">
+                            <div class="flex justify-between opacity-80 p-2 rounded-xl" style="background: rgba(0,0,0,0.05)">
+                                <span class="font-black uppercase text-[7px]">ISP:</span> 
+                                <span class="isp-badge ${getISPClass(item.sim)}">
+                                    ${item.ispLogo ? `<img src="${item.ispLogo}" class="isp-logo-img">` : ''}
+                                    ${item.sim || 'Universal'}
+                                </span>
+                            </div>
+                            <div class="flex justify-between opacity-80 p-2 rounded-xl" style="background: rgba(0,0,0,0.05)">
+                                <span class="font-black uppercase text-[7px]">Active Users:</span> 
+                                <span id="user-val-${item.id}" class="px-2 py-0.5 rounded-full font-black ${userColorClass}">${curUsers} Users</span>
+                            </div>
+                            <div class="flex justify-between opacity-80 p-2 rounded-xl" style="background: rgba(0,0,0,0.05)">
+                                <span class="font-black uppercase text-[7px]">Expiry Date:</span> 
+                                <span class="font-black ${isExpired ? 'text-rose-500' : ''}">${item.expire || 'Life Time'}</span>
+                            </div>
+                            <div class="flex justify-between opacity-80 p-2 rounded-xl" style="background: rgba(0,0,0,0.05)">
+                                <span class="font-black uppercase text-[7px]">Days Left:</span> 
+                                <span class="font-black ${isExpired ? 'text-rose-500' : daysColorClass}">${isExpired ? 'EXPIRED' : (diff !== null ? diff + ' Days' : 'Unlimited')}</span>
+                            </div>
+                            <div class="flex justify-between items-center opacity-80 p-2 rounded-xl" style="background: rgba(0,0,0,0.05)">
+                                <span class="font-black uppercase text-[7px]">Daily Gen Limit:</span> 
+                                <span class="px-2 py-0.5 rounded-full text-[8px] font-black ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}">${daily} / ${SERVER_LIMIT}</span>
+                            </div>
+                            ${item.note ? `<div class="p-2 rounded-xl border border-amber-500/30" style="background: rgba(245,158,11,0.1)"><p class="text-amber-500 font-medium italic"><i class="fas fa-info-circle mr-1"></i>${item.note}</p></div>` : ''}
+                        </div>
+                        <button onclick="startGen('${item.id}', '${item.title}', '${item.content}', ${item.dailyCount || 0}, '${item.lastResetDate}', ${isExpired})" 
+                                class="w-full py-3 ${isExpired ? 'bg-slate-400 cursor-not-allowed' : (isFull ? 'bg-rose-500' : 'bg-slate-900 hover:bg-black')} text-white rounded-xl font-black text-[9px] uppercase tracking-tighter transition-all">
+                            ${isExpired ? 'SERVER EXPIRED' : (isFull ? 'LIMIT REACHED' : 'Get Configuration')}
+                        </button>
+                    </div>
+                `;
+            });
+        }
+        
+        setInterval(() => { 
+            const clock = document.getElementById('server-clock');
+            if(clock) clock.innerText = new Date().toLocaleString(); 
+        }, 1000);
+
+        window.addEventListener('load', async () => { 
+            await signInAnonymously(auth); 
+            checkAdminSession(); 
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!e.target.closest('.theme-fab') && !e.target.closest('.theme-menu')) {
+                const menu = document.getElementById('theme-menu');
+                if(menu) menu.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
+
