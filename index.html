@@ -17,7 +17,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css"/>
 
-    <!-- Google AdSense (Replace with your own publisher ID and ad slot) -->
+    <!-- Google AdSense (REPLACE WITH YOUR OWN PUBLISHER ID AND AD SLOT) -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script>
     
     <style>
@@ -160,18 +160,20 @@
         
         .adsense-container { margin: 2rem auto; text-align: center; background: rgba(0,0,0,0.02); border-radius: 1rem; padding: 0.5rem; }
 
-        /* FAQ styling */
+        .info-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; }
         .faq-item { border-bottom: 1px solid var(--border); padding: 0.75rem 0; }
         .faq-question { font-weight: 800; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .faq-answer { display: none; margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.8; }
         .faq-item.active .faq-answer { display: block; }
+        .protocol-badge { display: inline-block; background: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-right: 0.5rem; margin-bottom: 0.5rem; }
+        .update-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--border); }
     </style>
 </head>
 <body class="theme-light min-h-screen pb-32">
 
     <div id="notification" class="fixed top-24 right-4 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[110] hidden animate-in border-l-4 border-amber-500"></div>
 
-    <!-- Theme Menu (full list) -->
+    <!-- Theme Menu - FULL 50+ THEMES -->
     <div id="theme-menu" class="theme-menu">
         <div onclick="setTheme('light')" class="theme-opt bg-slate-200" title="Light"></div>
         <div onclick="setTheme('dark')" class="theme-opt bg-slate-800" title="Dark"></div>
@@ -242,9 +244,9 @@
                     <span>JK-VPN<span class="text-indigo-400 text-[10px] font-normal ml-1">V4</span></span>
                 </div>
                 <div class="flex gap-2">
-                    <a id="contact-link" href="#" target="_blank" class="bg-sky-500 hover:bg-sky-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
+                    <button onclick="toggleModal('contact-modal', true)" class="bg-sky-500 hover:bg-sky-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
                         <i class="fas fa-paper-plane"></i> Contact
-                    </a>
+                    </button>
                     <button onclick="toggleModal('donate-modal', true)" class="bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
                         <i class="fas fa-heart"></i> Donate
                     </button>
@@ -338,6 +340,84 @@
             </div>
         </div>
 
+        <!-- Privacy Policy Modal (full) -->
+        <div id="privacy-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[200] hidden">
+            <div class="bg-white rounded-[2rem] p-6 w-full max-w-2xl shadow-2xl animate-in text-slate-900 max-h-[85vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4 sticky top-0 bg-white py-2">
+                    <h2 class="text-xl font-black">Privacy Policy</h2>
+                    <button onclick="toggleModal('privacy-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <div class="space-y-4 text-sm">
+                    <p><strong>Effective Date:</strong> March 2026</p>
+                    <p>JK VPN ("we", "our", "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our free VPN service.</p>
+                    <h3 class="font-bold mt-2">1. Information We Collect</h3>
+                    <p>We do <strong>not</strong> collect any personally identifiable information. We only collect anonymized usage statistics (total number of configurations generated) to monitor service performance. No IP addresses, browsing history, or personal data are logged.</p>
+                    <h3 class="font-bold mt-2">2. How We Use Your Information</h3>
+                    <p>Aggregated statistics help us improve server capacity and ensure fair usage (daily limits per server). We do not sell or share any data with third parties except as required by law.</p>
+                    <h3 class="font-bold mt-2">3. Cookies and Tracking</h3>
+                    <p>We use Google AdSense to display advertisements. AdSense may use cookies to serve ads based on your prior visits to this website. You can opt out of personalized advertising by visiting Google Ad Settings.</p>
+                    <h3 class="font-bold mt-2">4. Third-Party Links</h3>
+                    <p>Our website may contain links to third-party sites. We are not responsible for their privacy practices.</p>
+                    <h3 class="font-bold mt-2">5. Data Security</h3>
+                    <p>We implement reasonable security measures to protect the limited data we collect. However, no method of transmission over the Internet is 100% secure.</p>
+                    <h3 class="font-bold mt-2">6. Children's Privacy</h3>
+                    <p>Our service is not directed to children under 13. We do not knowingly collect information from minors.</p>
+                    <h3 class="font-bold mt-2">7. Changes to This Policy</h3>
+                    <p>We may update this Privacy Policy occasionally. Continued use of the service constitutes acceptance of the revised policy.</p>
+                    <p>If you have questions, contact us via the Contact modal.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terms of Service Modal (full) -->
+        <div id="terms-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[200] hidden">
+            <div class="bg-white rounded-[2rem] p-6 w-full max-w-2xl shadow-2xl animate-in text-slate-900 max-h-[85vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-4 sticky top-0 bg-white py-2">
+                    <h2 class="text-xl font-black">Terms of Service</h2>
+                    <button onclick="toggleModal('terms-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <div class="space-y-4 text-sm">
+                    <p><strong>Last Updated:</strong> March 2026</p>
+                    <p>By accessing or using JK VPN, you agree to be bound by these Terms of Service.</p>
+                    <h3 class="font-bold mt-2">1. Use of Service</h3>
+                    <p>JK VPN provides free VPN configuration files for educational and personal use. You must not use the service for any illegal activities, including but not limited to hacking, fraud, or distribution of malicious content. You are solely responsible for compliance with your local laws.</p>
+                    <h3 class="font-bold mt-2">2. Fair Usage Policy</h3>
+                    <p>Each server has a daily generation limit (currently 30). This ensures fair access for all users. Abuse of the service (e.g., automated scripts) may result in temporary or permanent ban.</p>
+                    <h3 class="font-bold mt-2">3. No Warranty</h3>
+                    <p>The service is provided "as is" without warranties of any kind. We do not guarantee uninterrupted availability, speed, or security. Use at your own risk.</p>
+                    <h3 class="font-bold mt-2">4. Limitation of Liability</h3>
+                    <p>To the fullest extent permitted by law, JK VPN shall not be liable for any indirect, incidental, or consequential damages arising from your use of the service.</p>
+                    <h3 class="font-bold mt-2">5. Intellectual Property</h3>
+                    <p>All content, logos, and trademarks are property of JK VPN. You may not copy or reproduce without permission.</p>
+                    <h3 class="font-bold mt-2">6. Modifications</h3>
+                    <p>We reserve the right to modify or discontinue the service at any time without notice. These terms may be updated, and your continued use constitutes acceptance.</p>
+                    <h3 class="font-bold mt-2">7. Contact</h3>
+                    <p>For any questions regarding these terms, please use the Contact modal.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Modal -->
+        <div id="contact-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[200] hidden">
+            <div class="bg-white rounded-[2rem] p-6 w-full max-w-md shadow-2xl animate-in text-slate-900">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl font-black">Contact Us</h2>
+                    <button onclick="toggleModal('contact-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <div class="space-y-4">
+                    <p class="text-sm">For support, inquiries, or feedback, you can reach us via email:</p>
+                    <div class="bg-slate-100 p-3 rounded-xl text-center">
+                        <i class="fas fa-envelope text-indigo-600 mr-2"></i>
+                        <a href="mailto:support@jkvpn.com" class="text-indigo-600 font-bold underline">support@jkvpn.com</a>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-2">We aim to respond within 24-48 hours.</p>
+                    <div class="border-t pt-4 mt-2">
+                        <p class="text-xs text-center">You can also reach us on social media (links coming soon).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Admin View -->
         <div id="admin-view" class="hidden space-y-6 animate-in">
             <div class="flex justify-between items-center">
@@ -381,7 +461,7 @@
                     </div>
                 </div>
 
-                <!-- Server Entry Form -->
+                <!-- Server Entry Form (with FULL FLAG LIST) -->
                 <div class="server-card p-6 rounded-[2rem] shadow-sm">
                     <div class="admin-section-header">
                         <h3 class="text-[10px] font-black uppercase opacity-60 tracking-widest mb-4 px-1">Server Entry</h3>
@@ -391,7 +471,6 @@
                         <div class="space-y-1">
                             <label class="text-[8px] font-black uppercase opacity-60 ml-2">Choose Flag (ISO Code)</label>
                             <select id="config-flag" class="input-box w-full p-3 rounded-xl text-xs font-black max-h-[150px]">
-                                <!-- ASIA -->
                                 <optgroup label="ASIA">
                                     <option value="af">Afghanistan</option><option value="am">Armenia</option>
                                     <option value="az">Azerbaijan</option><option value="bh">Bahrain</option>
@@ -420,7 +499,6 @@
                                     <option value="uz">Uzbekistan</option><option value="vn">Vietnam</option>
                                     <option value="ye">Yemen</option>
                                 </optgroup>
-                                <!-- EUROPE -->
                                 <optgroup label="EUROPE">
                                     <option value="al">Albania</option><option value="ad">Andorra</option>
                                     <option value="at">Austria</option><option value="by">Belarus</option>
@@ -445,7 +523,6 @@
                                     <option value="ch">Switzerland</option><option value="ua">Ukraine</option>
                                     <option value="gb">United Kingdom</option><option value="va">Vatican City</option>
                                 </optgroup>
-                                <!-- AMERICAS -->
                                 <optgroup label="AMERICAS">
                                     <option value="ag">Antigua</option><option value="ar">Argentina</option>
                                     <option value="bs">Bahamas</option><option value="bb">Barbados</option>
@@ -466,8 +543,7 @@
                                     <option value="us">United States</option><option value="uy">Uruguay</option>
                                     <option value="ve">Venezuela</option>
                                 </optgroup>
-                                <!-- AFRICA & OCEANIA -->
-                                <optgroup label="OTHER REGIONS">
+                                <optgroup label="AFRICA & OCEANIA">
                                     <option value="dz">Algeria</option><option value="ao">Angola</option>
                                     <option value="au">Australia</option><option value="eg">Egypt</option>
                                     <option value="et">Ethiopia</option><option value="gh">Ghana</option>
@@ -514,127 +590,45 @@
 
         <!-- User View -->
         <div id="user-view" class="space-y-6 animate-in">
-            <!-- Header Banner -->
             <div class="bg-slate-950 p-8 rounded-[2.5rem] text-white shadow-2xl relative flex flex-col items-center">
                 <div class="text-center mb-6">
                     <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-1">JK FREE VPN</h1>
                     <div id="server-clock" class="text-indigo-400 font-mono text-[9px] font-bold tracking-widest">...</div>
                 </div>
                 <div class="flex gap-4 justify-center w-full max-w-lg">
-                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
-                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Servers</p>
-                        <p id="total-server-display" class="text-xl font-black">0</p>
-                    </div>
-                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
-                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Daily Gen</p>
-                        <p id="daily-gen-display" class="text-xl font-black">0</p>
-                    </div>
-                    <div class="stat-card p-4 rounded-3xl text-center flex-1">
-                        <p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Total Gen</p>
-                        <p id="total-gen-display" class="text-xl font-black">0</p>
-                    </div>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1"><p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Servers</p><p id="total-server-display" class="text-xl font-black">0</p></div>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1"><p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Daily Gen</p><p id="daily-gen-display" class="text-xl font-black">0</p></div>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1"><p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Total Gen</p><p id="total-gen-display" class="text-xl font-black">0</p></div>
                 </div>
             </div>
 
-            <!-- Online Total Banner -->
             <div id="online-total-banner" class="hidden bg-indigo-600 p-4 rounded-2xl text-white flex justify-between items-center shadow-lg animate-in">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-users"></i></div>
-                    <div>
-                        <p class="text-[8px] font-black uppercase tracking-widest opacity-80">Total Active Users</p>
-                        <p id="online-total-count" class="text-xl font-black">0</p>
-                    </div>
-                </div>
+                <div class="flex items-center gap-3"><div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-users"></i></div><div><p class="text-[8px] font-black uppercase tracking-widest opacity-80">Total Active Users</p><p id="online-total-count" class="text-xl font-black">0</p></div></div>
                 <div class="text-right"><span class="text-[7px] font-black bg-white/20 px-2 py-1 rounded-full uppercase italic">Real-time</span></div>
             </div>
 
-            <!-- Filter Tabs -->
-            <div class="tab-grid-container">
-                <div class="tab-grid">
-                    <button id="tab-ALL" class="tab-btn active-all">All</button>
-                    <button id="tab-V2RAY" class="tab-btn">V2R</button>
-                    <button id="tab-SSH" class="tab-btn">SSH</button>
-                    <button id="tab-UDP" class="tab-btn">UDP</button>
-                    <button id="tab-TROJAN" class="tab-btn">TRJ</button>
-                    <button id="tab-OVPN" class="tab-btn">OVPN</button>
-                    <button id="tab-SS" class="tab-btn">SS</button>
-                    <button id="tab-ONLINE" class="tab-btn font-bold"><i class="fas fa-users mr-1"></i>On</button>
-                </div>
-            </div>
+            <div class="tab-grid-container"><div class="tab-grid"><button id="tab-ALL" class="tab-btn active-all">All</button><button id="tab-V2RAY" class="tab-btn">V2R</button><button id="tab-SSH" class="tab-btn">SSH</button><button id="tab-UDP" class="tab-btn">UDP</button><button id="tab-TROJAN" class="tab-btn">TRJ</button><button id="tab-OVPN" class="tab-btn">OVPN</button><button id="tab-SS" class="tab-btn">SS</button><button id="tab-ONLINE" class="tab-btn font-bold"><i class="fas fa-users mr-1"></i>On</button></div></div>
 
-            <!-- Config Grid -->
-            <div id="user-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-10"></div>
+            <div id="user-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-            <!-- FAQ Section (added for AdSense content) -->
-            <div class="server-card p-6 rounded-2xl my-6">
-                <h2 class="text-xl font-black mb-4 flex items-center gap-2"><i class="fas fa-question-circle text-indigo-500"></i> Frequently Asked Questions</h2>
-                <div id="faq-container">
-                    <div class="faq-item">
-                        <div class="faq-question"><span>What protocols does JK VPN support?</span><i class="fas fa-chevron-down text-sm"></i></div>
-                        <div class="faq-answer">JK VPN supports V2RAY, SSH, Trojan, UDP, OpenVPN, and Shadowsocks. You can filter servers by protocol using the tabs above.</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question"><span>How many times can I generate a config per day?</span><i class="fas fa-chevron-down text-sm"></i></div>
-                        <div class="faq-answer">Each server has a daily limit of 30 generations to ensure fair usage. Once a server reaches its limit, it will show "FULL".</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question"><span>Is JK VPN really free?</span><i class="fas fa-chevron-down text-sm"></i></div>
-                        <div class="faq-answer">Yes, all configurations are provided completely free. We run ads to cover server costs and keep the service alive.</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question"><span>How do I use the configuration?</span><i class="fas fa-chevron-down text-sm"></i></div>
-                        <div class="faq-answer">After generating a config, copy the content and import it into your preferred VPN client (e.g., V2RayNG, Shadowrocket, OpenVPN, etc.)</div>
-                    </div>
-                    <div class="faq-item">
-                        <div class="faq-question"><span>Why do I need to solve a math problem?</span><i class="fas fa-chevron-down text-sm"></i></div>
-                        <div class="faq-answer">The math challenge prevents automated bots from abusing the service and helps us maintain server stability for real users.</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- AdSense Unit - Responsive Display Ad -->
             <div class="adsense-container">
-                <ins class="adsbygoogle"
-                     style="display:block"
-                     data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"   <!-- Replace with your pub ID -->
-                     data-ad-slot="1234567890"                <!-- Replace with your ad slot ID -->
-                     data-ad-format="auto"
-                     data-full-width-responsive="true"></ins>
-                <script>
-                     (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
+                <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="1234567890" data-ad-format="auto" data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
                 <p class="text-[8px] opacity-50 mt-2">Advertisement</p>
             </div>
+
+            <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-globe text-indigo-500"></i> About JK VPN</h2><p class="text-sm mb-3">JK VPN is a free, community-driven VPN service providing high-speed configurations. We support V2Ray, SSH, Trojan, UDP, OpenVPN, Shadowsocks. No logs, fast servers.</p></div>
+            <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-rocket text-indigo-500"></i> How to Use</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><h3 class="font-black text-sm mb-2">Mobile (Android/iOS)</h3><ul class="list-disc list-inside text-xs"><li>Download V2RayNG, Shadowrocket, etc.</li><li>Click "Get Configuration"</li><li>Solve math challenge</li><li>Copy config & connect</li></ul></div><div><h3 class="font-black text-sm mb-2">Desktop</h3><ul class="list-disc list-inside text-xs"><li>Use V2RayN, Qv2ray, OpenVPN GUI</li><li>Import config & enjoy</li></ul></div></div></div>
+            <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-shield-alt text-indigo-500"></i> Protocols</h2><div><span class="protocol-badge">V2Ray</span><span class="protocol-badge">SSH</span><span class="protocol-badge">Trojan</span><span class="protocol-badge">UDP</span><span class="protocol-badge">OpenVPN</span><span class="protocol-badge">Shadowsocks</span></div></div>
+            <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-question-circle text-indigo-500"></i> FAQ</h2><div id="faq-container"><div class="faq-item"><div class="faq-question"><span>Is JK VPN completely free?</span><i class="fas fa-chevron-down text-sm"></i></div><div class="faq-answer">Yes, all configs free.</div></div><div class="faq-item"><div class="faq-question"><span>How many generations per day?</span><i class="fas fa-chevron-down text-sm"></i></div><div class="faq-answer">30 per server.</div></div><div class="faq-item"><div class="faq-question"><span>Do you keep logs?</span><i class="fas fa-chevron-down text-sm"></i></div><div class="faq-answer">No logs, only anonymized stats.</div></div></div></div>
         </div>
     </main>
-
-    <!-- Policy Modals (Privacy & Terms) -->
-    <div id="privacy-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[200] hidden">
-        <div class="bg-white rounded-[2rem] p-6 w-full max-w-xl shadow-2xl animate-in text-slate-900">
-            <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-black">Privacy Policy</h2><button onclick="toggleModal('privacy-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button></div>
-            <div class="max-h-[60vh] overflow-y-auto text-sm space-y-3">
-                <p><strong>JK VPN</strong> respects your privacy. This service does not collect any personal logs of your online activity. We only store anonymized usage statistics (total generation counts) to improve service. Third-party ads (Google AdSense) may use cookies to serve relevant ads. You can manage cookie preferences via browser settings. For any inquiries, contact via the provided contact link.</p>
-                <p>We do not share your data with third parties except as required by law. By using this service, you agree to the terms outlined in this policy.</p>
-                <p class="text-[10px] mt-2">Last updated: March 2026</p>
-            </div>
-        </div>
-    </div>
-    <div id="terms-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[200] hidden">
-        <div class="bg-white rounded-[2rem] p-6 w-full max-w-xl shadow-2xl animate-in text-slate-900">
-            <div class="flex justify-between items-center mb-4"><h2 class="text-xl font-black">Terms of Service</h2><button onclick="toggleModal('terms-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button></div>
-            <div class="max-h-[60vh] overflow-y-auto text-sm space-y-3">
-                <p>JK VPN provides free VPN configuration access for educational and personal use. You agree not to misuse the service for illegal activities. The service is provided "as is" without any guarantees. Daily limits per server apply to ensure fair usage. We reserve the right to modify or discontinue the service at any time.</p>
-                <p>Advertisements displayed are managed by Google AdSense. Any interaction with ads is subject to Google's policies.</p>
-                <p>By generating a configuration, you confirm you are of legal age and accept these terms.</p>
-            </div>
-        </div>
-    </div>
 
     <footer class="fixed-footer">
         <div class="flex justify-center gap-4 mb-1">
             <button onclick="toggleModal('privacy-modal', true)" class="text-[9px] font-bold underline hover:opacity-80">Privacy Policy</button>
             <button onclick="toggleModal('terms-modal', true)" class="text-[9px] font-bold underline hover:opacity-80">Terms of Service</button>
-            <a id="contact-footer-link" href="#" target="_blank" class="text-[9px] font-bold underline hover:opacity-80">Contact</a>
+            <button onclick="toggleModal('contact-modal', true)" class="text-[9px] font-bold underline hover:opacity-80">Contact</button>
         </div>
         <p class="font-black text-[9px] uppercase tracking-tighter italic">© 2018-2026 JK VPN - BY JUEHTET</p>
     </footer>
@@ -754,8 +748,6 @@
             if(snap.exists()){
                 const d = snap.data();
                 document.getElementById('running-text').innerText = d.marquee || "JK VPN V4 - FAST & SECURE";
-                document.getElementById('contact-link').href = d.contact || "#";
-                document.getElementById('contact-footer-link').href = d.contact || "#";
                 document.getElementById('d-name-1').innerText = d.dname1 || "KBZ PAY";
                 document.getElementById('d-acc-1').innerText = d.dacc1 || "09xxxxxxxxx";
                 document.getElementById('d-logo-1').src = d.dlogo1 || "";
@@ -909,22 +901,25 @@
             return 'isp-default';
         }
 
-        // FAQ toggle
         function initFaq() {
             const faqItems = document.querySelectorAll('.faq-item');
             faqItems.forEach(item => {
                 const questionDiv = item.querySelector('.faq-question');
-                questionDiv.addEventListener('click', () => {
-                    item.classList.toggle('active');
-                    const icon = questionDiv.querySelector('i');
-                    if (item.classList.contains('active')) {
-                        icon.classList.remove('fa-chevron-down');
-                        icon.classList.add('fa-chevron-up');
-                    } else {
-                        icon.classList.remove('fa-chevron-up');
-                        icon.classList.add('fa-chevron-down');
-                    }
-                });
+                if (questionDiv) {
+                    questionDiv.addEventListener('click', () => {
+                        item.classList.toggle('active');
+                        const icon = questionDiv.querySelector('i');
+                        if (icon) {
+                            if (item.classList.contains('active')) {
+                                icon.classList.remove('fa-chevron-down');
+                                icon.classList.add('fa-chevron-up');
+                            } else {
+                                icon.classList.remove('fa-chevron-up');
+                                icon.classList.add('fa-chevron-down');
+                            }
+                        }
+                    });
+                }
             });
         }
 
@@ -985,40 +980,14 @@
                         <span class="text-[7px] font-black px-2 py-1 bg-slate-900 text-white rounded-lg">${item.type}</span>
                     </div>
                     <div class="space-y-1.5 mb-5 text-[9px] flex-grow">
-                        <div class="flex justify-between p-2 rounded-xl bg-black/5">
-                            <span class="font-black uppercase text-[7px]">ISP:</span> 
-                            <span class="isp-badge ${getISPClass(item.sim)}">
-                                ${item.ispLogo ? `<img src="${item.ispLogo}" class="isp-logo-img">` : ''}
-                                ${item.sim || 'Universal'}
-                            </span>
-                        </div>
-                        <div class="flex justify-between p-2 rounded-xl bg-black/5">
-                            <span class="font-black uppercase text-[7px]">Active Users:</span> 
-                            <span class="px-2 py-0.5 rounded-full font-black status-badge-blue">${users} Users</span>
-                        </div>
-                        <div class="flex justify-between p-2 rounded-xl bg-black/5">
-                            <span class="font-black uppercase text-[7px]">Expiry:</span> 
-                            <span class="font-black">${item.expire || 'Life Time'}</span>
-                        </div>
-                        <div class="flex justify-between p-2 rounded-xl bg-black/5">
-                            <span class="font-black uppercase text-[7px]">Status:</span> 
-                            <span class="font-black ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">${isExpired ? 'EXPIRED' : (diff !== null ? diff + ' Days Left' : 'Permanent')}</span>
-                        </div>
-                        <div class="flex justify-between p-2 rounded-xl bg-black/5">
-                            <span class="font-black uppercase text-[7px]">Limit:</span> 
-                            <span class="px-2 py-0.5 rounded-full font-black ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}">${daily} / ${SERVER_LIMIT}</span>
-                        </div>
-                        ${item.note ? `
-                        <div class="flex justify-between p-2 rounded-xl bg-black/5">
-                            <span class="font-black uppercase text-[7px]">Note:</span> 
-                            <span class="font-black text-amber-500 italic text-[9px] break-words text-right max-w-[65%]">${item.note}</span>
-                        </div>
-                        ` : ''}
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">ISP:</span> <span class="isp-badge ${getISPClass(item.sim)}">${item.ispLogo ? `<img src="${item.ispLogo}" class="isp-logo-img">` : ''}${item.sim || 'Universal'}</span></div>
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Active Users:</span> <span class="px-2 py-0.5 rounded-full font-black status-badge-blue">${users} Users</span></div>
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Expiry:</span> <span class="font-black">${item.expire || 'Life Time'}</span></div>
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Status:</span> <span class="font-black ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">${isExpired ? 'EXPIRED' : (diff !== null ? diff + ' Days Left' : 'Permanent')}</span></div>
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Limit:</span> <span class="px-2 py-0.5 rounded-full font-black ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}">${daily} / ${SERVER_LIMIT}</span></div>
+                        ${item.note ? `<div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Note:</span> <span class="font-black text-amber-500 italic text-[9px] break-words text-right max-w-[65%]">${item.note}</span></div>` : ''}
                     </div>
-                    <button onclick="startGen('${item.id}', '${item.title.replace(/'/g, "\\'")}', '${escapedContent}', ${daily}, ${isExpired})" 
-                            class="w-full py-3 ${isExpired ? 'bg-slate-400' : (isFull ? 'bg-rose-500' : 'bg-slate-900')} text-white rounded-xl font-black text-[9px] uppercase shadow-md active:scale-95 transition-transform">
-                        ${isExpired ? 'EXPIRED' : (isFull ? 'FULL' : 'Get Configuration')}
-                    </button>
+                    <button onclick="startGen('${item.id}', '${item.title.replace(/'/g, "\\'")}', '${escapedContent}', ${daily}, ${isExpired})" class="w-full py-3 ${isExpired ? 'bg-slate-400' : (isFull ? 'bg-rose-500' : 'bg-slate-900')} text-white rounded-xl font-black text-[9px] uppercase shadow-md active:scale-95 transition-transform">${isExpired ? 'EXPIRED' : (isFull ? 'FULL' : 'Get Configuration')}</button>
                 `;
                 grid.appendChild(card);
             });
