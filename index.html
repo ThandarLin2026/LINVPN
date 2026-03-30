@@ -17,8 +17,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css"/>
 
-    <!-- Adsterra Popunder (keep in head as recommended) -->
-    <script type='text/javascript' src='https://pl29011286.profitablecpmratenetwork.com/7a/3a/91/7a3a91dcac2ffb13aa17ada80567fbc.js'></script>
+    <!-- Adsterra Popunder -->
+    <script data-cfasync="false" type="text/javascript" src="https://pl29011286.profitablecpmratenetwork.com/7a/3a/91/7a3a91dcac2ffb13aa17ada80567fbc.js"></script>
     
     <style>
         /* Your existing styles - unchanged */
@@ -285,14 +285,13 @@
             </div>
         </div>
 
-        <!-- Fixed: Ad-gate modal with empty container that will be filled dynamically -->
         <div id="ad-gate-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[125] hidden">
             <div class="bg-white rounded-[2rem] p-6 w-full max-w-md shadow-2xl animate-in text-slate-900">
                 <div class="text-center mb-4">
                     <h2 class="text-xl font-black">Loading your config</h2>
                     <p id="ad-gate-countdown" class="text-xs font-bold text-slate-500 mt-1">Please wait 3 seconds...</p>
                 </div>
-                <div id="gate-ad-container" class="ad-container"></div>  <!-- dynamic ad will be injected here -->
+                <div id="gate-ad-container" class="ad-container" style="min-width:300px; min-height:250px;"></div>
                 <button onclick="toggleModal('ad-gate-modal', false)" class="w-full py-3 bg-slate-900 text-white font-black rounded-xl mt-2">Skip</button>
             </div>
         </div>
@@ -557,7 +556,7 @@
                         'params' : {}
                     };
                 </script>
-                <script type="text/javascript" src="//www.highperformanceformat.com/4ad664768abc1308cf41c379018be536/invoke.js"></script>
+                <script data-cfasync="false" type="text/javascript" src="https://www.highperformanceformat.com/4ad664768abc1308cf41c379018be536/invoke.js"></script>
                 <p class="text-[8px] opacity-50 mt-2">Advertisement</p>
             </div>
         </div>
@@ -792,14 +791,16 @@
             toggleModal('quiz-modal', true);
         }
 
-        // FIX: dynamically inject the 300x250 ad into the modal when it is shown
         function injectModalAd() {
             const container = document.getElementById('gate-ad-container');
             if (!container) return;
-            container.innerHTML = ''; // clear previous
+
+            container.innerHTML = `<div style="min-width:300px; min-height:250px;"></div>`;
+
             const script1 = document.createElement('script');
             script1.type = 'text/javascript';
-            script1.text = `
+            script1.setAttribute('data-cfasync', 'false');
+            script1.textContent = `
                 atOptions = {
                     'key': 'd64ac9f985005ee9595b26e48fa958c5',
                     'format': 'iframe',
@@ -809,9 +810,11 @@
                 };
             `;
             container.appendChild(script1);
+
             const script2 = document.createElement('script');
             script2.type = 'text/javascript';
-            script2.src = '//www.highperformanceformat.com/d64ac9f985005ee9595b26e48fa958c5/invoke.js';
+            script2.setAttribute('data-cfasync', 'false');
+            script2.src = 'https://www.highperformanceformat.com/d64ac9f985005ee9595b26e48fa958c5/invoke.js';
             container.appendChild(script2);
         }
 
@@ -821,7 +824,6 @@
 
             processingData = { id, title, content, daily };
 
-            // Inject ad before showing modal
             injectModalAd();
 
             toggleModal('ad-gate-modal', true);
