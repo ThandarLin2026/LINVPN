@@ -17,8 +17,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css"/>
 
-    <!-- Adsterra Popunder -->
-    <script data-cfasync="false" type="text/javascript" src="https://pl29011286.profitablecpmratenetwork.com/7a/3a/91/7a3a91dcac2ffb13aa17ada80567fbc.js"></script>
+    <!-- Popunder script removed -->
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
@@ -165,6 +164,27 @@
         .faq-item.active .faq-answer { display: block; }
         .protocol-badge { display: inline-block; background: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-right: 0.5rem; margin-bottom: 0.5rem; }
         .update-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--border); }
+
+        /* Social bar styles */
+        .social-bar {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .social-bar a {
+            color: var(--text-main);
+            opacity: 0.7;
+            transition: opacity 0.2s, transform 0.2s;
+            font-size: 1.2rem;
+        }
+        .social-bar a:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+        @media (max-width: 640px) {
+            .social-bar { gap: 1rem; }
+        }
     </style>
 </head>
 <body class="theme-light min-h-screen pb-32">
@@ -559,6 +579,13 @@
     </main>
 
     <footer class="fixed-footer">
+        <!-- Social Bar Added -->
+        <div class="social-bar">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" title="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://t.me" target="_blank" rel="noopener noreferrer" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" title="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" title="Instagram"><i class="fab fa-instagram"></i></a>
+        </div>
         <div class="flex justify-center gap-4 mb-1">
             <a href="https://linvpn.site/privacy.html" target="_blank" class="text-[9px] font-bold underline hover:opacity-80">Privacy Policy</a>
             <a href="https://linvpn.site/terms.html" target="_blank" class="text-[9px] font-bold underline hover:opacity-80">Terms of Service</a>
