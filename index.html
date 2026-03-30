@@ -21,7 +21,6 @@
     <script data-cfasync="false" type="text/javascript" src="https://pl29011286.profitablecpmratenetwork.com/7a/3a/91/7a3a91dcac2ffb13aa17ada80567fbc.js"></script>
     
     <style>
-        /* Your existing styles - unchanged */
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         
@@ -173,7 +172,6 @@
     <div id="notification" class="fixed top-24 right-4 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[110] hidden animate-in border-l-4 border-amber-500"></div>
 
     <div id="theme-menu" class="theme-menu">
-        <!-- all theme options unchanged -->
         <div onclick="setTheme('light')" class="theme-opt bg-slate-200" title="Light"></div>
         <div onclick="setTheme('dark')" class="theme-opt bg-slate-800" title="Dark"></div>
         <div onclick="setTheme('midnight')" class="theme-opt bg-indigo-950" title="Midnight"></div>
@@ -291,7 +289,6 @@
                     <h2 class="text-xl font-black">Loading your config</h2>
                     <p id="ad-gate-countdown" class="text-xs font-bold text-slate-500 mt-1">Please wait 3 seconds...</p>
                 </div>
-                <div id="gate-ad-container" class="ad-container" style="min-width:300px; min-height:250px;"></div>
                 <button onclick="toggleModal('ad-gate-modal', false)" class="w-full py-3 bg-slate-900 text-white font-black rounded-xl mt-2">Skip</button>
             </div>
         </div>
@@ -346,7 +343,6 @@
         </div>
 
         <div id="admin-view" class="hidden space-y-6 animate-in">
-            <!-- Admin panel content unchanged -->
             <div class="flex justify-between items-center">
                 <h1 class="text-xl font-black uppercase italic">Admin Dashboard</h1>
                 <span class="text-[9px] font-black bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">MASTER CONTROL</span>
@@ -791,40 +787,11 @@
             toggleModal('quiz-modal', true);
         }
 
-        function injectModalAd() {
-            const container = document.getElementById('gate-ad-container');
-            if (!container) return;
-
-            container.innerHTML = `<div style="min-width:300px; min-height:250px;"></div>`;
-
-            const script1 = document.createElement('script');
-            script1.type = 'text/javascript';
-            script1.setAttribute('data-cfasync', 'false');
-            script1.textContent = `
-                atOptions = {
-                    'key': 'd64ac9f985005ee9595b26e48fa958c5',
-                    'format': 'iframe',
-                    'height': 250,
-                    'width': 300,
-                    'params': {}
-                };
-            `;
-            container.appendChild(script1);
-
-            const script2 = document.createElement('script');
-            script2.type = 'text/javascript';
-            script2.setAttribute('data-cfasync', 'false');
-            script2.src = 'https://www.highperformanceformat.com/d64ac9f985005ee9595b26e48fa958c5/invoke.js';
-            container.appendChild(script2);
-        }
-
         window.startGen = (id, title, content, daily, expired) => {
             if (expired) return showNotify("Expired!");
             if (daily >= SERVER_LIMIT) return showNotify("Server Full!");
 
             processingData = { id, title, content, daily };
-
-            injectModalAd();
 
             toggleModal('ad-gate-modal', true);
             let count = 3;
