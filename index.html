@@ -17,7 +17,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css"/>
 
-    <!-- Popunder script removed -->
+    <!-- No popunder or persistent banner scripts here -->
     
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
@@ -155,15 +155,12 @@
 
         .admin-section-header { border-left: 4px solid var(--accent); padding-left: 12px; margin-bottom: 20px; }
         
-        .ad-container { margin: 2rem auto; text-align: center; background: rgba(0,0,0,0.02); border-radius: 1rem; padding: 0.75rem; }
-
         .info-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; }
         .faq-item { border-bottom: 1px solid var(--border); padding: 0.75rem 0; }
         .faq-question { font-weight: 800; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
         .faq-answer { display: none; margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.8; }
         .faq-item.active .faq-answer { display: block; }
         .protocol-badge { display: inline-block; background: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-right: 0.5rem; margin-bottom: 0.5rem; }
-        .update-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--border); }
 
         /* Social bar styles */
         .social-bar {
@@ -303,13 +300,19 @@
             </div>
         </div>
 
+        <!-- Ad gate modal: now contains banner ad + continue button -->
         <div id="ad-gate-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[125] hidden">
             <div class="bg-white rounded-[2rem] p-6 w-full max-w-md shadow-2xl animate-in text-slate-900">
                 <div class="text-center mb-4">
-                    <h2 class="text-xl font-black">Loading your config</h2>
-                    <p id="ad-gate-countdown" class="text-xs font-bold text-slate-500 mt-1">Please wait 3 seconds...</p>
+                    <h2 class="text-xl font-black">Support Us</h2>
+                    <p class="text-xs font-bold text-slate-500 mt-1">Please view the ad to continue</p>
                 </div>
-                <button onclick="toggleModal('ad-gate-modal', false)" class="w-full py-3 bg-slate-900 text-white font-black rounded-xl mt-2">Skip</button>
+                <!-- Banner ad container (will be filled by ad script) -->
+                <div id="ad-gate-banner" class="my-4"></div>
+                <div class="flex gap-3 mt-4">
+                    <button id="ad-gate-continue" class="flex-1 py-3 bg-indigo-600 text-white font-black rounded-xl shadow-lg" disabled>Continue (3s)</button>
+                    <button onclick="toggleModal('ad-gate-modal', false)" class="flex-1 py-3 bg-slate-200 text-slate-800 font-black rounded-xl">Close</button>
+                </div>
             </div>
         </div>
 
@@ -551,35 +554,18 @@
 
             <div id="user-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-            <div class="ad-container">
-                <script async="async" data-cfasync="false" src="https://pl29013694.profitablecpmratenetwork.com/7686d41bec523d23362c1e370a4c3113/invoke.js"></script>
-                <div id="container-7686d41bec523d23362c1e370a4c3113"></div>
-                <p class="text-[8px] opacity-50 mt-2">Advertisement</p>
-            </div>
+            <!-- All persistent ad containers removed -->
 
             <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-globe text-indigo-500"></i> About JK VPN</h2><p class="text-sm mb-3">JK VPN is a free, community-driven VPN service providing high-speed configurations. We support V2Ray, SSH, Trojan, UDP, OpenVPN, Shadowsocks. No logs, fast servers.</p></div>
             <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-rocket text-indigo-500"></i> How to Use</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><h3 class="font-black text-sm mb-2">Mobile (Android/iOS)</h3><ul class="list-disc list-inside text-xs"><li>Download V2RayNG, Shadowrocket, etc.</li><li>Click "Get Configuration"</li><li>Solve math challenge</li><li>Copy config & connect</li></ul></div><div><h3 class="font-black text-sm mb-2">Desktop</h3><ul class="list-disc list-inside text-xs"><li>Use V2RayN, Qv2ray, OpenVPN GUI</li><li>Import config & enjoy</li></ul></div></div></div>
             <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-shield-alt text-indigo-500"></i> Protocols</h2><div><span class="protocol-badge">V2Ray</span><span class="protocol-badge">SSH</span><span class="protocol-badge">Trojan</span><span class="protocol-badge">UDP</span><span class="protocol-badge">OpenVPN</span><span class="protocol-badge">Shadowsocks</span></div></div>
             <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-question-circle text-indigo-500"></i> FAQ</h2><div id="faq-container"><div class="faq-item"><div class="faq-question"><span>Is JK VPN completely free?</span><i class="fas fa-chevron-down text-sm"></i></div><div class="faq-answer">Yes, all configs free.</div></div><div class="faq-item"><div class="faq-question"><span>How many generations per day?</span><i class="fas fa-chevron-down text-sm"></i></div><div class="faq-answer">30 per server.</div></div><div class="faq-item"><div class="faq-question"><span>Do you keep logs?</span><i class="fas fa-chevron-down text-sm"></i></div><div class="faq-answer">No logs, only anonymized stats.</div></div></div></div>
 
-            <div class="ad-container">
-                <script type="text/javascript">
-                    atOptions = {
-                        'key' : '4ad664768abc1308cf41c379018be536',
-                        'format' : 'iframe',
-                        'height' : 50,
-                        'width' : 320,
-                        'params' : {}
-                    };
-                </script>
-                <script data-cfasync="false" type="text/javascript" src="https://www.highperformanceformat.com/4ad664768abc1308cf41c379018be536/invoke.js"></script>
-                <p class="text-[8px] opacity-50 mt-2">Advertisement</p>
-            </div>
+            <!-- No ad containers here -->
         </div>
     </main>
 
     <footer class="fixed-footer">
-        <!-- Social Bar Added -->
         <div class="social-bar">
             <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" title="Facebook"><i class="fab fa-facebook-f"></i></a>
             <a href="https://t.me" target="_blank" rel="noopener noreferrer" title="Telegram"><i class="fab fa-telegram-plane"></i></a>
@@ -814,29 +800,83 @@
             toggleModal('quiz-modal', true);
         }
 
+        // Modified ad gate: loads banner scripts and uses a timer before enabling continue
+        function showAdGate() {
+            const modal = document.getElementById('ad-gate-modal');
+            const bannerDiv = document.getElementById('ad-gate-banner');
+            const continueBtn = document.getElementById('ad-gate-continue');
+            
+            // Clear previous content
+            bannerDiv.innerHTML = '';
+            
+            // Load first banner script (original ad)
+            const script1 = document.createElement('script');
+            script1.async = true;
+            script1.setAttribute('data-cfasync', 'false');
+            script1.src = 'https://pl29013694.profitablecpmratenetwork.com/7686d41bec523d23362c1e370a4c3113/invoke.js';
+            bannerDiv.appendChild(script1);
+            
+            // Create container for the ad
+            const container = document.createElement('div');
+            container.id = 'container-7686d41bec523d23362c1e370a4c3113';
+            bannerDiv.appendChild(container);
+            
+            // Load second banner script
+            const script2 = document.createElement('script');
+            script2.type = 'text/javascript';
+            script2.innerHTML = `
+                atOptions = {
+                    'key' : '4ad664768abc1308cf41c379018be536',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            `;
+            bannerDiv.appendChild(script2);
+            
+            const script3 = document.createElement('script');
+            script3.setAttribute('data-cfasync', 'false');
+            script3.type = 'text/javascript';
+            script3.src = 'https://www.highperformanceformat.com/4ad664768abc1308cf41c379018be536/invoke.js';
+            bannerDiv.appendChild(script3);
+            
+            // Disable continue button and start countdown
+            continueBtn.disabled = true;
+            let seconds = 3;
+            continueBtn.innerText = `Continue (${seconds}s)`;
+            const timer = setInterval(() => {
+                seconds--;
+                if (seconds <= 0) {
+                    clearInterval(timer);
+                    continueBtn.disabled = false;
+                    continueBtn.innerText = 'Continue';
+                } else {
+                    continueBtn.innerText = `Continue (${seconds}s)`;
+                }
+            }, 1000);
+            
+            // Set up continue button click (one-time)
+            const handler = () => {
+                toggleModal('ad-gate-modal', false);
+                openQuizForProcessing();
+                continueBtn.removeEventListener('click', handler);
+                // Clean up banner div to avoid duplicate scripts
+                bannerDiv.innerHTML = '';
+            };
+            continueBtn.removeEventListener('click', handler);
+            continueBtn.addEventListener('click', handler);
+            
+            // Show modal
+            toggleModal('ad-gate-modal', true);
+        }
+
         window.startGen = (id, title, content, daily, expired) => {
             if (expired) return showNotify("Expired!");
             if (daily >= SERVER_LIMIT) return showNotify("Server Full!");
 
             processingData = { id, title, content, daily };
-
-            toggleModal('ad-gate-modal', true);
-            let count = 3;
-            const countEl = document.getElementById('ad-gate-countdown');
-            countEl.innerText = `Please wait ${count} seconds...`;
-
-            if (adGateTimer) clearInterval(adGateTimer);
-            adGateTimer = setInterval(() => {
-                count -= 1;
-                if (count <= 0) {
-                    clearInterval(adGateTimer);
-                    adGateTimer = null;
-                    toggleModal('ad-gate-modal', false);
-                    openQuizForProcessing();
-                } else {
-                    countEl.innerText = `Please wait ${count} seconds...`;
-                }
-            }, 1000);
+            showAdGate(); // Show ad modal instead of simple countdown
         };
 
         document.getElementById('verify-quiz-btn').onclick = async () => {
