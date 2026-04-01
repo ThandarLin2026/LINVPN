@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>JK VPN V4 - Multi-Protocol Edition</title>
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)">
+    <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="JK VPN">
+    <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/ThandarLin2026/JK/main/image/logo.png">
+    
+    <!-- External Resources -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.2/css/flag-icons.min.css"/>
+
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5300241280829470"
+         crossorigin="anonymous"></script>
+    
+    <style>
+        /* ===== All existing CSS (themes, etc.) ===== */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-main: #0f172a;
+            --accent: #4f46e5;
+            --border: #e2e8f0;
+        }
+
+        /* Themes Palette (50+) */
+        .theme-light { --bg-color: #f8fafc; --card-bg: #ffffff; --text-main: #0f172a; --accent: #4f46e5; --border: #e2e8f0; }
+        .theme-dark { --bg-color: #020617; --card-bg: #1e293b; --text-main: #f8fafc; --accent: #6366f1; --border: #334155; }
+        .theme-midnight { --bg-color: #0f172a; --card-bg: #1e1b4b; --text-main: #e0e7ff; --accent: #818cf8; --border: #312e81; }
+        .theme-emerald { --bg-color: #064e3b; --card-bg: #065f46; --text-main: #ecfdf5; --accent: #10b981; --border: #064e3b; }
+        .theme-rose { --bg-color: #4c0519; --card-bg: #881337; --text-main: #fff1f2; --accent: #fb7185; --border: #4c0519; }
+        .theme-amber { --bg-color: #451a03; --card-bg: #78350f; --text-main: #fffbeb; --accent: #fbbf24; --border: #451a03; }
+        .theme-slate { --bg-color: #334155; --card-bg: #475569; --text-main: #f1f5f9; --accent: #94a3b8; --border: #1e293b; }
+        .theme-ocean { --bg-color: #0c4a6e; --card-bg: #075985; --text-main: #f0f9ff; --accent: #38bdf8; --border: #0c4a6e; }
+        .theme-purple { --bg-color: #4c1d95; --card-bg: #5b21b6; --text-main: #f5f3ff; --accent: #a78bfa; --border: #4c1d95; }
+        .theme-forest { --bg-color: #14532d; --card-bg: #166534; --text-main: #f0fdf4; --accent: #4ade80; --border: #14532d; }
+        .theme-wine { --bg-color: #701a75; --card-bg: #86198f; --text-main: #fdf4ff; --accent: #e879f9; --border: #701a75; }
+        .theme-coffee { --bg-color: #3e2723; --card-bg: #4e342e; --text-main: #efebe9; --accent: #a1887f; --border: #3e2723; }
+        .theme-gold { --bg-color: #1a1a1a; --card-bg: #2a2a2a; --text-main: #d4af37; --accent: #ffd700; --border: #333333; }
+        .theme-neon { --bg-color: #000000; --card-bg: #111111; --text-main: #39ff14; --accent: #39ff14; --border: #222222; }
+        .theme-sky { --bg-color: #e0f2fe; --card-bg: #ffffff; --text-main: #0369a1; --accent: #0ea5e9; --border: #bae6fd; }
+        .theme-mint { --bg-color: #ecfdf5; --card-bg: #ffffff; --text-main: #047857; --accent: #10b981; --border: #a7f3d0; }
+        .theme-lava { --bg-color: #450a0a; --card-bg: #7f1d1d; --text-main: #fef2f2; --accent: #f87171; --border: #450a0a; }
+        .theme-nord { --bg-color: #2e3440; --card-bg: #3b4252; --text-main: #eceff4; --accent: #88c0d0; --border: #434c5e; }
+        .theme-dracula { --bg-color: #282a36; --card-bg: #44475a; --text-main: #f8f8f2; --accent: #bd93f9; --border: #6272a4; }
+        .theme-cyber { --bg-color: #000b1e; --card-bg: #001a3d; --text-main: #00fff2; --accent: #ff00ff; --border: #00fff2; }
+        .theme-sakura { --bg-color: #fff1f2; --card-bg: #ffffff; --text-main: #be123c; --accent: #fda4af; --border: #fecdd3; }
+        .theme-desert { --bg-color: #fef3c7; --card-bg: #ffffff; --text-main: #92400e; --accent: #d97706; --border: #fde68a; }
+        .theme-grape { --bg-color: #2e1065; --card-bg: #4c1d95; --text-main: #ede9fe; --accent: #8b5cf6; --border: #2e1065; }
+        .theme-teal { --bg-color: #134e4a; --card-bg: #115e59; --text-main: #f0fdfa; --accent: #2dd4bf; --border: #134e4a; }
+        .theme-coal { --bg-color: #171717; --card-bg: #262626; --text-main: #d4d4d4; --accent: #737373; --border: #404040; }
+        .theme-copper { --bg-color: #431407; --card-bg: #7c2d12; --text-main: #fff7ed; --accent: #fb923c; --border: #431407; }
+        .theme-olive { --bg-color: #365314; --card-bg: #3f6212; --text-main: #f7fee7; --accent: #a3e635; --border: #365314; }
+        .theme-blood { --bg-color: #450a0a; --card-bg: #991b1b; --text-main: #fef2f2; --accent: #ef4444; --border: #450a0a; }
+        .theme-royal { --bg-color: #1e1b4b; --card-bg: #312e81; --text-main: #e0e7ff; --accent: #fbbf24; --border: #1e1b4b; }
+        .theme-void { --bg-color: #000000; --card-bg: #0a0a0a; --text-main: #ffffff; --accent: #ffffff; --border: #333333; }
+        .theme-candy { --bg-color: #fdf2f8; --card-bg: #ffffff; --text-main: #db2777; --accent: #f472b6; --border: #fbcfe8; }
+        .theme-sunflower { --bg-color: #fef9c3; --card-bg: #ffffff; --text-main: #854d0e; --accent: #eab308; --border: #fde047; }
+        .theme-indigo { --bg-color: #e0e7ff; --card-bg: #ffffff; --text-main: #3730a3; --accent: #4f46e5; --border: #c7d2fe; }
+        .theme-zinc { --bg-color: #18181b; --card-bg: #27272a; --text-main: #fafafa; --accent: #a1a1aa; --border: #3f3f46; }
+        .theme-stone { --bg-color: #1c1917; --card-bg: #292524; --text-main: #fafaf9; --accent: #a8a29e; --border: #44403c; }
+        .theme-lime { --bg-color: #f7fee7; --card-bg: #ffffff; --text-main: #365314; --accent: #84cc16; --border: #d9f99d; }
+        .theme-neutral { --bg-color: #fafafa; --card-bg: #ffffff; --text-main: #171717; --accent: #737373; --border: #e5e5e5; }
+        .theme-cyan { --bg-color: #ecfeff; --card-bg: #ffffff; --text-main: #164e63; --accent: #06b6d4; --border: #cffafe; }
+        .theme-maroon { --bg-color: #500724; --card-bg: #701a35; --text-main: #fff1f2; --accent: #e11d48; --border: #500724; }
+        .theme-navy { --bg-color: #020617; --card-bg: #0f172a; --text-main: #f8fafc; --accent: #3b82f6; --border: #1e293b; }
+        .theme-plum { --bg-color: #2d0a31; --card-bg: #4a1259; --text-main: #fdf4ff; --accent: #d946ef; --border: #2d0a31; }
+        .theme-moss { --bg-color: #052e16; --card-bg: #14532d; --text-main: #f0fdf4; --accent: #22c55e; --border: #052e16; }
+        .theme-rust { --bg-color: #431407; --card-bg: #7c2d12; --text-main: #fff7ed; --accent: #ea580c; --border: #431407; }
+        .theme-shadow { --bg-color: #0a0a0a; --card-bg: #1a1a1a; --text-main: #525252; --accent: #ffffff; --border: #262626; }
+        .theme-blush { --bg-color: #fff1f2; --card-bg: #ffffff; --text-main: #9d174d; --accent: #f472b6; --border: #fecdd3; }
+        .theme-forest-dark { --bg-color: #061a06; --card-bg: #0c2a0c; --text-main: #99ff99; --accent: #00ff00; --border: #143314; }
+        .theme-ocean-deep { --bg-color: #011627; --card-bg: #011f35; --text-main: #2ec4b6; --accent: #e71d36; --border: #011f35; }
+        .theme-sunset { --bg-color: #2d1b2d; --card-bg: #4a2d4a; --text-main: #ff9e00; --accent: #fe019a; --border: #4a2d4a; }
+        .theme-ghost { --bg-color: #f8fafc; --card-bg: rgba(255,255,255,0.05); --text-main: #0f172a; --accent: #64748b; --border: #f1f5f9; }
+        .theme-clay { --bg-color: #78350f; --card-bg: #92400e; --text-main: #fef3c7; --accent: #f59e0b; --border: #78350f; }
+        .theme-glacier { --bg-color: #f0f9ff; --card-bg: #ffffff; --text-main: #0c4a6e; --accent: #7dd3fc; --border: #e0f2fe; }
+
+        body { background-color: var(--bg-color); color: var(--text-main); }
+        .server-card { background-color: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); }
+        .input-box { background-color: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); }
+
+        .animate-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .header-sticky { position: sticky; top: 0; z-index: 50; }
+
+        .flag-circle {
+            width: 42px; height: 42px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: #ffffff; border: 2px solid #e2e8f0;
+            flex-shrink: 0; overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .flag-circle i { font-size: 1.5rem; }
+
+        .led-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            display: inline-block; margin-right: 4px;
+        }
+        .led-online { background-color: #10b981; animation: pulse-green 1.5s infinite; }
+        .led-offline { background-color: #ef4444; animation: pulse-red 1.5s infinite; }
+
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+        @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+        .tab-grid-container { position: sticky; top: 104px; z-index: 45; padding: 8px 16px; background: var(--bg-color); margin: -8px -16px 16px -16px; }
+        .tab-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; padding: 4px; border-radius: 12px; background: rgba(0,0,0,0.05); backdrop-filter: blur(10px); overflow-x: auto; }
+        .tab-btn { font-weight: 800; font-size: 7px; padding: 8px 1px; border-radius: 8px; transition: all 0.3s; text-transform: uppercase; background: rgba(0,0,0,0.1); color: var(--text-main); white-space: nowrap; }
+        .active-all { background: #1e293b !important; color: white !important; }
+        .active-v2ray { background: #4f46e5 !important; color: white !important; }
+        .active-ssh { background: #059669 !important; color: white !important; }
+        .active-udp { background: #ea580c !important; color: white !important; }
+        .active-trojan { background: #db2777 !important; color: white !important; }
+        .active-ovpn { background: #f59e0b !important; color: white !important; }
+        .active-ss { background: #8b5cf6 !important; color: white !important; }
+        .active-online { background: #0ea5e9 !important; color: white !important; }
+
+        .marquee-container { background: #0f172a; color: #fbbf24; padding: 8px 0; overflow: hidden; white-space: nowrap; font-weight: 800; font-size: 12px; border-bottom: 3px solid #fbbf24; }
+        .marquee-content { display: inline-block; animation: marquee 30s linear infinite; padding-left: 100%; }
+        @keyframes marquee { 0% { transform: translate(0, 0); } 100% { transform: translate(-100%, 0); } }
+
+        .stat-card { background: rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); flex: 1; }
+
+        .fixed-footer { position: fixed; bottom: 0; left: 0; width: 100%; background: var(--card-bg); backdrop-filter: blur(10px); padding: 10px 0; border-top: 1px solid var(--border); text-align: center; z-index: 40; }
+
+        .ping-excellent { color: #10b981; }
+        .ping-good { color: #f59e0b; }
+        .ping-bad { color: #ef4444; }
+
+        .isp-badge { padding: 4px 10px; border-radius: 8px; font-weight: 800; text-transform: uppercase; font-size: 8px; color: white; display: flex; align-items: center; gap: 6px; }
+        .isp-dtac { background: #0076be; }
+        .isp-true { background: #ed1c24; }
+        .isp-ais { background: #10b981; }
+        .isp-default { background: #64748b; }
+        .isp-logo-img { width: 20px; height: 20px; border-radius: 4px; object-fit: contain; background: white; padding: 1px; }
+
+        .theme-fab { position: fixed; bottom: 80px; right: 20px; z-index: 100; width: 55px; height: 55px; border-radius: 50%; background: var(--accent); color: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); cursor: pointer; transition: all 0.3s; }
+        .theme-menu { position: fixed; bottom: 145px; right: 20px; z-index: 100; background: var(--card-bg); border-radius: 25px; padding: 15px; display: none; grid-template-columns: repeat(5, 1fr); gap: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.4); border: 2px solid var(--accent); max-height: 400px; overflow-y: auto; width: 280px; }
+        .theme-opt { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 3px solid rgba(0,0,0,0.1); transition: all 0.2s; position: relative; }
+        .theme-opt:hover { transform: scale(1.15); }
+        .theme-opt.active::after { content: '\f00c'; font-family: 'Font Awesome 6 Free'; font-weight: 900; color: white; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 10px; text-shadow: 0 0 2px black; }
+
+        .status-badge-blue { background: #3b82f6; color: white; }
+        .status-badge-green { background: #10b981; color: white; }
+        .status-badge-red { background: #ef4444; color: white; }
+        .status-badge-orange { background: #f59e0b; color: white; }
+
+        .admin-section-header { border-left: 4px solid var(--accent); padding-left: 12px; margin-bottom: 20px; }
+        
+        .adsense-container { margin: 2rem auto; text-align: center; background: rgba(0,0,0,0.02); border-radius: 1rem; padding: 0.5rem; }
+
+        .info-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 1.5rem; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .faq-item { border-bottom: 1px solid var(--border); padding: 0.75rem 0; }
+        .faq-question { font-weight: 800; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .faq-answer { display: none; margin-top: 0.5rem; font-size: 0.8rem; opacity: 0.8; }
+        .faq-item.active .faq-answer { display: block; }
+        .protocol-badge { display: inline-block; background: var(--accent); color: white; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: bold; margin-right: 0.5rem; margin-bottom: 0.5rem; }
+        .update-item { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px dashed var(--border); }
+        
+        /* new: notification styles */
+        .notification-item { background: var(--card-bg); border-left: 4px solid var(--accent); padding: 0.75rem; margin-bottom: 0.75rem; border-radius: 1rem; font-size: 0.75rem; }
+        .user-notification-area { background: rgba(0,0,0,0.03); border-radius: 1.5rem; padding: 1rem; margin-bottom: 1.5rem; border: 1px solid var(--border); }
+    </style>
+</head>
+<body class="theme-light min-h-screen pb-32">
+
+    <div id="notification" class="fixed top-24 right-4 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[110] hidden animate-in border-l-4 border-amber-500"></div>
+
+    <!-- Theme Menu - FULL 50+ THEMES -->
+    <div id="theme-menu" class="theme-menu">
+        <div onclick="setTheme('light')" class="theme-opt bg-slate-200" title="Light"></div>
+        <div onclick="setTheme('dark')" class="theme-opt bg-slate-800" title="Dark"></div>
+        <div onclick="setTheme('midnight')" class="theme-opt bg-indigo-950" title="Midnight"></div>
+        <div onclick="setTheme('emerald')" class="theme-opt bg-emerald-800" title="Emerald"></div>
+        <div onclick="setTheme('rose')" class="theme-opt bg-rose-800" title="Rose"></div>
+        <div onclick="setTheme('amber')" class="theme-opt bg-amber-800" title="Amber"></div>
+        <div onclick="setTheme('slate')" class="theme-opt bg-slate-600" title="Slate"></div>
+        <div onclick="setTheme('ocean')" class="theme-opt bg-sky-800" title="Ocean"></div>
+        <div onclick="setTheme('purple')" class="theme-opt bg-purple-700" title="Purple"></div>
+        <div onclick="setTheme('forest')" class="theme-opt bg-green-900" title="Forest"></div>
+        <div onclick="setTheme('wine')" class="theme-opt bg-fuchsia-900" title="Wine"></div>
+        <div onclick="setTheme('coffee')" class="theme-opt bg-stone-800" title="Coffee"></div>
+        <div onclick="setTheme('gold')" class="theme-opt bg-yellow-600" title="Gold"></div>
+        <div onclick="setTheme('neon')" class="theme-opt bg-lime-500" title="Neon"></div>
+        <div onclick="setTheme('sky')" class="theme-opt bg-sky-300" title="Sky"></div>
+        <div onclick="setTheme('mint')" class="theme-opt bg-emerald-300" title="Mint"></div>
+        <div onclick="setTheme('lava')" class="theme-opt bg-red-900" title="Lava"></div>
+        <div onclick="setTheme('nord')" class="theme-opt bg-slate-500" title="Nord"></div>
+        <div onclick="setTheme('dracula')" class="theme-opt bg-indigo-900" title="Dracula"></div>
+        <div onclick="setTheme('cyber')" class="theme-opt bg-cyan-900" title="Cyber"></div>
+        <div onclick="setTheme('sakura')" class="theme-opt bg-pink-300" title="Sakura"></div>
+        <div onclick="setTheme('desert')" class="theme-opt bg-orange-200" title="Desert"></div>
+        <div onclick="setTheme('grape')" class="theme-opt bg-violet-950" title="Grape"></div>
+        <div onclick="setTheme('teal')" class="theme-opt bg-teal-800" title="Teal"></div>
+        <div onclick="setTheme('coal')" class="theme-opt bg-neutral-800" title="Coal"></div>
+        <div onclick="setTheme('copper')" class="theme-opt bg-orange-900" title="Copper"></div>
+        <div onclick="setTheme('olive')" class="theme-opt bg-lime-900" title="Olive"></div>
+        <div onclick="setTheme('blood')" class="theme-opt bg-red-600" title="Blood"></div>
+        <div onclick="setTheme('royal')" class="theme-opt bg-blue-900" title="Royal"></div>
+        <div onclick="setTheme('void')" class="theme-opt bg-black" title="Void"></div>
+        <div onclick="setTheme('candy')" class="theme-opt bg-pink-400" title="Candy"></div>
+        <div onclick="setTheme('sunflower')" class="theme-opt bg-yellow-400" title="Sunflower"></div>
+        <div onclick="setTheme('indigo')" class="theme-opt bg-indigo-500" title="Indigo"></div>
+        <div onclick="setTheme('zinc')" class="theme-opt bg-zinc-800" title="Zinc"></div>
+        <div onclick="setTheme('stone')" class="theme-opt bg-stone-700" title="Stone"></div>
+        <div onclick="setTheme('lime')" class="theme-opt bg-lime-400" title="Lime"></div>
+        <div onclick="setTheme('neutral')" class="theme-opt bg-neutral-300" title="Neutral"></div>
+        <div onclick="setTheme('cyan')" class="theme-opt bg-cyan-500" title="Cyan"></div>
+        <div onclick="setTheme('maroon')" class="theme-opt bg-rose-900" title="Maroon"></div>
+        <div onclick="setTheme('navy')" class="theme-opt bg-blue-950" title="Navy"></div>
+        <div onclick="setTheme('plum')" class="theme-opt bg-purple-900" title="Plum"></div>
+        <div onclick="setTheme('moss')" class="theme-opt bg-green-950" title="Moss"></div>
+        <div onclick="setTheme('rust')" class="theme-opt bg-orange-800" title="Rust"></div>
+        <div onclick="setTheme('shadow')" class="theme-opt bg-neutral-900" title="Shadow"></div>
+        <div onclick="setTheme('blush')" class="theme-opt bg-pink-200" title="Blush"></div>
+        <div onclick="setTheme('forest-dark')" class="theme-opt bg-emerald-950" title="Forest-Dark"></div>
+        <div onclick="setTheme('ocean-deep')" class="theme-opt bg-sky-950" title="Ocean-Deep"></div>
+        <div onclick="setTheme('sunset')" class="theme-opt bg-fuchsia-800" title="Sunset"></div>
+        <div onclick="setTheme('ghost')" class="theme-opt bg-slate-100" title="Ghost"></div>
+        <div onclick="setTheme('clay')" class="theme-opt bg-orange-700" title="Clay"></div>
+        <div onclick="setTheme('glacier')" class="theme-opt bg-sky-100" title="Glacier"></div>
+    </div>
+    
+    <div class="theme-fab" onclick="toggleThemeMenu()">
+        <i class="fas fa-palette text-xl"></i>
+    </div>
+
+    <div class="header-sticky">
+        <div class="marquee-container">
+            <div id="running-text" class="marquee-content italic uppercase tracking-wider">Loading...</div>
+        </div>
+
+        <nav class="bg-slate-900 text-white p-4 shadow-xl">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3 font-black text-xl tracking-tighter cursor-pointer" onclick="window.location.reload()">
+                    <img src="https://raw.githubusercontent.com/ThandarLin2026/JK/main/image/logo.png" alt="Logo" class="w-[40px] h-[40px] object-contain rounded-lg">
+                    <span>JK-VPN<span class="text-indigo-400 text-[10px] font-normal ml-1">V4</span></span>
+                </div>
+                <div class="flex gap-2">
+                    <a id="top-contact-link" href="https://linvpn.site/contact.html" target="_blank" class="bg-sky-500 hover:bg-sky-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
+                        <i class="fas fa-paper-plane"></i> Contact
+                    </a>
+                    <button onclick="toggleModal('donate-modal', true)" class="bg-amber-500 hover:bg-amber-600 px-3 py-2 rounded-xl text-[10px] font-bold transition-all flex items-center gap-1">
+                        <i class="fas fa-heart"></i> Donate
+                    </button>
+                    <button onclick="toggleModal('admin-modal', true)" id="admin-login-btn" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-xl text-[10px] font-bold transition-all">
+                        <i class="fas fa-user-lock"></i>
+                    </button>
+                    <button onclick="logoutAdmin()" id="admin-logout-btn" class="hidden bg-rose-600 hover:bg-rose-700 px-3 py-2 rounded-xl text-[10px] font-bold transition-all">
+                        <i class="fas fa-power-off"></i>
+                    </button>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <main class="max-w-6xl mx-auto p-4 md:p-8">
+
+        <!-- Admin Login Modal -->
+        <div id="admin-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[120] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl animate-in text-slate-900">
+                <h2 class="text-xl font-black text-center mb-6">Admin Login</h2>
+                <input type="password" id="admin-password-input" placeholder="Enter Password" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-xl outline-none mb-6 text-center text-lg tracking-widest">
+                <div class="flex gap-3">
+                    <button onclick="toggleModal('admin-modal', false)" class="flex-1 py-3 font-bold text-slate-500">Close</button>
+                    <button onclick="verifyAdmin()" class="flex-1 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg">Login</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Check Modal -->
+        <div id="quiz-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[120] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center text-slate-900">
+                <div class="mb-4 text-slate-400 font-bold uppercase text-[9px] tracking-widest">Security Check</div>
+                <h2 class="text-2xl font-black mb-6" id="quiz-question">0 + 0 = ?</h2>
+                <input type="number" id="quiz-answer" placeholder="Result" class="w-full p-4 bg-slate-100 border-2 border-transparent focus:border-indigo-500 rounded-xl outline-none mb-6 text-center text-xl font-black">
+                <div class="flex gap-3">
+                    <button onclick="toggleModal('quiz-modal', false)" class="flex-1 py-3 font-bold text-slate-500">Cancel</button>
+                    <button id="verify-quiz-btn" class="flex-1 py-3 bg-indigo-600 text-white font-black rounded-xl shadow-lg">Submit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="success-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[130] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-sm shadow-2xl animate-in text-center text-slate-900">
+                <div class="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-check text-2xl"></i>
+                </div>
+                <h2 class="text-xl font-black text-slate-900 mb-2">Generated Successfully</h2>
+                <p class="text-slate-500 text-xs mb-8">Enjoy your high speed connection!</p>
+                <button id="show-config-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-xl shadow-lg">View Config</button>
+            </div>
+        </div>
+
+        <!-- Config Modal -->
+        <div id="config-modal" class="fixed inset-0 bg-slate-900/95 backdrop-blur-md flex items-center justify-center p-4 z-[150] hidden">
+            <div class="bg-white rounded-[2rem] p-6 w-full max-w-xl shadow-2xl animate-in text-slate-900">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="modal-title" class="text-sm font-black italic uppercase pr-4"></h2>
+                    <button onclick="toggleModal('config-modal', false)" class="text-slate-400"><i class="fas fa-times text-xl"></i></button>
+                </div>
+                <div class="bg-slate-900 rounded-xl p-4 mb-6">
+                    <pre id="modal-content" class="text-indigo-400 font-mono text-[10px] whitespace-pre-wrap break-all max-h-[250px] overflow-y-auto"></pre>
+                </div>
+                <button id="modal-copy-btn" class="w-full py-4 bg-indigo-600 text-white font-black rounded-xl shadow-lg flex items-center justify-center gap-2 text-xs">
+                    <i class="fas fa-copy"></i> Copy Configuration
+                </button>
+            </div>
+        </div>
+
+        <!-- Donate Modal -->
+        <div id="donate-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md flex items-center justify-center p-4 z-[120] hidden">
+            <div class="bg-white rounded-[2rem] p-8 w-full max-w-md shadow-2xl animate-in relative text-slate-900">
+                <button onclick="toggleModal('donate-modal', false)" class="absolute top-4 right-4 text-slate-400 hover:text-rose-500"><i class="fas fa-times text-lg"></i></button>
+                <div class="text-center mb-6"><h2 class="text-xl font-black text-slate-900">Support Me</h2></div>
+                <div class="space-y-4">
+                    <div class="bg-slate-50 p-4 rounded-xl flex items-center gap-4 border border-slate-100">
+                        <img id="d-logo-1" src="" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/100x100?text=Bank'">
+                        <div>
+                            <p id="d-name-1" class="font-black text-slate-900 text-[10px] uppercase">...</p>
+                            <p id="d-acc-1" class="text-indigo-600 font-mono font-bold text-sm">...</p>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-xl flex items-center gap-4 border border-slate-100">
+                        <img id="d-logo-2" src="" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='https://placehold.co/100x100?text=Bank'">
+                        <div>
+                            <p id="d-name-2" class="font-black text-slate-900 text-[10px] uppercase">...</p>
+                            <p id="d-acc-2" class="text-indigo-600 font-mono font-bold text-sm">...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin View -->
+        <div id="admin-view" class="hidden space-y-6 animate-in">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-black uppercase italic">Admin Dashboard</h1>
+                <span class="text-[9px] font-black bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full">MASTER CONTROL</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Global Config -->
+                <div class="server-card p-6 rounded-[2rem] shadow-sm space-y-4">
+                    <div class="admin-section-header">
+                        <h3 class="text-[10px] font-black uppercase opacity-60 tracking-widest px-1">Global Configuration</h3>
+                    </div>
+                    <!-- NEW: Separate running text input and save button -->
+                    <div>
+                        <input type="text" id="set-marquee-single" placeholder="Running Text (Separate Save)" class="input-box w-full p-3 rounded-xl text-xs font-bold italic">
+                        <button id="save-marquee-btn" class="w-full mt-2 bg-indigo-600 text-white font-black py-2 rounded-xl text-xs">Save Running Text</button>
+                    </div>
+                    <!-- Social Link field (updates top Contact button) -->
+                    <input type="text" id="set-social-link" placeholder="Social Link (Contact URL)" class="input-box w-full p-3 rounded-xl text-xs font-bold">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <p class="text-[8px] font-bold opacity-60 uppercase">Bank 1</p>
+                            <input type="text" id="admin-dlogo1" placeholder="Logo Link" class="input-box w-full p-2 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dname1" placeholder="Name" class="input-box w-full p-2 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dacc1" placeholder="Acc No" class="input-box w-full p-2 rounded-lg text-[10px]">
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-[8px] font-bold opacity-60 uppercase">Bank 2</p>
+                            <input type="text" id="admin-dlogo2" placeholder="Logo Link" class="input-box w-full p-2 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dname2" placeholder="Name" class="input-box w-full p-2 rounded-lg text-[10px]">
+                            <input type="text" id="admin-dacc2" placeholder="Acc No" class="input-box w-full p-2 rounded-lg text-[10px]">
+                        </div>
+                    </div>
+                    <button id="save-settings-btn" class="w-full bg-indigo-600 text-white font-black py-4 rounded-xl text-xs hover:bg-indigo-700 transition-all shadow-lg">Save Bank & Social</button>
+                    
+                    <div class="pt-4 border-t border-slate-200 mt-4">
+                        <div class="admin-section-header">
+                            <h3 class="text-[10px] font-black uppercase text-rose-600 tracking-widest px-1">Maintenance Tools</h3>
+                        </div>
+                        <button id="reset-limits-btn" class="w-full bg-rose-600 text-white font-black py-4 rounded-xl text-xs hover:bg-rose-700 transition-all shadow-lg flex items-center justify-center gap-2">
+                            <i class="fas fa-redo-alt"></i> RESET ALL DAILY LIMITS
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Server Entry Form (FULL FLAG LIST intact) -->
+                <div class="server-card p-6 rounded-[2rem] shadow-sm">
+                    <div class="admin-section-header">
+                        <h3 class="text-[10px] font-black uppercase opacity-60 tracking-widest mb-4 px-1">Server Entry</h3>
+                    </div>
+                    <input type="hidden" id="edit-id" value="">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black uppercase opacity-60 ml-2">Choose Flag (ISO Code)</label>
+                            <select id="config-flag" class="input-box w-full p-3 rounded-xl text-xs font-black max-h-[150px]">
+                                <optgroup label="ASIA">
+                                    <option value="af">Afghanistan</option><option value="am">Armenia</option>
+                                    <option value="az">Azerbaijan</option><option value="bh">Bahrain</option>
+                                    <option value="bd">Bangladesh</option><option value="bt">Bhutan</option>
+                                    <option value="bn">Brunei</option><option value="kh">Cambodia</option>
+                                    <option value="cn">China</option><option value="cy">Cyprus</option>
+                                    <option value="ge">Georgia</option><option value="hk">Hong Kong</option>
+                                    <option value="in">India</option><option value="id">Indonesia</option>
+                                    <option value="ir">Iran</option><option value="iq">Iraq</option>
+                                    <option value="il">Israel</option><option value="jp">Japan</option>
+                                    <option value="jo">Jordan</option><option value="kz">Kazakhstan</option>
+                                    <option value="kw">Kuwait</option><option value="kg">Kyrgyzstan</option>
+                                    <option value="la">Laos</option><option value="lb">Lebanon</option>
+                                    <option value="mo">Macao</option><option value="my">Malaysia</option>
+                                    <option value="mv">Maldives</option><option value="mn">Mongolia</option>
+                                    <option value="mm" selected>Myanmar</option><option value="np">Nepal</option>
+                                    <option value="kp">North Korea</option><option value="om">Oman</option>
+                                    <option value="pk">Pakistan</option><option value="ps">Palestine</option>
+                                    <option value="ph">Philippines</option><option value="qa">Qatar</option>
+                                    <option value="sa">Saudi Arabia</option><option value="sg">Singapore</option>
+                                    <option value="kr">South Korea</option><option value="lk">Sri Lanka</option>
+                                    <option value="sy">Syria</option><option value="tw">Taiwan</option>
+                                    <option value="tj">Tajikistan</option><option value="th">Thailand</option>
+                                    <option value="tl">Timor-Leste</option><option value="tr">Turkey</option>
+                                    <option value="tm">Turkmenistan</option><option value="ae">UAE</option>
+                                    <option value="uz">Uzbekistan</option><option value="vn">Vietnam</option>
+                                    <option value="ye">Yemen</option>
+                                </optgroup>
+                                <optgroup label="EUROPE">
+                                    <option value="al">Albania</option><option value="ad">Andorra</option>
+                                    <option value="at">Austria</option><option value="by">Belarus</option>
+                                    <option value="be">Belgium</option><option value="ba">Bosnia</option>
+                                    <option value="bg">Bulgaria</option><option value="hr">Croatia</option>
+                                    <option value="cz">Czechia</option><option value="dk">Denmark</option>
+                                    <option value="ee">Estonia</option><option value="fi">Finland</option>
+                                    <option value="fr">France</option><option value="de">Germany</option>
+                                    <option value="gr">Greece</option><option value="hu">Hungary</option>
+                                    <option value="is">Iceland</option><option value="ie">Ireland</option>
+                                    <option value="it">Italy</option><option value="lv">Latvia</option>
+                                    <option value="li">Liechtenstein</option><option value="lt">Lithuania</option>
+                                    <option value="lu">Luxembourg</option><option value="mt">Malta</option>
+                                    <option value="md">Moldova</option><option value="mc">Monaco</option>
+                                    <option value="me">Montenegro</option><option value="nl">Netherlands</option>
+                                    <option value="mk">North Macedonia</option><option value="no">Norway</option>
+                                    <option value="pl">Poland</option><option value="pt">Portugal</option>
+                                    <option value="ro">Romania</option><option value="ru">Russia</option>
+                                    <option value="sm">San Marino</option><option value="rs">Serbia</option>
+                                    <option value="sk">Slovakia</option><option value="si">Slovenia</option>
+                                    <option value="es">Spain</option><option value="se">Sweden</option>
+                                    <option value="ch">Switzerland</option><option value="ua">Ukraine</option>
+                                    <option value="gb">United Kingdom</option><option value="va">Vatican City</option>
+                                </optgroup>
+                                <optgroup label="AMERICAS">
+                                    <option value="ag">Antigua</option><option value="ar">Argentina</option>
+                                    <option value="bs">Bahamas</option><option value="bb">Barbados</option>
+                                    <option value="bz">Belize</option><option value="bo">Bolivia</option>
+                                    <option value="br">Brazil</option><option value="ca">Canada</option>
+                                    <option value="cl">Chile</option><option value="co">Colombia</option>
+                                    <option value="cr">Costa Rica</option><option value="cu">Cuba</option>
+                                    <option value="dm">Dominica</option><option value="do">Dominican Rep</option>
+                                    <option value="ec">Ecuador</option><option value="sv">El Salvador</option>
+                                    <option value="gd">Grenada</option><option value="gt">Guatemala</option>
+                                    <option value="gy">Guyana</option><option value="ht">Haiti</option>
+                                    <option value="hn">Honduras</option><option value="jm">Jamaica</option>
+                                    <option value="mx">Mexico</option><option value="ni">Nicaragua</option>
+                                    <option value="pa">Panama</option><option value="py">Paraguay</option>
+                                    <option value="pe">Peru</option><option value="kn">Saint Kitts</option>
+                                    <option value="lc">Saint Lucia</option><option value="vc">Saint Vincent</option>
+                                    <option value="sr">Suriname</option><option value="tt">Trinidad</option>
+                                    <option value="us">United States</option><option value="uy">Uruguay</option>
+                                    <option value="ve">Venezuela</option>
+                                </optgroup>
+                                <optgroup label="AFRICA & OCEANIA">
+                                    <option value="dz">Algeria</option><option value="ao">Angola</option>
+                                    <option value="au">Australia</option><option value="eg">Egypt</option>
+                                    <option value="et">Ethiopia</option><option value="gh">Ghana</option>
+                                    <option value="ke">Kenya</option><option value="ma">Morocco</option>
+                                    <option value="nz">New Zealand</option><option value="ng">Nigeria</option>
+                                    <option value="za">South Africa</option><option value="tz">Tanzania</option>
+                                    <option value="ug">Uganda</option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <div class="space-y-1">
+                            <label class="text-[8px] font-black uppercase opacity-60 ml-2">Server Display Name</label>
+                            <input type="text" id="config-title" placeholder="Server Name" class="input-box w-full p-3 rounded-xl text-xs font-bold">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="text" id="config-sim" placeholder="ISP (TRUE, AIS, DTAC, etc.)" class="input-box p-3 rounded-xl text-xs font-bold uppercase">
+                        <input type="text" id="config-isp-logo" placeholder="ISP Logo Link" class="input-box p-3 rounded-xl text-xs font-bold">
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="date" id="config-expire" class="input-box p-3 rounded-xl text-xs font-bold w-full">
+                        <select id="config-type" class="input-box p-3 rounded-xl text-xs font-black">
+                            <option value="V2RAY">V2RAY</option>
+                            <option value="SSH">SSH</option>
+                            <option value="TROJAN">TROJAN</option>
+                            <option value="UDP">UDP</option>
+                            <option value="OVPN">OVPN</option>
+                            <option value="SS">SHADOWSOCKS</option>
+                        </select>
+                    </div>
+                    <textarea id="config-content" rows="3" placeholder="Paste Config Link/Content Here" class="input-box w-full p-3 rounded-xl mb-3 text-[10px] font-mono"></textarea>
+                    <input type="text" id="config-note" placeholder="Special Note (Optional)" class="input-box w-full p-3 rounded-xl mb-4 text-xs font-medium italic">
+                    <button id="publish-btn" class="w-full py-4 bg-slate-900 text-white font-black rounded-xl hover:bg-black transition-all shadow-xl">Publish Config</button>
+                </div>
+            </div>
+
+            <!-- NEW: Admin Notifications Manager -->
+            <div class="server-card p-6 rounded-[2rem] shadow-sm">
+                <div class="admin-section-header">
+                    <h3 class="text-[10px] font-black uppercase opacity-60 tracking-widest px-1">📢 Admin Notifications</h3>
+                </div>
+                <div class="mb-4 flex gap-2">
+                    <input type="text" id="new-notif-text" placeholder="Notification text" class="input-box flex-1 p-3 rounded-xl text-sm">
+                    <button id="add-notif-btn" class="bg-indigo-600 text-white px-6 rounded-xl font-black text-xs">➕ Add</button>
+                </div>
+                <div id="admin-notif-list" class="space-y-2"></div>
+            </div>
+
+            <div class="server-card p-6 rounded-[2rem] shadow-sm">
+                <div class="admin-section-header">
+                    <h3 class="text-[10px] font-black uppercase opacity-60 tracking-widest mb-4 px-1">Manage Published Servers</h3>
+                </div>
+                <div id="admin-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"></div>
+            </div>
+        </div>
+
+        <!-- User View -->
+        <div id="user-view" class="space-y-6 animate-in">
+            <div class="bg-slate-950 p-8 rounded-[2.5rem] text-white shadow-2xl relative flex flex-col items-center">
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl font-black italic tracking-tighter uppercase mb-1">JK FREE VPN</h1>
+                    <div id="server-clock" class="text-indigo-400 font-mono text-[9px] font-bold tracking-widest">...</div>
+                </div>
+                <div class="flex gap-4 justify-center w-full max-w-lg">
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1"><p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Servers</p><p id="total-server-display" class="text-xl font-black">0</p></div>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1"><p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Daily Gen</p><p id="daily-gen-display" class="text-xl font-black">0</p></div>
+                    <div class="stat-card p-4 rounded-3xl text-center flex-1"><p class="text-[8px] uppercase font-black text-indigo-300 mb-1">Total Gen</p><p id="total-gen-display" class="text-xl font-black">0</p></div>
+                </div>
+            </div>
+
+            <div id="online-total-banner" class="hidden bg-indigo-600 p-4 rounded-2xl text-white flex justify-between items-center shadow-lg animate-in">
+                <div class="flex items-center gap-3"><div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center"><i class="fas fa-users"></i></div><div><p class="text-[8px] font-black uppercase tracking-widest opacity-80">Total Active Users</p><p id="online-total-count" class="text-xl font-black">0</p></div></div>
+                <div class="text-right"><span class="text-[7px] font-black bg-white/20 px-2 py-1 rounded-full uppercase italic">Real-time</span></div>
+            </div>
+
+            <div class="tab-grid-container"><div class="tab-grid"><button id="tab-ALL" class="tab-btn active-all">All</button><button id="tab-V2RAY" class="tab-btn">V2R</button><button id="tab-SSH" class="tab-btn">SSH</button><button id="tab-UDP" class="tab-btn">UDP</button><button id="tab-TROJAN" class="tab-btn">TRJ</button><button id="tab-OVPN" class="tab-btn">OVPN</button><button id="tab-SS" class="tab-btn">SS</button><button id="tab-ONLINE" class="tab-btn font-bold"><i class="fas fa-users mr-1"></i>On</button></div></div>
+
+            <!-- NEW: User notifications display area -->
+            <div id="user-notifications-area" class="user-notification-area"></div>
+
+            <div id="user-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+            <!-- AdSense ad unit 1 -->
+            <div class="adsense-container">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-5300241280829470"
+                     data-ad-slot="7182511748"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                <p class="text-[8px] opacity-50 mt-2">Advertisement</p>
+            </div>
+
+            <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-globe text-indigo-500"></i> About JK VPN</h2><p class="text-sm mb-3">JK VPN is a free, community-driven VPN service providing high-speed configurations. We support V2Ray, SSH, Trojan, UDP, OpenVPN, Shadowsocks. No logs, fast servers.</p></div>
+            <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-rocket text-indigo-500"></i> How to Use</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><h3 class="font-black text-sm mb-2">Mobile (Android/iOS)</h3><ul class="list-disc list-inside text-xs"><li>Download V2RayNG, Shadowrocket, etc.</li><li>Click "Get Configuration"</li><li>Solve math challenge</li><li>Copy config & connect</li></ul></div><div><h3 class="font-black text-sm mb-2">Desktop</h3><ul class="list-disc list-inside text-xs"><li>Use V2RayN, Qv2ray, OpenVPN GUI</li><li>Import config & enjoy</li></ul></div></div></div>
+            <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-shield-alt text-indigo-500"></i> Protocols</h2><div><span class="protocol-badge">V2Ray</span><span class="protocol-badge">SSH</span><span class="protocol-badge">Trojan</span><span class="protocol-badge">UDP</span><span class="protocol-badge">OpenVPN</span><span class="protocol-badge">Shadowsocks</span></div></div>
+            <div class="info-card"><h2 class="text-xl font-black mb-3 flex items-center gap-2"><i class="fas fa-question-circle text-indigo-500"></i> FAQ</h2><div id="faq-container"><div class="faq-item"><div class="faq-question"><span>Is JK VPN completely free?</span><i class="fas fa-chevron-down text-sm"></i></div><div class="faq-answer">Yes, all configs free.</div></div><div class="faq-item"><div class="faq-question"><span>How many generations per day?</span><i class="fas fa-chevron-down text-sm"></i></div><div class="faq-answer">30 per server.</div></div><div class="faq-item"><div class="faq-question"><span>Do you keep logs?</span><i class="fas fa-chevron-down text-sm"></i></div><div class="faq-answer">No logs, only anonymized stats.</div></div></div></div>
+
+            <!-- AdSense ad unit 2 -->
+            <div class="adsense-container">
+                <ins class="adsbygoogle"
+                     style="display:block"
+                     data-ad-client="ca-pub-5300241280829470"
+                     data-ad-slot="1454602995"
+                     data-ad-format="auto"
+                     data-full-width-responsive="true"></ins>
+                <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                <p class="text-[8px] opacity-50 mt-2">Advertisement</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="fixed-footer">
+        <div class="flex justify-center gap-4 mb-1">
+            <a href="https://linvpn.site/privacy.html" target="_blank" class="text-[9px] font-bold underline hover:opacity-80">Privacy Policy</a>
+            <a href="https://linvpn.site/terms.html" target="_blank" class="text-[9px] font-bold underline hover:opacity-80">Terms of Service</a>
+            <a href="https://linvpn.site/contact.html" target="_blank" class="text-[9px] font-bold underline hover:opacity-80">Contact</a>
+        </div>
+        <p class="font-black text-[9px] uppercase tracking-tighter italic">© 2018-2026 JK VPN - BY JUEHTET</p>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, Timestamp, increment, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyChinW5tTi6cpFHLjiecWBaD-LTArNXJu0",
+            authDomain: "jkvpn-generator.firebaseapp.com",
+            projectId: "jkvpn-generator",
+            storageBucket: "jkvpn-generator.firebasestorage.app",
+            messagingSenderId: "859082016268",
+            appId: "1:859082016268:web:a2c04fa13cf422b3299029"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = "jkvpn-v4-main";
+        const ADMIN_PASS = "JueHtet19991";
+        const SERVER_LIMIT = 30;
+
+        let allConfigs = [];
+        let currentFilter = 'ALL';
+        let processingData = null;
+        let quizSolution = 0;
+        let serverPingState = {}; 
+        let serverUserCountState = {};
+
+        function getFlagElement(code) {
+            const countryCode = (code || 'un').toLowerCase();
+            return `<span class="fi fi-${countryCode}"></span>`;
+        }
+
+        window.toggleThemeMenu = () => {
+            const menu = document.getElementById('theme-menu');
+            menu.style.display = (menu.style.display === 'grid' ? 'none' : 'grid');
+        };
+
+        window.setTheme = (theme) => {
+            document.body.className = 'theme-' + theme + ' min-h-screen pb-32';
+            localStorage.setItem('jkvpn_theme', theme);
+            document.querySelectorAll('.theme-opt').forEach(opt => {
+                opt.classList.toggle('active', opt.title.toLowerCase() === theme);
+            });
+            document.getElementById('theme-menu').style.display = 'none';
+        };
+
+        const savedTheme = localStorage.getItem('jkvpn_theme') || 'light';
+        setTheme(savedTheme);
+
+        function showNotify(msg) {
+            const n = document.getElementById('notification');
+            n.innerText = msg; n.classList.remove('hidden'); 
+            setTimeout(() => n.classList.add('hidden'), 3000);
+        }
+
+        window.toggleModal = (id, show) => {
+            const el = document.getElementById(id);
+            if (show) el.classList.remove('hidden'); else el.classList.add('hidden');
+        };
+
+        window.verifyAdmin = () => {
+            if (document.getElementById('admin-password-input').value === ADMIN_PASS) {
+                localStorage.setItem('jkvpn_admin_session', 'active');
+                checkAdminSession(); toggleModal('admin-modal', false);
+                renderUI();
+            } else { showNotify("Wrong Pass!"); }
+        };
+
+        window.logoutAdmin = () => { localStorage.removeItem('jkvpn_admin_session'); location.reload(); };
+
+        function checkAdminSession() {
+            const isAdmin = localStorage.getItem('jkvpn_admin_session') === 'active';
+            document.getElementById('admin-view').classList.toggle('hidden', !isAdmin);
+            document.getElementById('user-view').classList.toggle('hidden', isAdmin);
+            document.getElementById('admin-login-btn').classList.toggle('hidden', isAdmin);
+            document.getElementById('admin-logout-btn').classList.toggle('hidden', !isAdmin);
+        }
+
+        const configsCol = collection(db, 'artifacts', appId, 'public', 'data', 'configs');
+        const statsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'stats', 'global');
+        const settingsDoc = doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'main');
+        const notificationsCol = collection(db, 'artifacts', appId, 'public', 'data', 'notifications');
+
+        onSnapshot(configsCol, (snap) => {
+            allConfigs = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+                .sort((a,b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+            document.getElementById('total-server-display').innerText = allConfigs.length;
+            renderUI(); 
+            updateTotalOnline();
+        });
+
+        setInterval(() => {
+            allConfigs.forEach(c => {
+                const variation = Math.floor(Math.random() * 10) - 5;
+                serverPingState[c.id] = Math.max(20, Math.min(300, (serverPingState[c.id] || 40) + variation));
+                const pEl = document.getElementById(`ping-val-${c.id}`);
+                if(pEl) {
+                    pEl.innerText = `${serverPingState[c.id]}ms`;
+                    pEl.className = serverPingState[c.id] > 150 ? 'ping-bad' : (serverPingState[c.id] > 80 ? 'ping-good' : 'ping-excellent');
+                }
+            });
+        }, 5000);
+
+        onSnapshot(statsDoc, (snap) => {
+            if(snap.exists()){
+                const data = snap.data();
+                document.getElementById('total-gen-display').innerText = (data.total || 0).toLocaleString();
+                document.getElementById('daily-gen-display').innerText = (data.daily || 0).toLocaleString();
+            }
+        });
+
+        onSnapshot(settingsDoc, (snap) => {
+            if(snap.exists()){
+                const d = snap.data();
+                document.getElementById('running-text').innerText = d.marquee || "JK VPN V4 - FAST & SECURE";
+                document.getElementById('d-name-1').innerText = d.dname1 || "KBZ PAY";
+                document.getElementById('d-acc-1').innerText = d.dacc1 || "09xxxxxxxxx";
+                document.getElementById('d-logo-1').src = d.dlogo1 || "";
+                document.getElementById('d-name-2').innerText = d.dname2 || "WAVE PAY";
+                document.getElementById('d-acc-2').innerText = d.dacc2 || "09xxxxxxxxx";
+                document.getElementById('d-logo-2').src = d.dlogo2 || "";
+                // Update top contact link from socialLink
+                const socialLink = d.socialLink || "https://linvpn.site/contact.html";
+                document.getElementById('top-contact-link').href = socialLink;
+                // populate fields for admin
+                document.getElementById('set-marquee-single').value = d.marquee || "";
+                document.getElementById('set-social-link').value = socialLink;
+                // Also populate original fields if they exist (for backward compatibility)
+                if(document.getElementById('set-marquee')) document.getElementById('set-marquee').value = d.marquee || "";
+                if(document.getElementById('set-contact')) document.getElementById('set-contact').value = socialLink;
+                // Bank fields
+                document.getElementById('admin-dlogo1').value = d.dlogo1 || "";
+                document.getElementById('admin-dname1').value = d.dname1 || "";
+                document.getElementById('admin-dacc1').value = d.dacc1 || "";
+                document.getElementById('admin-dlogo2').value = d.dlogo2 || "";
+                document.getElementById('admin-dname2').value = d.dname2 || "";
+                document.getElementById('admin-dacc2').value = d.dacc2 || "";
+            }
+        });
+
+        function updateTotalOnline() {
+            let total = 0; allConfigs.forEach(c => {
+                if(!serverUserCountState[c.id]) serverUserCountState[c.id] = Math.floor(Math.random() * 20) + 5;
+                total += (serverUserCountState[c.id] || 0);
+            });
+            const countEl = document.getElementById('online-total-count');
+            if(countEl) countEl.innerText = total.toLocaleString();
+        }
+
+        // Separate save for running text
+        document.getElementById('save-marquee-btn').onclick = async () => {
+            const newMarquee = document.getElementById('set-marquee-single').value;
+            await setDoc(settingsDoc, { marquee: newMarquee }, { merge: true });
+            showNotify("Running text saved!");
+        };
+
+        // Save bank + social link (main)
+        document.getElementById('save-settings-btn').onclick = async () => {
+            const payload = {
+                dlogo1: document.getElementById('admin-dlogo1').value,
+                dname1: document.getElementById('admin-dname1').value,
+                dacc1: document.getElementById('admin-dacc1').value,
+                dlogo2: document.getElementById('admin-dlogo2').value,
+                dname2: document.getElementById('admin-dname2').value,
+                dacc2: document.getElementById('admin-dacc2').value,
+                socialLink: document.getElementById('set-social-link').value
+            };
+            await setDoc(settingsDoc, payload, { merge: true }); 
+            showNotify("Bank & Social saved!");
+        };
+
+        document.getElementById('reset-limits-btn').onclick = async () => {
+            if(!confirm("Reset ALL limits?")) return;
+            const snap = await getDocs(configsCol);
+            for (const docSnap of snap.docs) {
+                await updateDoc(docSnap.ref, { dailyCount: 0 });
+            }
+            await updateDoc(statsDoc, { daily: 0 });
+            showNotify("Reset Complete!");
+        };
+
+        document.getElementById('publish-btn').onclick = async () => {
+            const id = document.getElementById('edit-id').value;
+            const payload = {
+                flag: document.getElementById('config-flag').value,
+                title: document.getElementById('config-title').value, 
+                sim: document.getElementById('config-sim').value,
+                ispLogo: document.getElementById('config-isp-logo').value,
+                type: document.getElementById('config-type').value,
+                content: document.getElementById('config-content').value,
+                expire: document.getElementById('config-expire').value,
+                note: document.getElementById('config-note').value
+            };
+            if(!payload.title || !payload.content) return showNotify("Fields empty!");
+            
+            try {
+                if(id) { 
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id), payload); 
+                } else { 
+                    await addDoc(configsCol, { ...payload, dailyCount: 0, createdAt: Timestamp.now() }); 
+                }
+                document.getElementById('edit-id').value = "";
+                ['config-title', 'config-sim', 'config-isp-logo', 'config-content', 'config-note'].forEach(fid => document.getElementById(fid).value = "");
+                showNotify("Published!");
+            } catch (err) {
+                showNotify("Error Saving!");
+            }
+        };
+
+        window.deleteConfig = async (id) => { 
+            if(confirm("Are you sure you want to delete this server?")) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'configs', id));
+                    showNotify("Deleted Successfully!");
+                } catch(err) {
+                    showNotify("Delete Failed!");
+                }
+            }
+        };
+
+        window.editConfig = (itemStr) => {
+            const item = JSON.parse(decodeURIComponent(itemStr));
+            document.getElementById('edit-id').value = item.id;
+            document.getElementById('config-flag').value = item.flag || "us";
+            document.getElementById('config-title').value = item.title || "";
+            document.getElementById('config-sim').value = item.sim || "";
+            document.getElementById('config-isp-logo').value = item.ispLogo || "";
+            document.getElementById('config-expire').value = item.expire || "";
+            document.getElementById('config-type').value = item.type || "V2RAY";
+            document.getElementById('config-content').value = item.content || "";
+            document.getElementById('config-note').value = item.note || "";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.startGen = (id, title, content, daily, expired) => {
+            if (expired) return showNotify("Expired!");
+            if (daily >= SERVER_LIMIT) return showNotify("Server Full!");
+            processingData = { id, title, content, daily };
+            const n1 = Math.floor(Math.random() * 10) + 1;
+            const n2 = Math.floor(Math.random() * 10) + 1;
+            quizSolution = n1 + n2;
+            document.getElementById('quiz-question').innerText = `${n1} + ${n2} = ?`;
+            toggleModal('quiz-modal', true);
+        };
+
+        document.getElementById('verify-quiz-btn').onclick = async () => {
+            const ans = parseInt(document.getElementById('quiz-answer').value);
+            if (ans !== quizSolution) return showNotify("Wrong!");
+            toggleModal('quiz-modal', false);
+            const sRef = doc(db, 'artifacts', appId, 'public', 'data', 'configs', processingData.id);
+            await updateDoc(sRef, { dailyCount: increment(1) });
+            await updateDoc(statsDoc, { total: increment(1), daily: increment(1) });
+            toggleModal('success-modal', true);
+            document.getElementById('show-config-btn').onclick = () => {
+                toggleModal('success-modal', false);
+                document.getElementById('modal-title').innerText = processingData.title;
+                document.getElementById('modal-content').innerText = processingData.content;
+                document.getElementById('modal-copy-btn').onclick = () => {
+                    const t = document.createElement('textarea');
+                    t.value = processingData.content;
+                    document.body.appendChild(t);
+                    t.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(t);
+                    showNotify("Copied!");
+                };
+                toggleModal('config-modal', true);
+            };
+        };
+
+        const filterTabs = ['ALL', 'V2RAY', 'SSH', 'UDP', 'TROJAN', 'OVPN', 'SS', 'ONLINE'];
+        filterTabs.forEach(t => {
+            const btn = document.getElementById(`tab-${t}`);
+            if(btn) btn.onclick = () => {
+                currentFilter = t;
+                document.querySelectorAll('.tab-btn').forEach(b => b.className = 'tab-btn');
+                const maps = { 'ALL': 'active-all', 'V2RAY': 'active-v2ray', 'SSH': 'active-ssh', 'UDP': 'active-udp', 'TROJAN': 'active-trojan', 'OVPN': 'active-ovpn', 'SS': 'active-ss', 'ONLINE': 'active-online' };
+                btn.classList.add(maps[t]);
+                document.getElementById('online-total-banner').classList.toggle('hidden', t !== 'ONLINE');
+                renderUI();
+            };
+        });
+
+        function getISPClass(isp) {
+            const v = (isp || '').toLowerCase();
+            if(v.includes('dtac')) return 'isp-dtac';
+            if(v.includes('true')) return 'isp-true';
+            if(v.includes('ais')) return 'isp-ais';
+            return 'isp-default';
+        }
+
+        function initFaq() {
+            const faqItems = document.querySelectorAll('.faq-item');
+            faqItems.forEach(item => {
+                const questionDiv = item.querySelector('.faq-question');
+                if (questionDiv) {
+                    questionDiv.addEventListener('click', () => {
+                        item.classList.toggle('active');
+                        const icon = questionDiv.querySelector('i');
+                        if (icon) {
+                            if (item.classList.contains('active')) {
+                                icon.classList.remove('fa-chevron-down');
+                                icon.classList.add('fa-chevron-up');
+                            } else {
+                                icon.classList.remove('fa-chevron-up');
+                                icon.classList.add('fa-chevron-down');
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // Notifications management
+        let notifs = [];
+        function renderNotifications(){
+            const adminListDiv = document.getElementById('admin-notif-list');
+            const userArea = document.getElementById('user-notifications-area');
+            if(adminListDiv) adminListDiv.innerHTML = notifs.map(n => `<div class="flex justify-between items-center p-3 rounded-xl bg-black/5 border-l-4 border-indigo-400"><span class="text-xs">${escapeHtml(n.text)}</span><div><button onclick="editNotif('${n.id}','${escapeHtml(n.text).replace(/'/g,"\\'")}')" class="text-indigo-500 mr-2"><i class="fas fa-edit"></i></button><button onclick="deleteNotif('${n.id}')" class="text-rose-500"><i class="fas fa-trash"></i></button></div></div>`).join('');
+            if(userArea) userArea.innerHTML = notifs.length ? `<div class="text-xs font-bold mb-2 flex items-center gap-2"><i class="fas fa-bell text-indigo-500"></i> Announcements</div>${notifs.map(n=>`<div class="notification-item text-sm">📢 ${escapeHtml(n.text)}</div>`).join('')}` : `<div class="text-center text-xs opacity-50">No announcements</div>`;
+        }
+        window.editNotif = (id, oldText) => { const newText = prompt("Edit notification", oldText); if(newText && newText.trim()) updateDoc(doc(db,'artifacts',appId,'public','data','notifications',id), { text: newText.trim() }); };
+        window.deleteNotif = async (id) => { if(confirm("Delete notification?")) await deleteDoc(doc(db,'artifacts',appId,'public','data','notifications',id)); };
+        document.getElementById('add-notif-btn')?.addEventListener('click', async () => { const txt = document.getElementById('new-notif-text').value.trim(); if(txt) { await addDoc(notificationsCol, { text: txt, createdAt: Timestamp.now() }); document.getElementById('new-notif-text').value = ""; showNotify("Added"); } else showNotify("Enter text"); });
+        onSnapshot(notificationsCol, (snap) => { notifs = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)); renderNotifications(); });
+        function escapeHtml(str){ return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m; }); }
+
+        function renderUI() {
+            const grid = document.getElementById('user-grid');
+            const adminList = document.getElementById('admin-list');
+            if(!grid) return; 
+            grid.innerHTML = ''; 
+            if(adminList) adminList.innerHTML = '';
+            
+            const isAdmin = localStorage.getItem('jkvpn_admin_session') === 'active';
+
+            if(isAdmin && adminList) {
+                allConfigs.forEach(item => {
+                    const node = document.createElement('div');
+                    node.className = "server-card p-4 rounded-2xl flex justify-between items-center";
+                    node.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 flex items-center justify-center overflow-hidden border rounded-full">${getFlagElement(item.flag)}</div>
+                            <div><p class="text-[10px] font-black uppercase">${item.title}</p></div>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="editConfig('${encodeURIComponent(JSON.stringify(item))}')" class="w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg hover:bg-indigo-200"><i class="fas fa-edit text-[10px]"></i></button>
+                            <button onclick="deleteConfig('${item.id}')" class="w-8 h-8 bg-rose-100 text-rose-500 rounded-lg hover:bg-rose-200"><i class="fas fa-trash text-[10px]"></i></button>
+                        </div>
+                    `;
+                    adminList.appendChild(node);
+                });
+            }
+
+            let filtered = currentFilter === 'ALL' ? allConfigs : 
+                           (currentFilter === 'ONLINE' ? allConfigs.filter(c => !c.expire || new Date(c.expire) >= new Date().setHours(0,0,0,0)) : 
+                           allConfigs.filter(c => c.type === currentFilter));
+
+            filtered.forEach(item => {
+                const daily = item.dailyCount || 0;
+                const isFull = daily >= SERVER_LIMIT;
+                const isExpired = item.expire && new Date(item.expire) < new Date().setHours(0,0,0,0);
+                const diff = item.expire ? Math.ceil((new Date(item.expire) - new Date().setHours(0,0,0,0)) / 86400000) : null;
+                const ping = serverPingState[item.id] || 45;
+                const users = serverUserCountState[item.id] || 12;
+
+                const escapedContent = item.content.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                const card = document.createElement('div');
+                card.className = `server-card rounded-[1.8rem] p-5 flex flex-col transition-all ${isExpired ? 'opacity-50 grayscale' : 'hover:shadow-xl'}`;
+                card.innerHTML = `
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="flag-circle">${getFlagElement(item.flag)}</div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="text-[11px] font-black italic break-words">${item.title}</h3>
+                            <div class="flex items-center">
+                                <span class="led-dot ${isExpired ? 'led-offline' : 'led-online'}"></span>
+                                <p class="text-[7px] font-black uppercase ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">
+                                    ${isExpired ? 'OFFLINE' : 'ONLINE'} • <span id="ping-val-${item.id}" class="ping-excellent">${ping}ms</span>
+                                </p>
+                            </div>
+                        </div>
+                        <span class="text-[7px] font-black px-2 py-1 bg-slate-900 text-white rounded-lg">${item.type}</span>
+                    </div>
+                    <div class="space-y-1.5 mb-5 text-[9px] flex-grow">
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">ISP:</span> <span class="isp-badge ${getISPClass(item.sim)}">${item.ispLogo ? `<img src="${item.ispLogo}" class="isp-logo-img">` : ''}${item.sim || 'Universal'}</span></div>
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Active Users:</span> <span class="px-2 py-0.5 rounded-full font-black status-badge-blue">${users} Users</span></div>
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Expiry:</span> <span class="font-black">${item.expire || 'Life Time'}</span></div>
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Status:</span> <span class="font-black ${isExpired ? 'text-rose-500' : 'text-emerald-500'}">${isExpired ? 'EXPIRED' : (diff !== null ? diff + ' Days Left' : 'Permanent')}</span></div>
+                        <div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Limit:</span> <span class="px-2 py-0.5 rounded-full font-black ${isFull ? 'bg-rose-100 text-rose-600' : 'bg-emerald-100 text-emerald-600'}">${daily} / ${SERVER_LIMIT}</span></div>
+                        ${item.note ? `<div class="flex justify-between p-2 rounded-xl bg-black/5"><span class="font-black uppercase text-[7px]">Note:</span> <span class="font-black text-amber-500 italic text-[9px] break-words text-right max-w-[65%]">${item.note}</span></div>` : ''}
+                    </div>
+                    <button onclick="startGen('${item.id}', '${item.title.replace(/'/g, "\\'")}', '${escapedContent}', ${daily}, ${isExpired})" class="w-full py-3 ${isExpired ? 'bg-slate-400' : (isFull ? 'bg-rose-500' : 'bg-slate-900')} text-white rounded-xl font-black text-[9px] uppercase shadow-md active:scale-95 transition-transform">${isExpired ? 'EXPIRED' : (isFull ? 'FULL' : 'Get Configuration')}</button>
+                `;
+                grid.appendChild(card);
+            });
+            initFaq();
+        }
+        
+        setInterval(() => { document.getElementById('server-clock').innerText = new Date().toLocaleString(); }, 1000);
+        window.addEventListener('load', async () => { await signInAnonymously(auth); checkAdminSession(); initFaq(); });
+    </script>
+</body>
+</html>
