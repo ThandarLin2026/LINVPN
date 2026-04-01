@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIM Packages Guide</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Pyidaungsu', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .operator-card {
+            border-radius: 1.5rem;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .operator-card:active {
+            transform: scale(0.98);
+        }
+
+        .ussd-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(243, 244, 246, 1);
+            padding: 1rem;
+            border-radius: 1rem;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .dark .ussd-btn {
+            background: rgba(31, 41, 55, 1);
+            color: white;
+        }
+
+        .ussd-btn:active {
+            background: rgba(229, 231, 235, 1);
+        }
+
+        .dark .ussd-btn:active {
+            background: rgba(55, 65, 81, 1);
+        }
+
+        .dtac-accent { border-top: 6px solid #00a1e4; }
+        .true-accent { border-top: 6px solid #ed1c24; }
+        .ais-accent { border-top: 6px solid #91c11e; }
+
+        .theme-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-slate-950 text-gray-900 dark:text-gray-100 min-h-screen pb-20">
+
+    <!-- Theme Switcher -->
+    <div id="themeToggle" class="theme-fab bg-white dark:bg-gray-800 text-yellow-500 dark:text-yellow-400">
+        <i class="fa-solid fa-moon dark:hidden text-2xl"></i>
+        <i class="fa-solid fa-sun hidden dark:block text-2xl"></i>
+    </div>
+
+    <div class="max-w-md mx-auto p-5">
+        <header class="py-8 text-center">
+            <h1 class="text-3xl font-black tracking-tight">SIM PACKAGES</h1>
+            <p class="text-gray-500 dark:text-gray-400 text-sm mt-1">အင်တာနက်စမတ်နည်းလမ်းညွှန်</p>
+        </header>
+
+        <!-- DTAC Section -->
+        <div class="operator-card dtac-accent bg-white dark:bg-gray-900 shadow-xl mb-8 p-6">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center p-2 border border-gray-100 dark:border-gray-800">
+                    <img src="https://raw.githubusercontent.com/ThandarLin2026/LINVPN/main/image/d.png" alt="DTAC Logo">
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">DTAC SIM</h2>
+                    <span class="text-[10px] bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 px-2 py-0.5 rounded font-bold uppercase">Thailand</span>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <p class="text-sm font-bold text-gray-600 dark:text-gray-400 mb-2">Jaidee Plan ( စမတ်နည်း )</p>
+                    <p class="text-xs mb-3">ဖုန်းဘေလ် 30 ဖြည့်ထားရန် လိုအပ်ပါသည်။</p>
+                    <a href="tel:*117*30%23" class="ussd-btn border border-gray-200 dark:border-gray-700">
+                        <span class="text-2xl font-mono font-bold text-blue-500">*117*30#</span>
+                        <div class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-phone-flip text-sm"></i>
+                        </div>
+                    </a>
+                </div>
+                <div class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+                    <p class="text-[11px] text-blue-700 dark:text-blue-300 text-center italic font-bold">"ကျိုင်ဒီအရံနက်စာအိတ်ကျလာရင်ရပါပြီး"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TRUE Section -->
+        <div class="operator-card true-accent bg-white dark:bg-gray-900 shadow-xl mb-8 p-6">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center p-2 border border-gray-100 dark:border-gray-800">
+                    <img src="https://raw.githubusercontent.com/ThandarLin2026/LINVPN/main/image/t.png" alt="TRUE Logo">
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">TRUE SIM</h2>
+                    <span class="text-[10px] bg-red-100 dark:bg-red-900 text-red-600 dark:text-red-300 px-2 py-0.5 rounded font-bold uppercase">Social Media</span>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <div>
+                    <div class="flex justify-between items-end mb-2">
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400">Twitter Plan</p>
+                        <span class="text-xs font-bold text-red-500">53 Baht</span>
+                    </div>
+                    <a href="tel:*900*3509%23" class="ussd-btn border border-gray-200 dark:border-gray-700">
+                        <span class="text-2xl font-mono font-bold text-red-600">*900*3509#</span>
+                        <div class="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-phone-flip text-sm"></i>
+                        </div>
+                    </a>
+                </div>
+
+                <div>
+                    <div class="flex justify-between items-end mb-2">
+                        <p class="text-sm font-bold text-gray-600 dark:text-gray-400">Vdo Zoom Plan</p>
+                        <span class="text-xs font-bold text-red-500">85 Baht</span>
+                    </div>
+                    <a href="tel:*900*8234%23" class="ussd-btn border border-gray-200 dark:border-gray-700">
+                        <span class="text-2xl font-mono font-bold text-red-600">*900*8234#</span>
+                        <div class="w-10 h-10 bg-red-600 text-white rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-phone-flip text-sm"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- AIS Section -->
+        <div class="operator-card ais-accent bg-white dark:bg-gray-900 shadow-xl mb-8 p-6">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center p-2 border border-gray-100 dark:border-gray-800">
+                    <img src="https://raw.githubusercontent.com/ThandarLin2026/LINVPN/main/image/a.png" alt="AIS Logo">
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold">AIS SIM</h2>
+                    <span class="text-[10px] bg-lime-100 dark:bg-lime-900 text-lime-600 dark:text-lime-300 px-2 py-0.5 rounded font-bold uppercase">Budget Offer</span>
+                </div>
+            </div>
+
+            <div class="bg-lime-50 dark:bg-lime-900/10 p-4 rounded-2xl border-2 border-dashed border-lime-200 dark:border-lime-800 mb-6">
+                <p class="text-xs font-bold text-lime-700 dark:text-lime-400 mb-4 text-center">AIS က 10 ဘတ်ပဲကုန်ပါမယ်</p>
+                <div class="space-y-4">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">ကဒ်အသစ် ➤</p>
+                        <a href="tel:*777*44%23" class="ussd-btn bg-white dark:bg-gray-800 border border-lime-200 dark:border-lime-900">
+                            <span class="text-xl font-mono font-bold text-lime-600">*777*44#</span>
+                            <i class="fa-solid fa-phone-flip text-lime-600"></i>
+                        </a>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">ကဒ်အဟောင်း ➤</p>
+                        <a href="tel:*777*1043%23" class="ussd-btn bg-white dark:bg-gray-800 border border-lime-200 dark:border-lime-900">
+                            <span class="text-xl font-mono font-bold text-lime-600">*777*1043#</span>
+                            <i class="fa-solid fa-phone-flip text-lime-600"></i>
+                        </a>
+                    </div>
+                </div>
+                <p class="text-[10px] mt-4 text-gray-500 dark:text-gray-400 text-center leading-relaxed">
+                    SMS ကျလာပြီးနောက် ဖုန်းဘေ 10 ဘတ်ထည့်ပါ။ 64kbps တစ်လစာရပါမည်။
+                </p>
+            </div>
+
+            <!-- Alternative AIS Plans -->
+            <div class="space-y-2 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <p class="text-[10px] font-bold text-gray-400 uppercase ml-1">Alternative Plans</p>
+                <a href="tel:*777*7067%23" class="flex justify-between items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 no-underline">
+                    <span class="text-xs font-bold text-gray-600 dark:text-gray-400">64 Kbps (32฿)</span>
+                    <span class="font-mono text-sm font-bold text-lime-600">*777*7067#</span>
+                </a>
+                <a href="tel:*777*7068%23" class="flex justify-between items-center p-3 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 no-underline">
+                    <span class="text-xs font-bold text-gray-600 dark:text-gray-400">128 Kbps (34฿)</span>
+                    <span class="font-mono text-sm font-bold text-lime-600">*777*7068#</span>
+                </a>
+            </div>
+        </div>
+
+        <footer class="text-center py-6 text-gray-400 text-[10px] font-bold uppercase tracking-widest">
+            © 2024 SIM GUIDE THAILAND
+        </footer>
+    </div>
+
+    <script>
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+
+        // Check for existing preference
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+    </script>
+</body>
+</html>
+
