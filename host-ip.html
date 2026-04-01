@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Hostname to IP Lookup</title>
+    <style>
+        body {
+            font-family: Arial;
+            text-align: center;
+            background: #0f172a;
+            color: white;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+        button {
+            background: #22c55e;
+            color: white;
+            cursor: pointer;
+        }
+        .box {
+            background: #1e293b;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+        iframe {
+            width: 90%;
+            height: 300px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>🌐 Hostname to IP Tool</h2>
+
+<input type="text" id="hostname" placeholder="Enter domain (example.com)">
+<button onclick="lookupIP()">Lookup</button>
+
+<div class="box" id="result"></div>
+
+<h3>📍 Your IP Info</h3>
+<div class="box" id="myip"></div>
+
+<iframe id="map"></iframe>
+
+<script>
+
+// 🔍 Hostname → IP
+async function lookupIP() {
+    let host = document.getElementById("hostname").value;
+
+    let res = await fetch(`https://dns.google/resolve?name=${host}`);
+    let data = await res.json();
+
+    if (data.Answer) {
+        document.getElementById("result").innerHTML =
+            "IP Address: " + data.Answer[0].data;
+    } else {
+        document.getElementById("result").innerHTML = "Not found";
+    }
+}
+
+// 🌍 Visitor IP Info
+async function getMyIP() {
+    let res = await fetch("https://ipapi.co/json/");
+    let data = await res.json();
+
+    document.getElementById("myip").innerHTML = `
+        IP: ${data.ip} <br>
+        Country: ${data.country_name} <br>
+        City: ${data.city} <br>
+        ISP: ${data.org}
+    `;
+
+    // 🗺️ Map
+    document.getElementById("map").src =
+        `https://maps.google.com/maps?q=${data.latitude},${data.longitude}&z=12&output=embed`;
+}
+
+getMyIP();
+
+</script>
+
+</body>
+</html>
