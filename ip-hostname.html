@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="my">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>JK VPN DNS RECORD</title>
+  <style>
+    :root{
+      --fg:#0f172a; --muted:#64748b; --line:#e2e8f0;
+      --accent:#2563eb; --card:#ffffffaa;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; color:var(--fg); font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+      min-height:100vh;
+      background: radial-gradient(1200px 600px at 10% -10%, #c7d2fe 0%, transparent 50%),
+                  radial-gradient(1200px 600px at 110% 10%, #a7f3d0 0%, transparent 50%),
+                  linear-gradient(180deg,#f8fafc, #eef2ff 60%, #e0f2fe);
+    }
+    .wrap{max-width:920px; margin:32px auto; padding:16px;}
+    .card{
+      background:var(--card); backdrop-filter: blur(8px);
+      border:1px solid var(--line); border-radius:16px; padding:18px;
+      box-shadow: 0 10px 30px rgba(2,6,23,.06);
+    }
+    h1{margin:0 0 6px; font-size:26px; letter-spacing:.3px;}
+    .byline{display:flex; align-items:center; gap:10px; margin:0 0 14px}
+    .tg{
+      display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px;
+      text-decoration:none; border:1px solid var(--line); border-radius:999px; background:#ffffffcc;
+    }
+    .tg:hover{background:#fff}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .note{font-size:12px; color:var(--muted); margin-top:10px}
+    .info{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:12px 0 16px}
+    .pill{
+      display:flex; justify-content:space-between; align-items:center; gap:8px;
+      padding:10px 12px; border:1px solid var(--line); border-radius:12px; background:#fff;
+      font-size:14px;
+    }
+    .pill span{color:var(--muted)}
+    .pill b{font-weight:700}
+    form{display:grid; gap:12px; grid-template-columns:1fr;}
+    .row{display:grid; gap:10px; grid-template-columns:160px 1fr; align-items:center;}
+    label{color:var(--muted); font-size:14px}
+    input,select{
+      width:100%; height:42px; padding:10px 12px; border:1px solid var(--line);
+      border-radius:12px; font-size:16px; background:#fff;
+    }
+    input[type="checkbox"]{width:auto; height:auto}
+    .btns{display:flex; gap:10px; margin-top:4px}
+    /* === Three-color gradient primary button === */
+    button{
+      height:44px; padding:0 18px; border-radius:12px; border:0;
+      color:#fff; font-weight:800; letter-spacing:.2px;
+      background: linear-gradient(90deg,#ef4444, #f59e0b, #22c55e);
+      background-size:200% 100%;
+      box-shadow:0 6px 16px rgba(15,23,42,.15);
+      transition: transform .08s ease, box-shadow .2s ease, background-position .8s ease;
+    }
+    button:hover{background-position:100% 0; box-shadow:0 10px 22px rgba(15,23,42,.20)}
+    button:active{transform: translateY(1px)}
+    button.ghost{
+      background:#fff; color:var(--accent); border:1px solid var(--accent); font-weight:700;
+    }
+    button[disabled]{ opacity: .6; cursor: not-allowed; }
+    #msg{margin-top:10px; padding:12px; border-radius:12px; background:#f8fafc; border:1px solid var(--line); min-height:44px}
+    @media (max-width:680px){
+      .row{grid-template-columns:1fr}
+      .info{grid-template-columns:1fr}
+    }
+    .footer{
+      margin-top:18px; font-size:13px; color:#0f172a; text-align:center;
+      background:#ffffffaa; border:1px solid var(--line); border-radius:12px; padding:10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>JK VPN DNS RECORD</h1>
+
+      <!-- Telegram icon link only (no @ text visible) -->
+      <p class="byline">
+        <a class="tg" href="https://t.me/Juevpn" target="_blank" rel="noopener" title="Contact on Telegram">
+          <span class="sr-only">@Juevpn</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+            <path fill="#229ED9" d="M21.943 4.509a1.5 1.5 0 0 0-2.047-1.579L3.27 9.47c-1.49.55-1.403 2.7.122 3.113l4.8 1.317 1.85 5.966a1.2 1.2 0 0 0 2.046.447l2.676-2.74 4.64 3.37c.998.725 2.406.18 2.64-1.02l2.94-15.38zM8.79 12.9l9.75-6.01-7.77 7.78-.26 3.4-1.72-5.17z"/>
+          </svg>
+        </a>
+      </p>
+
+      <!-- Info bar: server time, IP, location -->
+      <div class="info">
+        <div class="pill"><span>Server Time</span><b id="srvTime">Loading…</b></div>
+        <div class="pill"><span>IP</span><b id="ip">Detecting…</b></div>
+        <div class="pill"><span>Location</span><b id="loc">Detecting…</b></div>
+      </div>
+
+      <form id="dnsForm" autocomplete="off">
+        <div class="row">
+          <label for="type">Type</label>
+          <select id="type" required>
+            <option value="A">A</option>
+            <option value="AAAA">AAAA</option>
+            <option value="CNAME">CNAME</option>
+            <option value="TXT">TXT</option>
+            <option value="MX">MX</option>
+            <option value="NS">NS</option>
+            <option value="CAA">CAA</option>
+            <option value="HTTPS">HTTPS</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="host">Host</label>
+          <input id="host" type="text" placeholder="sub (or sub.jvpn.shop)" required />
+        </div>
+
+        <div class="row">
+          <label id="contentLabel" for="content">IPv4 Address</label>
+          <input id="content" type="text" placeholder="e.g. 203.0.113.10" required />
+        </div>
+
+        <div class="row" id="prioRow" style="display:none">
+          <label for="priority">Priority</label>
+          <input id="priority" type="number" min="0" max="65535" placeholder="10 (MX only)" />
+        </div>
+
+        <div class="row">
+          <label for="ttl">TTL</label>
+          <select id="ttl">
+            <option value="1" selected>Auto</option>
+            <option value="60">60</option>
+            <option value="120">120</option>
+            <option value="300">300</option>
+            <option value="600">600</option>
+            <option value="1800">1800</option>
+            <option value="3600">3600</option>
+          </select>
+        </div>
+
+        <div class="row" id="proxiedRow">
+          <label for="proxied">Proxy through Cloudflare</label>
+          <div><input id="proxied" type="checkbox" checked /> <span class="note">အမှန်ခြစ်ကိုဖြုတ်ပေးပါ</span></div>
+        </div>
+
+        <div class="btns">
+          <button type="submit" id="addBtn">Add Record</button>
+          <button type="button" class="ghost" id="resetBtn">Reset</button>
+        </div>
+        <div id="msg"></div>
+
+        <div class="note">
+          Host ကို <b>full</b> (ဥပမာ <code>app.jvpn.shop</code>) သို့မဟုတ် <b>short</b> (ဥပမာ <code>app</code>) လို့ရေးနိုင်ပါတယ်—
+          short ဖြစ်ရင် <code>.jvpn.shop</code> ကိုအလိုအလျောက်ပေါင်းပေးမည်။
+        </div>
+      </form>
+    </div>
+
+    <div class="footer">
+      Admin : <b>Jue Htet</b> မှာစေတနာဖြင့် ပြုလုပ်ပေးထားပါသည်
+    </div>
+  </div>
+
+  <script>
+    // ===== Settings =====
+    const ROOT = "jvpn.shop";
+    const API_URL = "https://jk-free-dns.jvpnshop.workers.dev/dns";
+
+    // ===== Elements =====
+    const typeEl = document.getElementById("type");
+    const hostEl = document.getElementById("host");
+    const contentEl = document.getElementById("content");
+    const contentLabel = document.getElementById("contentLabel");
+    const prioRow = document.getElementById("prioRow");
+    const priorityEl = document.getElementById("priority");
+    const proxiedRow = document.getElementById("proxiedRow");
+    const proxiedEl = document.getElementById("proxied");
+    const ttlEl = document.getElementById("ttl");
+    const msg = document.getElementById("msg");
+    const addBtn = document.getElementById("addBtn");
+
+    const srvTimeEl = document.getElementById("srvTime");
+    const ipEl = document.getElementById("ip");
+    const locEl = document.getElementById("loc");
+
+    // Ensure TTL shows "Auto" on load
+    ttlEl.value = "1";
+
+    function setPlaceholders(){
+      const t = typeEl.value;
+      prioRow.style.display = (t === "MX") ? "grid" : "none";
+      proxiedRow.style.display = (t === "A" || t === "AAAA" || t === "CNAME") ? "grid" : "none";
+      switch(t){
+        case "A": contentLabel.textContent="IPv4 Address"; contentEl.placeholder="e.g. 203.0.113.10"; break;
+        case "AAAA": contentLabel.textContent="IPv6 Address"; contentEl.placeholder="e.g. 2001:db8::1"; break;
+        case "CNAME": contentLabel.textContent="Target Hostname"; contentEl.placeholder="e.g. target.example.com"; break;
+        case "TXT": contentLabel.textContent="TXT Value"; contentEl.placeholder='e.g. v=spf1 include:_spf.example ~all'; break;
+        case "MX": contentLabel.textContent="Mail Server"; contentEl.placeholder="e.g. mail.example.com"; break;
+        case "NS": contentLabel.textContent="Nameserver Host"; contentEl.placeholder="e.g. ns1.example.com"; break;
+        case "CAA": contentLabel.textContent="CAA Value"; contentEl.placeholder='e.g. 0 issue \"letsencrypt.org\"'; break;
+        case "HTTPS": contentLabel.textContent="Value"; contentEl.placeholder="HTTPS record value"; break;
+      }
+    }
+    typeEl.addEventListener("change", setPlaceholders);
+    setPlaceholders();
+
+    function normalizeHost(raw){
+      const v = (raw||"").trim().replace(/\s+/g,"");
+      if(!v) return "";
+      if (v === ROOT || v.endsWith("."+ROOT)) return v.toLowerCase();
+      return (v+"."+ROOT).toLowerCase();
+    }
+
+    function show(kind,text){
+      msg.textContent = text;
+      if(kind==="ok"){ msg.style.borderColor="#22c55e"; msg.style.background="#ecfdf5"; }
+      else if(kind==="warn"){ msg.style.borderColor="#f59e0b"; msg.style.background="#fffbeb"; }
+      else { msg.style.borderColor="#ef4444"; msg.style.background="#fef2f2"; }
+    }
+
+    // Duplicate guard (local)
+    const LS_KEY = "jk_vip_dns_created";
+    function alreadyCreated(type,name){
+      try{
+        const m = JSON.parse(localStorage.getItem(LS_KEY)||"{}");
+        const key = type+"|"+name;
+        return !!m[key];
+      }catch{ return false; }
+    }
+    function markCreated(type,name){
+      try{
+        const m = JSON.parse(localStorage.getItem(LS_KEY)||"{}");
+        m[type+"|"+name] = 1;
+        localStorage.setItem(LS_KEY, JSON.stringify(m));
+      }catch{}
+    }
+
+    document.getElementById("resetBtn").addEventListener("click",()=>{
+      document.getElementById("dnsForm").reset();
+      ttlEl.value = "1"; // keep Auto
+      setPlaceholders(); msg.textContent=""; hostEl.focus();
+    });
+
+    // Helper: robust parse for various server response shapes
+    function parseResponse(resp){
+      // resp may be object or something else
+      if(!resp) return { ok:false, raw: resp };
+
+      // Common shapes:
+      // { ok: true, record: {...}, action: 'create' }
+      // { success: true, action: 'create', record: {...} }   <-- Cloudflare-like shown in screenshot
+      // { success: true, id: '...', name: '...', content: '...' }  (less common)
+      // { error: 'already exists' }
+      // Or server might return string containing JSON (rare)
+      try{
+        // If resp is string, try parse
+        if(typeof resp === "string"){
+          try{
+            const j = JSON.parse(resp);
+            return parseResponse(j);
+          }catch(e){
+            // not JSON string; look for "success":true inside text
+            const lower = resp.toLowerCase();
+            if(lower.includes('"success":true') || lower.includes("'success':true")){
+              // try to extract JSON substring
+              const p = resp.indexOf('{');
+              try{
+                const j2 = JSON.parse(resp.slice(p));
+                return parseResponse(j2);
+              }catch(e2){
+                return { ok:true, raw:resp, info: 'success-text' };
+              }
+            }
+            return { ok:false, raw:resp };
+          }
+        }
+
+        // It's an object
+        const obj = resp;
+        // If Cloudflare-like
+        if(obj.success === true && obj.record){
+          return { ok:true, record: obj.record, action: obj.action || null, raw: obj };
+        }
+        // If top-level ok
+        if(obj.ok === true && obj.record){
+          return { ok:true, record: obj.record, action: obj.action || null, raw: obj };
+        }
+        // If fields present without wrapper
+        if(obj.name && obj.content && obj.type){
+          return { ok:true, record: { name: obj.name, content: obj.content, type: obj.type, id: obj.id||null }, raw: obj };
+        }
+        // If server returns { error: "..." }
+        if(obj.error){
+          return { ok:false, error: String(obj.error), raw: obj };
+        }
+        // If server returns { errors: [...] }
+        if(obj.errors && Array.isArray(obj.errors) && obj.errors.length){
+          const e0 = obj.errors[0];
+          const msg = (e0 && e0.message) ? e0.message : JSON.stringify(obj.errors);
+          return { ok:false, error: msg, raw: obj };
+        }
+        // Last resort: contains nested success somewhere
+        if(obj.result && obj.result.success === true && obj.result.record){
+          return { ok:true, record: obj.result.record, raw: obj };
+        }
+
+        // Not recognized
+        return { ok:false, raw: obj };
+      }catch(err){
+        return { ok:false, raw: resp, parseError: err.message };
+      }
+    }
+
+    async function submitPayload(payload){
+      // disable to prevent double submit
+      addBtn.disabled = true;
+      addBtn.textContent = "Processing…";
+      try{
+        const res = await fetch(API_URL, {
+          method:"POST",
+          headers:{ "Content-Type":"application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        // try to parse JSON even if non-200
+        let data;
+        try{ data = await res.json(); }catch(e){
+          // maybe text
+          try{ data = await res.text(); }catch(e2){ data = null; }
+        }
+        return parseResponse(data);
+      }catch(err){
+        return { ok:false, error: "Network error: "+(err && err.message ? err.message : String(err)) };
+      }finally{
+        addBtn.disabled = false;
+        addBtn.textContent = "Add Record";
+      }
+    }
+
+    document.getElementById("dnsForm").addEventListener("submit", async (e)=>{
+      e.preventDefault();
+      const type = typeEl.value;
+      const name = normalizeHost(hostEl.value);
+      const content = contentEl.value.trim();
+      const ttl = parseInt(ttlEl.value,10) || 300;
+      const proxied = !!proxiedEl.checked;
+
+      if(!name){ show("err","❌ Host required"); return; }
+      if(!name.endsWith("."+ROOT) && name !== ROOT){
+        show("err",`❌ Host must be under ${ROOT}`); return;
+      }
+      if(!content){ show("err","❌ Content required"); return; }
+
+      // local duplicate guard
+      if(alreadyCreated(type,name)){
+        show("warn","⚠️ အဲ့ဒီနာမည်နဲ့ record ကို ပြီးသားထည့်ထားပါတယ်—ထပ်မပြုလုပ်ပါ။");
+        return;
+      }
+
+      const payload = { type, name, content, ttl };
+      if(type==="MX"){
+        const p = parseInt(priorityEl.value,10);
+        if(Number.isNaN(p)){ show("err","❌ MX priority required"); return; }
+        payload.priority = p;
+      }
+      if(type==="A" || type==="AAAA" || type==="CNAME"){
+        payload.proxied = proxied;
+      }
+
+      show("warn","Processing…");
+
+      // Submit
+      const result = await submitPayload(payload);
+
+      // Interpret
+      if(result.ok && result.record){
+        // success
+        const rec = result.record;
+        const recName = rec.name || name;
+        const recType = rec.type || type;
+        const recContent = rec.content || rec.target || content;
+        show("ok", `✅ Create Successfully: ${recContent} - ${recName}`);
+        markCreated(recType, recName);
+        return;
+      }
+
+      // if server indicated already exists
+      if(result.error){
+        const low = String(result.error).toLowerCase();
+        if(low.includes("already") || low.includes("exists") || low.includes("duplicate")){
+          show("warn","⚠️ အဲ့ဒီနာမည်နဲ့ record ရှိပြီးသား ဖြစ်နိုင်သည်။");
+          // mark locally to avoid further tries
+          markCreated(type,name);
+          return;
+        }else{
+          show("err","❌ Error: "+result.error);
+          return;
+        }
+      }
+
+      // Raw fallback: maybe the server returned a raw object with success:true but different shape
+      if(result.raw){
+        // check raw for success flag
+        try{
+          const r = result.raw;
+          if(r && (r.success === true || r.ok === true || (typeof r === 'object' && (r.id || r.record)))){
+            const rec = r.record || { name: r.name, content: r.content, type: r.type, id: r.id };
+            const recName = (rec && rec.name) ? rec.name : name;
+            const recContent = (rec && (rec.content||rec.target)) ? (rec.content||rec.target) : content;
+            const recType = (rec && rec.type) ? rec.type : type;
+            show("ok", `✅ Create Successfully: ${recContent} - ${recName}`);
+            markCreated(recType, recName);
+            return;
+          }
+        }catch(_){}
+      }
+
+      // If we reach here it's unexpected
+      show("err","❌ Unexpected response: "+JSON.stringify(result.raw || {}));
+      console.error("Unrecognized server response:", result);
+    });
+
+    // ===== Accurate Server Time (by IP timezone) =====
+    async function initServerTime(){
+      let baseMs = Date.now();
+      let tzLabel = "";
+      try{
+        // Use user's IP timezone so displayed time matches their location
+        const r = await fetch("https://worldtimeapi.org/api/ip", {cache:"no-store"});
+        if(r.ok){
+          const j = await r.json();
+          if(j && j.datetime){
+            baseMs = Date.parse(j.datetime);
+            tzLabel = j.timezone || "";
+          }
+        }
+      }catch(_){} 
+      function fmt(ms){
+        const d = new Date(ms);
+        const y = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2,"0");
+        const da = String(d.getDate()).padStart(2,"0");
+        const hh = String(d.getHours()).padStart(2,"0");
+        const mm = String(d.getMinutes()).padStart(2,"0");
+        const ss = String(d.getSeconds()).padStart(2,"0");
+        return `${y}-${m}-${da} ${hh}:${mm}:${ss}${tzLabel ? " ("+tzLabel+")":""}`;
+      }
+      srvTimeEl.textContent = fmt(baseMs);
+      setInterval(()=>{ baseMs += 1000; srvTimeEl.textContent = fmt(baseMs); },1000);
+    }
+
+    // ===== IP & Location (with fallback) =====
+    async function initIP(){
+      try{
+        const r = await fetch("https://ipapi.co/json/", {cache:"no-store"});
+        if(r.ok){
+          const j = await r.json();
+          if(j){
+            if(j.ip) ipEl.textContent = j.ip;
+            const parts = [j.city, j.region, j.country_name].filter(Boolean);
+            if(parts.length){ locEl.textContent = parts.join(", "); return; }
+          }
+        }
+        throw new Error("ipapi failed");
+      }catch(_){
+        try{
+          const r2 = await fetch("https://ipwho.is/", {cache:"no-store"});
+          if(r2.ok){
+            const j2 = await r2.json();
+            if(j2 && j2.success){
+              if(j2.ip) ipEl.textContent = j2.ip;
+              const parts2 = [j2.city, j2.region, j2.country].filter(Boolean);
+              if(parts2.length){ locEl.textContent = parts2.join(", "); return; }
+            }
+          }
+          throw new Error("ipwho.is failed");
+        }catch(__){
+          ipEl.textContent = "Unavailable";
+          locEl.textContent = "Unavailable";
+        }
+      }
+    }
+
+    initServerTime();
+    initIP();
+  </script>
+</body>
+</html>
