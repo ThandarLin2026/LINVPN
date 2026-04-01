@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>JK VPN V4 - Multi-Protocol Edition</title>
+    <title>JK FREE VPN CONFIG - Multi-Protocol Edition</title>
     <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#4f46e5" media="(prefers-color-scheme: light)">
     <meta name="theme-color" content="#020617" media="(prefers-color-scheme: dark)">
@@ -203,12 +203,14 @@
             border: 1px solid var(--border);
             border-radius: 1.5rem;
             padding: 0.75rem;
-            min-width: 180px;
+            min-width: 200px;
             z-index: 60;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
             display: none;
             flex-direction: column;
             gap: 0.5rem;
+            max-height: 400px;
+            overflow-y: auto;
         }
         .menu-content.show {
             display: flex;
@@ -332,6 +334,14 @@
                         </a>
                         <a href="https://linvpn.site/sim.html" target="_blank" class="menu-item">
                             <i class="fas fa-sim-card"></i> Sim & Package
+                        </a>
+                        <!-- NEW: Host IP Checker -->
+                        <a href="https://linvpn.site/host-ip-checker.html" target="_blank" class="menu-item">
+                            <i class="fas fa-network-wired"></i> Host IP Checker
+                        </a>
+                        <!-- NEW: IP To Hostname (DNS) -->
+                        <a href="https://linvpn.site/ip-hostname.html" target="_blank" class="menu-item">
+                            <i class="fas fa-address-card"></i> IP To Hostname (DNS)
                         </a>
                     </div>
                 </div>
