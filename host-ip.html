@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live IP & Network Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        #map { height: 350px; width: 100%; border-radius: 16px; z-index: 1; }
+        .data-card { transition: all 0.3s ease; }
+        .data-card:hover { transform: translateY(-2px); }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Header Section -->
+    <header class="bg-white border-b border-slate-200 py-6">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-blue-600 rounded-lg">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04 Pel 12.02 12.02 0 00-3.478 8.12 11.951 11.951 0 001.378 5.75c1.47 2.766 4.398 4.603 7.718 4.603s6.248-1.837 7.718-4.603a11.95 11.95 0 001.378-5.75c0-2.951-1.07-5.63-2.862-7.69z"></path></svg>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Network Scanner Pro</h1>
+                    <p class="text-xs text-slate-500 font-medium uppercase tracking-widest">Real-time IP Diagnostics</p>
+                </div>
+            </div>
+            <div id="statusArea" class="flex items-center gap-2 px-4 py-2 bg-slate-100 rounded-full">
+                <div id="statusDot" class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                <span id="statusText" class="text-sm font-semibold text-slate-600">Checking Network...</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-10">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- Left Side: Main IP Info -->
+            <div class="lg:col-span-7 space-y-6">
+                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-5">
+                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path></svg>
+                    </div>
+
+                    <div class="relative z-10">
+                        <label class="text-sm font-bold text-blue-600 uppercase tracking-tighter">Your Network Public IP</label>
+                        <div id="displayIp" class="text-4xl md:text-5xl font-black text-slate-900 my-2 tracking-tighter">---.---.---.---</div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
+                            <div class="data-card bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Provider (ISP)</p>
+                                <p id="displayIsp" class="text-base font-bold text-slate-800 truncate leading-tight">Searching...</p>
+                            </div>
+                            <div class="data-card bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Location</p>
+                                <p id="displayLoc" class="text-base font-bold text-slate-800 leading-tight">Searching...</p>
+                            </div>
+                            <div class="data-card bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Timezone</p>
+                                <p id="displayTz" class="text-base font-bold text-slate-800 leading-tight">---</p>
+                            </div>
+                            <div class="data-card bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                                <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Country Info</p>
+                                <p id="displayCountry" class="text-base font-bold text-slate-800 leading-tight">---</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Map Box -->
+                <div class="bg-white p-2 rounded-3xl shadow-sm border border-slate-200">
+                    <div id="map"></div>
+                </div>
+            </div>
+
+            <!-- Right Side: Controls & Search -->
+            <div class="lg:col-span-5 space-y-6">
+                
+                <div class="bg-slate-900 p-8 rounded-3xl shadow-xl text-white">
+                    <h3 class="text-xl font-bold mb-6">Manual Search</h3>
+                    <div class="space-y-4">
+                        <div class="relative">
+                            <input type="text" id="manualIp" placeholder="8.8.8.8 သို့မဟုတ် google.com" 
+                                class="w-full bg-slate-800 border border-slate-700 rounded-2xl px-5 py-4 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all placeholder:text-slate-500">
+                        </div>
+                        <button onclick="manualLookup()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-2xl transition-all shadow-lg shadow-blue-900/20 active:scale-95">
+                            Check IP Details
+                        </button>
+                        <button onclick="initScan()" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-bold py-4 rounded-2xl transition-all border border-slate-700 active:scale-95">
+                            Refresh My Network
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl border border-slate-200">
+                    <h4 class="font-bold text-slate-800 mb-2">Network Security Tip</h4>
+                    <p class="text-sm text-slate-500 leading-relaxed">
+                        သင်၏ IP Address သည် သင်၏ အင်တာနက်ဝန်ဆောင်မှုပေးသူ (ISP) နှင့် ခန့်မှန်းခြေ တည်နေရာကို ဖော်ပြနေပါသည်။ VPN အသုံးပြုခြင်းဖြင့် သင်၏ အချက်အလက်များကို ပိုမိုလုံခြုံစေနိုင်ပါသည်။
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Map Script -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        let map, marker;
+
+        // Initialize Map
+        function updateMap(lat, lon, label) {
+            if (!map) {
+                map = L.map('map', { zoomControl: false }).setView([lat, lon], 12);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+                L.control.zoom({ position: 'bottomright' }).addTo(map);
+                marker = L.marker([lat, lon]).addTo(map);
+            } else {
+                map.setView([lat, lon], 12);
+                marker.setLatLng([lat, lon]);
+            }
+            marker.bindPopup(`<b>${label}</b>`).openPopup();
+        }
+
+        // Logic to detect IP and Details
+        async function initScan(targetIp = "") {
+            const statusText = document.getElementById('statusText');
+            const statusDot = document.getElementById('statusDot');
+            
+            statusText.textContent = "Scanning...";
+            statusDot.className = "w-2 h-2 bg-blue-500 rounded-full animate-ping";
+
+            try {
+                // First: Get the actual IP address via Cloudflare (very reliable)
+                let ipToUse = targetIp;
+                if (!ipToUse) {
+                    const cfResponse = await fetch('https://1.1.1.1/cdn-cgi/trace');
+                    const cfData = await cfResponse.text();
+                    ipToUse = cfData.match(/ip=(.*)/)[1];
+                }
+
+                // Second: Get details using IP-API (HTTPS enabled through proxy/CORS bypass or reliable mirrors)
+                // We use ipapi.co which is very reliable for HTTPS
+                const res = await fetch(`https://ipapi.co/${ipToUse}/json/`);
+                const data = await res.json();
+
+                if (data.error) throw new Error(data.reason);
+
+                // Update UI
+                document.getElementById('displayIp').textContent = data.ip;
+                document.getElementById('displayIsp').textContent = data.org || "Unknown Provider";
+                document.getElementById('displayLoc').textContent = `${data.city}, ${data.region}`;
+                document.getElementById('displayCountry').textContent = `${data.country_name} (${data.country_code})`;
+                document.getElementById('displayTz').textContent = data.timezone;
+                
+                updateMap(data.latitude, data.longitude, `${data.city}, ${data.country_name}`);
+
+                statusText.textContent = "Network Secured";
+                statusDot.className = "w-2 h-2 bg-green-500 rounded-full";
+
+            } catch (err) {
+                console.error(err);
+                statusText.textContent = "Scan Failed";
+                statusDot.className = "w-2 h-2 bg-red-500 rounded-full";
+                document.getElementById('displayIp').textContent = "Connection Error";
+            }
+        }
+
+        function manualLookup() {
+            const input = document.getElementById('manualIp').value.trim();
+            if (input) initScan(input);
+        }
+
+        // Auto start
+        window.onload = () => initScan();
+
+        // Keyboard Enter
+        document.getElementById('manualIp').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') manualLookup();
+        });
+    </script>
+</body>
+</html>
+
