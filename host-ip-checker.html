@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>IP Info Tool</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            cursor: pointer;
+        }
+        .box {
+            background: #1e293b;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 10px;
+        }
+        iframe {
+            width: 90%;
+            height: 300px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<h2>🌐 IP / Host Info Checker</h2>
+
+<input type="text" id="input" placeholder="Enter IP or Domain">
+<button onclick="check()">Check</button>
+
+<div class="box" id="info"></div>
+<div class="box" id="hostname"></div>
+
+<iframe id="map"></iframe>
+
+<script>
+
+async function check() {
+    let input = document.getElementById("input").value;
+
+    // 🔍 Get IP from domain (if needed)
+    let ip = input;
+
+    if (isNaN(input.replace(/\./g, ""))) {
+        let dns = await fetch(`https://dns.google/resolve?name=${input}`);
+        let dnsData = await dns.json();
+        if (dnsData.Answer) {
+            ip = dnsData.Answer[0].data;
+        }
+    }
+
+    // 🌍 IP Info
+    let res = await fetch(`https://ipapi.co/${ip}/json/`);
+    let data = await res.json();
+
+    document.getElementById("info").innerHTML = `
+        IP: ${data.ip} <br>
+        Country: ${data.country_name} <br>
+        City: ${data.city} <br>
+        ISP: ${data.org}
+    `;
+
+    // 🗺️ Map
+    document.getElementById("map").src =
+        `https://maps.google.com/maps?q=${data.latitude},${data.longitude}&z=12&output=embed`;
+
+    // 🔄 Reverse DNS (IP → Hostname)
+    try {
+        let rdns = await fetch(`https://dns.google/resolve?name=${ip}&type=PTR`);
+        let rdnsData = await rdns.json();
+
+        if (rdnsData.Answer) {
+            let hosts = rdnsData.Answer.map(a => a.data).join("<br>");
+            document.getElementById("hostname").innerHTML =
+                "<b>Hostnames:</b><br>" + hosts;
+        } else {
+            document.getElementById("hostname").innerHTML =
+                "No Hostname Found";
+        }
+    } catch {
+        document.getElementById("hostname").innerHTML =
+            "Reverse DNS Error";
+    }
+}
+
+</script>
+
+</body>
+</html>
