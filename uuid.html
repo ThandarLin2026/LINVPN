@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UUID Generator PRO</title>
+
+<style>
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#020617,#0f172a);
+    color:white;
+}
+.container{max-width:800px;margin:40px auto;padding:20px;}
+.card{
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(20px);
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+h1{text-align:center;}
+
+.guide{
+    margin-top:15px;
+    background:rgba(255,255,255,0.05);
+    padding:15px;
+    border-radius:15px;
+    font-size:14px;
+    line-height:1.6;
+}
+
+.controls{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-top:15px;
+}
+input,select{
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+}
+button{
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#22c55e;
+    color:black;
+    font-weight:bold;
+}
+
+.uuid-box{
+    background:rgba(0,0,0,0.4);
+    padding:10px;
+    margin-top:8px;
+    border-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    word-break:break-all;
+}
+
+.copy{
+    background:white;
+    color:black;
+    padding:3px 6px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:11px;
+}
+
+.toast{
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#22c55e;
+    color:black;
+    padding:10px 20px;
+    border-radius:10px;
+    opacity:0;
+    transition:0.3s;
+}
+.toast.show{opacity:1;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<h1>🛡️ UUID Generator PRO</h1>
+
+<!-- GUIDE -->
+<div class="guide">
+<b>📖 What is a UUID?</b><br>
+A UUID (Universally Unique Identifier) is a randomly generated unique string used to identify data, users, devices, or sessions without duplication.<br><br>
+
+<b>⚡ Where is UUID used?</b><br>
+- Databases (User IDs, Order IDs)<br>
+- APIs (Request ID, Tokens)<br>
+- Authentication (Session ID)<br>
+- Apps (Device ID)<br>
+- Tracking & Logs<br>
+- Security Systems<br><br>
+
+<b>🛠️ How to Use</b><br>
+1. Enter how many UUIDs you want (1–1000)<br>
+2. Select format (Standard / No Hyphen)<br>
+3. Optional: Set auto-generate interval (ms)<br>
+4. Click Generate<br>
+5. Copy or Download results<br><br>
+
+🔐 100% Secure – Runs in your browser (no server).
+</div>
+
+<!-- CONTROLS -->
+<div class="controls">
+    <input id="count" type="number" value="1" min="1" max="1000">
+    
+    <select id="format">
+        <option value="standard">Standard</option>
+        <option value="nohyphen">No Hyphens</option>
+    </select>
+
+    <input id="interval" type="number" placeholder="Auto (ms)">
+
+    <button onclick="generate()">Generate</button>
+    <button onclick="copyAll()">Copy All</button>
+    <button onclick="downloadTXT()">TXT</button>
+    <button onclick="downloadCSV()">CSV</button>
+</div>
+
+<!-- RESULT -->
+<div id="result"></div>
+
+</div>
+</div>
+
+<div id="toast" class="toast">Copied!</div>
+
+<script>
+let autoTimer=null;
+let generatedList=[];
+
+// UUID Generator
+function secureUUID(){
+    if(crypto.randomUUID){
+        return crypto.randomUUID();
+    }
+
+    let bytes=new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+
+    bytes[6]=(bytes[6]&0x0f)|0x40;
+    bytes[8]=(bytes[8]&0x3f)|0x80;
+
+    return [...bytes].map((b,i)=>{
+        return (b.toString(16).padStart(2,"0")) +
+        ([4,6,8,10].includes(i)?"-":"");
+    }).join("");
+}
+
+// Generate
+function generate(){
+    let count=+document.getElementById("count").value;
+    let format=document.getElementById("format").value;
+    let result=document.getElementById("result");
+
+    result.innerHTML="";
+    generatedList=[];
+
+    for(let i=0;i<count;i++){
+        let id=secureUUID();
+
+        if(format==="nohyphen"){
+            id=id.replace(/-/g,"");
+        }
+
+        generatedList.push(id);
+
+        result.innerHTML+=`
+        <div class="uuid-box">
+            ${id}
+            <span class="copy" onclick="copy('${id}')">Copy</span>
+        </div>`;
+    }
+}
+
+// Copy single
+function copy(text){
+    navigator.clipboard.writeText(text);
+    showToast();
+}
+
+// Copy all
+function copyAll(){
+    if(!generatedList.length)return;
+    navigator.clipboard.writeText(generatedList.join("\\n"));
+    showToast();
+}
+
+// Download TXT
+function downloadTXT(){
+    if(!generatedList.length)return;
+    let blob=new Blob([generatedList.join("\\n")],{type:"text/plain"});
+    let a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="uuid.txt";
+    a.click();
+}
+
+// Download CSV
+function downloadCSV(){
+    if(!generatedList.length)return;
+    let blob=new Blob([generatedList.join(",")],{type:"text/csv"});
+    let a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download="uuid.csv";
+    a.click();
+}
+
+// Auto Generate
+document.getElementById("interval").addEventListener("input",function(){
+    let val=+this.value;
+
+    if(autoTimer)clearInterval(autoTimer);
+
+    if(val>0){
+        autoTimer=setInterval(generate,val);
+    }
+});
+
+// Toast
+function showToast(){
+    let t=document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),1500);
+}
+</script>
+
+</body>
+</html>
