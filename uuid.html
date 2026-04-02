@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure UUID Generator</title>
+
+<style>
+body {
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#020617,#0f172a);
+    color:white;
+}
+.container {
+    max-width:700px;
+    margin:40px auto;
+    padding:20px;
+}
+.card {
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(20px);
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+h1 {text-align:center;}
+
+.controls {
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+}
+input {
+    flex:1;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    background:rgba(255,255,255,0.08);
+    color:white;
+}
+button {
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#22c55e;
+    color:black;
+    font-weight:bold;
+}
+
+.uuid-box {
+    background:rgba(0,0,0,0.4);
+    padding:10px;
+    margin-top:8px;
+    border-radius:10px;
+    display:flex;
+    justify-content:space-between;
+    font-size:13px;
+    word-break:break-all;
+}
+
+.copy {
+    background:white;
+    color:black;
+    padding:3px 6px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:11px;
+}
+
+.toast {
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#22c55e;
+    color:black;
+    padding:10px 20px;
+    border-radius:10px;
+    opacity:0;
+    transition:0.3s;
+}
+.toast.show {opacity:1;}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<div class="card">
+
+<h1>🛡️ Secure UUID Generator</h1>
+
+<div class="controls">
+    <input id="count" type="number" value="1" min="1" max="100">
+    <button onclick="generate()">Generate</button>
+</div>
+
+<div id="result"></div>
+
+</div>
+</div>
+
+<div id="toast" class="toast">Copied!</div>
+
+<script>
+// 🔐 Secure UUID Generator
+function secureUUID(){
+    if (crypto.randomUUID) {
+        return crypto.randomUUID(); // BEST
+    }
+
+    // fallback (secure)
+    let bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+
+    bytes[6] = (bytes[6] & 0x0f) | 0x40;
+    bytes[8] = (bytes[8] & 0x3f) | 0x80;
+
+    return [...bytes].map((b,i)=>{
+        return (b.toString(16).padStart(2,"0")) +
+        ([4,6,8,10].includes(i) ? "-" : "");
+    }).join("");
+}
+
+function generate(){
+    let count=document.getElementById("count").value;
+    let result=document.getElementById("result");
+    result.innerHTML="";
+
+    for(let i=0;i<count;i++){
+        let id=secureUUID();
+        result.innerHTML+=`
+        <div class="uuid-box">
+            ${id}
+            <span class="copy" onclick="copy('${id}')">Copy</span>
+        </div>`;
+    }
+}
+
+function copy(text){
+    navigator.clipboard.writeText(text);
+    showToast();
+}
+
+function showToast(){
+    let t=document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),1500);
+}
+</script>
+
+</body>
+</html>
