@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>LinVPN Temp Mail | Disposable Email Service</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap');
+        * { font-family: 'Inter', system-ui, -apple-system, sans-serif; }
+        body {
+            background: radial-gradient(circle at 10% 30%, rgba(239, 246, 255, 0.9), rgba(219, 234, 254, 0.6));
+        }
+        .glass-modern {
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.08);
+        }
+        .inbox-item {
+            transition: all 0.2s ease;
+        }
+        .inbox-item:hover {
+            background: #f8fafc;
+            border-left-color: #2563eb;
+            transform: translateX(4px);
+        }
+        .guide-card {
+            background: linear-gradient(115deg, #f1f5f9 0%, #ffffff 100%);
+            border-left: 5px solid #2563eb;
+        }
+        .btn-press:active {
+            transform: scale(0.97);
+        }
+        ::selection {
+            background: #bfdbfe;
+            color: #1e3a8a;
+        }
+    </style>
+</head>
+<body class="min-h-screen py-8 px-4 md:py-14">
+
+    <div class="max-w-3xl mx-auto">
+        <!-- Header Section -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-700 to-indigo-600 rounded-3xl shadow-2xl shadow-blue-300/40 mb-6 rotate-2 hover:rotate-0 transition-all duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-black tracking-tighter text-slate-800">LinVPN <span class="text-blue-600 bg-gradient-to-r from-blue-600 to-indigo-500 bg-clip-text text-transparent">Mail</span></h1>
+            <p class="text-slate-500 font-semibold text-[12px] uppercase tracking-[0.25em] mt-3">Secure & Anonymous Temporary Email</p>
+        </div>
+
+        <!-- Email Address Card (Glass) -->
+        <div class="glass-modern rounded-3xl shadow-2xl p-6 md:p-10 mb-8 border border-white/60">
+            <div class="space-y-6">
+                <div class="relative">
+                    <input id="emailDisplay" readonly class="w-full p-5 md:p-6 bg-slate-50 border-2 border-blue-100 rounded-2xl font-mono text-xl md:text-2xl text-center text-blue-800 outline-none shadow-inner focus:ring-2 focus:ring-blue-300 transition-all" value="Loading...">
+                    <div class="absolute -top-3 left-6 bg-blue-700 text-white text-[11px] px-4 py-1.5 rounded-full font-extrabold uppercase tracking-wider shadow-md">Active Inbox</div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="copyToClipboard()" id="copyBtn" class="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-200 transition-all btn-press">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                        Copy Address
+                    </button>
+                    <button onclick="refreshEmail()" class="flex items-center justify-center gap-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-4 rounded-2xl transition-all btn-press">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                        New Email
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- USAGE GUIDE CARD (New section) - modern & helpful -->
+        <div class="guide-card rounded-2xl p-6 mb-8 shadow-md border border-white/70">
+            <div class="flex items-start gap-4 flex-wrap md:flex-nowrap">
+                <div class="bg-blue-100 p-3 rounded-2xl text-blue-700">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="font-black text-slate-800 text-lg flex items-center gap-2">📘 Quick Guide <span class="text-xs font-mono bg-slate-200 px-2 py-0.5 rounded-full">how to use</span></h3>
+                    <div class="grid md:grid-cols-2 gap-x-6 gap-y-2 mt-3 text-sm text-slate-600">
+                        <div class="flex items-start gap-2"><span class="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold mt-0.5">1</span> <span>Copy your temporary email address above.</span></div>
+                        <div class="flex items-start gap-2"><span class="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold mt-0.5">2</span> <span>Use it on websites, signups, or apps.</span></div>
+                        <div class="flex items-start gap-2"><span class="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold mt-0.5">3</span> <span>Inbox auto-refreshes every 6 seconds.</span></div>
+                        <div class="flex items-start gap-2"><span class="bg-blue-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] font-bold mt-0.5">4</span> <span>Click <strong>“New Email”</strong> to generate fresh address (old inbox wiped).</span></div>
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-3 border-t border-slate-200 pt-2 italic">⚡ Powered by LinVPN secure relay — no logs, fully disposable.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inbox Card -->
+        <div class="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-white/70 overflow-hidden transition-all">
+            <div class="px-6 md:px-10 py-5 border-b border-slate-100 flex justify-between items-center bg-white/50">
+                <div class="flex items-center gap-3">
+                    <span class="flex h-3 w-3 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-80"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    <h2 class="font-black text-slate-700 text-xs uppercase tracking-[0.2em]">INBOX · LIVE MAIL</h2>
+                </div>
+                <button onclick="fetchInbox()" class="text-blue-600 text-xs font-extrabold hover:bg-blue-50 px-4 py-2 rounded-full transition-all uppercase tracking-wider flex items-center gap-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    Refresh
+                </button>
+            </div>
+            
+            <div id="inbox" class="divide-y divide-slate-100 min-h-[420px] bg-white/40">
+                <div class="flex flex-col items-center justify-center py-32 text-slate-300">
+                    <div class="mb-4 animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                    </div>
+                    <p class="font-bold text-sm tracking-wider uppercase text-slate-400">Waiting for incoming messages...</p>
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center mt-12 text-slate-400 text-[11px] font-black uppercase tracking-[0.3em]">🔐 LinVPN Cloud Infrastructure · Temp Mail Service</p>
+    </div>
+
+    <script>
+        const API_BASE = 'https://linvpn-tempmail.linvpn2026.workers.dev';
+        const DOMAIN = 'linvpn.site';
+
+        // Get existing email or create fresh one
+        let myEmail = localStorage.getItem('linvpn_mail_addr') || createNewMail();
+        document.getElementById('emailDisplay').value = myEmail;
+
+        function createNewMail() {
+            const randomId = Math.random().toString(36).substring(2, 12);
+            const addr = `${randomId}@${DOMAIN}`;
+            localStorage.setItem('linvpn_mail_addr', addr);
+            return addr;
+        }
+
+        function refreshEmail() {
+            const userConfirmed = confirm("⚠️ Generate a NEW email address? Your current inbox and all messages will be permanently erased.");
+            if (userConfirmed) {
+                myEmail = createNewMail();
+                document.getElementById('emailDisplay').value = myEmail;
+                // Clear the inbox UI immediately
+                const inboxDiv = document.getElementById('inbox');
+                inboxDiv.innerHTML = `<div class="flex flex-col items-center justify-center py-32 text-slate-300">
+                    <div class="mb-4 animate-pulse">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
+                    </div>
+                    <p class="font-bold text-sm tracking-wider uppercase text-slate-400">Fresh inbox — waiting for emails...</p>
+                </div>`;
+                // fetch inbox (which will be empty)
+                fetchInbox();
+            }
+        }
+
+        function copyToClipboard() {
+            const input = document.getElementById('emailDisplay');
+            input.select();
+            input.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            const btn = document.getElementById('copyBtn');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<span class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Copied!</span>';
+            setTimeout(() => {
+                btn.innerHTML = originalContent;
+            }, 2000);
+        }
+
+        async function fetchInbox() {
+            const inboxEl = document.getElementById('inbox');
+            if (!myEmail) {
+                myEmail = localStorage.getItem('linvpn_mail_addr');
+                if (!myEmail) myEmail = createNewMail();
+                document.getElementById('emailDisplay').value = myEmail;
+            }
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/messages?email=${encodeURIComponent(myEmail)}`);
+                if (!res.ok) throw new Error(`API responded with status ${res.status}`);
+                const data = await res.json();
+                
+                if (!data || data.length === 0) {
+                    inboxEl.innerHTML = `<div class="flex flex-col items-center justify-center py-28 text-slate-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-3 opacity-40" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        <p class="font-semibold text-sm uppercase tracking-wider">📭 No messages yet</p>
+                        <p class="text-xs mt-1 text-slate-300">New emails appear automatically</p>
+                    </div>`;
+                } else {
+                    // Sort by time descending (newest first) but original API might be oldest first; we reverse for clarity
+                    const sortedMessages = [...data].reverse();
+                    inboxEl.innerHTML = sortedMessages.map(msg => {
+                        // sanitize body to avoid XSS but keep formatting
+                        const safeSubject = escapeHtml(msg.subject || '(No subject)');
+                        const safeFrom = escapeHtml(msg.from || 'unknown');
+                        const safeBody = escapeHtml(msg.body || 'No content').replace(/\n/g, '<br>');
+                        const timeStr = msg.time ? new Date(msg.time).toLocaleString() : new Date().toLocaleString();
+                        return `
+                            <div class="inbox-item p-6 md:p-8 cursor-pointer border-l-4 border-transparent hover:border-blue-500 transition-all duration-150 bg-white/30">
+                                <div class="flex flex-wrap justify-between items-start gap-2 mb-3">
+                                    <span class="text-[11px] font-black text-blue-700 bg-blue-100 px-3 py-1.5 rounded-full uppercase tracking-wide flex items-center gap-1">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                        FROM: ${safeFrom}
+                                    </span>
+                                    <span class="text-[10px] text-slate-400 font-mono font-semibold">${timeStr}</span>
+                                </div>
+                                <h3 class="font-extrabold text-slate-800 text-lg md:text-xl mb-3 group-hover:text-blue-600">${safeSubject}</h3>
+                                <div class="text-sm text-slate-600 bg-white/70 p-5 rounded-xl border border-slate-100 font-mono leading-relaxed whitespace-pre-wrap shadow-sm">${safeBody}</div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (err) {
+                console.error("Fetch inbox error:", err);
+                inboxEl.innerHTML = `<div class="p-12 text-center text-red-400 text-sm font-semibold">
+                    ⚠️ Connection error. Retrying soon...<br>
+                    <span class="text-xs text-slate-400">Make sure you're online & API reachable</span>
+                </div>`;
+            }
+        }
+
+        // simple escape utility
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+                return c;
+            });
+        }
+
+        // Auto refresh every 6 seconds (unchanged functionality)
+        let intervalId = setInterval(fetchInbox, 6000);
+        
+        // Fetch on load and also ensure email display is consistent
+        window.addEventListener('load', () => {
+            fetchInbox();
+            // make sure email is displayed properly
+            if (myEmail) document.getElementById('emailDisplay').value = myEmail;
+        });
+
+        // Optional: clean interval on page unload (good practice)
+        window.addEventListener('beforeunload', () => {
+            if (intervalId) clearInterval(intervalId);
+        });
+    </script>
+</body>
+</html>
