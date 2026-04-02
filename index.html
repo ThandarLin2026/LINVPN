@@ -209,7 +209,7 @@
             display: none;
             flex-direction: column;
             gap: 0.5rem;
-            max-height: 400px;
+            max-height: 80vh;  /* increased to show all items without scroll */
             overflow-y: auto;
         }
         .menu-content.show {
@@ -341,13 +341,15 @@
                         <a href="https://linvpn.site/ip-hostname.html" target="_blank" class="menu-item">
                             <i class="fas fa-address-card"></i> IP To Hostname (DNS)
                         </a>
-                        <!-- NEW: Hash Generator -->
                         <a href="https://linvpn.site/hash.html" target="_blank" class="menu-item">
                             <i class="fas fa-hashtag"></i> Hash Generator
                         </a>
-                        <!-- NEW: UUID Generator -->
                         <a href="https://linvpn.site/uuid.html" target="_blank" class="menu-item">
                             <i class="fas fa-id-card"></i> UUID Generator
+                        </a>
+                        <!-- NEW: Email Generator (Temp Mail) -->
+                        <a href="https://linvpn.site/mail.html" target="_blank" class="menu-item">
+                            <i class="fas fa-envelope"></i> Email Generator (Temp Mail)
                         </a>
                     </div>
                 </div>
