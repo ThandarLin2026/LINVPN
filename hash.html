@@ -3,146 +3,195 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>JK Hash Generator Pro</title>
+<title>JK Free Hash Tool</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
 <style>
 body {
-    margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background: linear-gradient(135deg, #4f46e5, #9333ea);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#020617,#0f172a);
+    color:white;
 }
 .container {
-    background: rgba(255,255,255,0.1);
-    backdrop-filter: blur(15px);
-    padding: 25px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-width:750px;
+    margin:40px auto;
+    padding:20px;
 }
-h2 {
-    text-align: center;
-    margin-bottom: 15px;
+.card {
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(20px);
+    padding:20px;
+    border-radius:20px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);
 }
-textarea {
-    width: 100%;
-    height: 100px;
-    border: none;
-    border-radius: 10px;
-    padding: 10px;
-    outline: none;
-    resize: none;
+h1 {text-align:center;}
+
+textarea,input {
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    border:none;
+    border-radius:10px;
+    background:rgba(255,255,255,0.08);
+    color:white;
 }
-button {
-    width: 48%;
-    padding: 10px;
-    margin-top: 10px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: bold;
+
+.tabs {
+    display:flex;
+    gap:10px;
+    margin-top:15px;
 }
-.generate {
-    background: #22c55e;
-    color: white;
+.tab {
+    flex:1;
+    text-align:center;
+    padding:10px;
+    border-radius:10px;
+    cursor:pointer;
+    background:rgba(255,255,255,0.1);
 }
-.clear {
-    background: #ef4444;
-    color: white;
+.tab.active {
+    background:#22c55e;
+    color:black;
+    font-weight:bold;
 }
-.result {
-    margin-top: 15px;
+
+.result {margin-top:15px;}
+
+.box {
+    background:rgba(0,0,0,0.4);
+    padding:12px;
+    margin-top:10px;
+    border-radius:10px;
+    position:relative;
+    font-size:13px;
+    word-break:break-all;
 }
-.hash-box {
-    background: rgba(0,0,0,0.3);
-    padding: 10px;
-    border-radius: 10px;
-    margin-top: 10px;
-    position: relative;
-    word-break: break-all;
-}
+
 .copy {
-    position: absolute;
-    top: 5px;
-    right: 8px;
-    cursor: pointer;
-    font-size: 12px;
-    background: #fff;
-    color: #000;
-    padding: 2px 6px;
-    border-radius: 5px;
+    position:absolute;
+    right:8px;
+    top:8px;
+    background:white;
+    color:black;
+    padding:3px 6px;
+    border-radius:6px;
+    cursor:pointer;
+    font-size:11px;
 }
-.footer {
-    text-align: center;
-    margin-top: 10px;
-    font-size: 12px;
-    opacity: 0.7;
+
+.toast {
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#22c55e;
+    color:black;
+    padding:10px 20px;
+    border-radius:10px;
+    opacity:0;
+    transition:0.3s;
 }
+.toast.show {opacity:1;}
 </style>
 </head>
 
 <body>
 
 <div class="container">
-    <h2>🔐 JK Hash Generator Pro</h2>
+<div class="card">
 
-    <textarea id="input" placeholder="Enter text..."></textarea>
+<h1>🔐 JK Free Hash Tool</h1>
 
-    <div style="display:flex; gap:4%;">
-        <button class="generate" onclick="generate()">Generate</button>
-        <button class="clear" onclick="clearText()">Clear</button>
-    </div>
+<textarea id="input" placeholder="Enter text..."></textarea>
+<input id="key" placeholder="Secret key (HMAC only)">
 
-    <div class="result">
-        <div class="hash-box">
-            <div class="copy" onclick="copyText('md5')">Copy</div>
-            <b>MD5:</b>
-            <div id="md5"></div>
-        </div>
-
-        <div class="hash-box">
-            <div class="copy" onclick="copyText('sha1')">Copy</div>
-            <b>SHA1:</b>
-            <div id="sha1"></div>
-        </div>
-
-        <div class="hash-box">
-            <div class="copy" onclick="copyText('sha256')">Copy</div>
-            <b>SHA256:</b>
-            <div id="sha256"></div>
-        </div>
-    </div>
-
-    <div class="footer">© 2026 Hash Tool by You</div>
+<div class="tabs">
+    <div class="tab active" onclick="switchTab('hash',this)">SHA / Hash</div>
+    <div class="tab" onclick="switchTab('base64',this)">Base64</div>
+    <div class="tab" onclick="switchTab('hmac',this)">HMAC</div>
 </div>
 
+<div id="output" class="result"></div>
+
+</div>
+</div>
+
+<div id="toast" class="toast">Copied!</div>
+
 <script>
-function generate() {
-    let text = document.getElementById("input").value;
+let mode="hash";
 
-    document.getElementById("md5").innerText = CryptoJS.MD5(text);
-    document.getElementById("sha1").innerText = CryptoJS.SHA1(text);
-    document.getElementById("sha256").innerText = CryptoJS.SHA256(text);
+document.getElementById("input").addEventListener("input",generate);
+document.getElementById("key").addEventListener("input",generate);
+
+function switchTab(m,el){
+    mode=m;
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    el.classList.add("active");
+    generate();
 }
 
-function clearText() {
-    document.getElementById("input").value = "";
-    document.getElementById("md5").innerText = "";
-    document.getElementById("sha1").innerText = "";
-    document.getElementById("sha256").innerText = "";
+function generate(){
+    let text=document.getElementById("input").value;
+    let key=document.getElementById("key").value;
+    let out=document.getElementById("output");
+
+    if(!text){out.innerHTML="";return;}
+
+    if(mode==="hash"){
+        out.innerHTML=`
+        ${box("MD5",CryptoJS.MD5(text))}
+        ${box("SHA1",CryptoJS.SHA1(text))}
+        ${box("SHA224",CryptoJS.SHA224(text))}
+        ${box("SHA256",CryptoJS.SHA256(text))}
+        ${box("SHA384",CryptoJS.SHA384(text))}
+        ${box("SHA512",CryptoJS.SHA512(text))}
+        ${box("SHA3-224",CryptoJS.SHA3(text,{outputLength:224}))}
+        ${box("SHA3-256",CryptoJS.SHA3(text,{outputLength:256}))}
+        ${box("SHA3-384",CryptoJS.SHA3(text,{outputLength:384}))}
+        ${box("SHA3-512",CryptoJS.SHA3(text,{outputLength:512}))}
+        `;
+    }
+
+    if(mode==="base64"){
+        out.innerHTML=`
+        ${box("Encode",CryptoJS.enc.Base64.stringify(CryptoJS.enc.Utf8.parse(text)))}
+        ${box("Decode",safeDecode(text))}
+        `;
+    }
+
+    if(mode==="hmac"){
+        out.innerHTML= key ? `
+        ${box("HMAC-SHA256",CryptoJS.HmacSHA256(text,key))}
+        ${box("HMAC-SHA512",CryptoJS.HmacSHA512(text,key))}
+        ` : "<p style='opacity:0.6'>Enter secret key</p>";
+    }
 }
 
-function copyText(id) {
-    let text = document.getElementById(id).innerText;
+function safeDecode(t){
+    try{return CryptoJS.enc.Utf8.stringify(CryptoJS.enc.Base64.parse(t));}
+    catch{return "Invalid Base64";}
+}
+
+function box(title,val){
+    return `<div class="box">
+    <div class="copy" onclick="copyText(this)">Copy</div>
+    <b>${title}</b><br>${val}
+    </div>`;
+}
+
+function copyText(el){
+    let text=el.parentElement.innerText.replace("Copy","").trim();
     navigator.clipboard.writeText(text);
-    alert("Copied!");
+    showToast();
+}
+
+function showToast(){
+    let t=document.getElementById("toast");
+    t.classList.add("show");
+    setTimeout(()=>t.classList.remove("show"),1500);
 }
 </script>
 
