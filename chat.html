@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Chat Support Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --sat: env(safe-area-inset-top);
+            --sar: env(safe-area-inset-right);
+            --sab: env(safe-area-inset-bottom);
+            --sal: env(safe-area-inset-left);
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
+            height: 100dvh; /* Dynamic height for mobile keyboards */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-msg { background: #0084ff; color: white; border-radius: 18px 18px 0 18px; box-shadow: 0 2px 4px rgba(0,132,255,0.1); }
+        .admin-msg { background: #f0f2f5; color: #1c1e21; border-radius: 18px 18px 18px 0; }
+        .active-user-card { background: #e7f3ff; border-right: 4px solid #0084ff; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .status-online { background-color: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .status-offline { background-color: #ef4444; }
+
+        /* Fix for mobile input hiding */
+        .input-container {
+            padding-bottom: calc(0.75rem + var(--sab));
+            background: white;
+            border-top: 1px solid #e2e8f0;
+            position: relative;
+            z-index: 50;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 100% !important; display: none; position: absolute; inset: 0; z-index: 40; }
+            .sidebar.active { display: flex; }
+            .chat-main { width: 100% !important; display: none; }
+            .chat-main.active { display: flex; }
+        }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <!-- Navbar -->
+    <nav class="bg-white border-b px-4 py-2 flex justify-between items-center z-50 shrink-0 shadow-sm">
+        <div class="flex items-center space-x-2 text-blue-600">
+            <i class="fas fa-comments text-xl"></i>
+            <span class="font-bold text-lg">Support</span>
+        </div>
+        <div class="flex bg-slate-100 p-1 rounded-lg">
+            <button onclick="switchView('user')" id="tab-user" class="text-xs font-bold px-4 py-1.5 rounded-md bg-white shadow-sm text-blue-600 transition-all">User</button>
+            <button onclick="switchView('admin')" id="tab-admin" class="text-xs font-bold px-4 py-1.5 rounded-md text-slate-500 transition-all">Admin</button>
+        </div>
+    </nav>
+
+    <!-- USER VIEW -->
+    <div id="user-view" class="flex-1 flex flex-col max-w-lg mx-auto bg-white shadow-xl w-full overflow-hidden relative">
+        <div class="bg-blue-600 p-4 text-white flex items-center justify-between shrink-0">
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <div class="w-10 h-10 bg-white rounded-full text-blue-600 flex items-center justify-center font-bold shadow-md">A</div>
+                    <div id="admin-status-dot" class="absolute bottom-0 right-0 w-3 h-3 border-2 border-blue-600 rounded-full status-offline"></div>
+                </div>
+                <div>
+                    <h2 class="font-bold text-sm">Admin Support</h2>
+                    <p id="admin-status-text" class="text-[10px] opacity-80 uppercase tracking-wider font-semibold">Offline</p>
+                </div>
+            </div>
+            <span id="my-id" class="text-[9px] bg-blue-700/50 px-2 py-1 rounded-md font-mono"></span>
+        </div>
+        
+        <div id="user-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 custom-scrollbar"></div>
+        
+        <!-- User Input Bar -->
+        <div class="input-container p-3 flex items-center space-x-2">
+            <button id="user-record-btn" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500 active:scale-90 transition-all">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <input type="text" id="user-input" placeholder="စာရိုက်ပါ..." class="flex-1 bg-slate-100 rounded-full px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:bg-white transition-all">
+            <button id="user-send-btn" class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-95">
+                <i class="fas fa-paper-plane text-xs"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- ADMIN VIEW -->
+    <div id="admin-view" class="hidden flex-1 flex overflow-hidden bg-white relative">
+        <!-- Delete Modal -->
+        <div id="delete-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm">
+            <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-xs w-full text-center">
+                <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center text-2xl mx-auto mb-4">
+                    <i class="fas fa-trash-alt"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">Chat ကို ဖျက်မလား?</h3>
+                <p class="text-slate-500 text-sm mb-6">စာများအားလုံး အပြီးတိုင် ပျက်သွားပါမည်။</p>
+                <div class="flex space-x-3">
+                    <button onclick="closeDeleteModal()" class="flex-1 py-3 bg-slate-100 rounded-xl font-bold text-slate-600">Cancel</button>
+                    <button id="confirm-delete-btn" class="flex-1 py-3 bg-red-600 rounded-xl font-bold text-white">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Login Overlay -->
+        <div id="admin-login-overlay" class="absolute inset-0 z-[60] flex items-center justify-center bg-slate-50 p-6">
+            <div class="max-w-xs w-full bg-white p-8 rounded-3xl shadow-2xl text-center">
+                <div class="w-16 h-16 bg-blue-600 text-white rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 shadow-lg"><i class="fas fa-lock"></i></div>
+                <h2 class="font-bold text-xl mb-4">Admin Panel</h2>
+                <input type="password" id="admin-pass-input" placeholder="Password" class="w-full border border-slate-200 rounded-xl px-4 py-3 mb-4 text-center outline-none focus:ring-2 focus:ring-blue-500">
+                <button id="admin-login-btn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-md hover:bg-blue-700">Unlock</button>
+                <p id="login-error" class="text-red-500 text-xs mt-4 hidden">စကားဝှက် မှားယွင်းနေပါသည်။</p>
+            </div>
+        </div>
+
+        <div id="admin-content" class="flex-1 flex opacity-0 transition-opacity duration-300">
+            <!-- Sidebar -->
+            <div id="admin-sidebar" class="sidebar active w-80 border-r flex flex-col shrink-0 bg-white">
+                <div class="p-4 border-b font-bold flex justify-between items-center">
+                    <span class="text-slate-700">Message List</span>
+                    <button onclick="logoutAdmin()" class="text-slate-400 hover:text-red-500 transition-colors"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+                <div id="admin-user-list" class="flex-1 overflow-y-auto custom-scrollbar"></div>
+            </div>
+
+            <!-- Chat Window -->
+            <div id="admin-chat-main" class="chat-main flex-1 flex flex-col bg-slate-50 relative">
+                <div class="p-4 bg-white border-b flex items-center justify-between shrink-0 shadow-sm z-10">
+                    <div class="flex items-center">
+                        <button onclick="toggleSidebar(true)" class="md:hidden mr-3 text-slate-500 w-8 h-8 flex items-center justify-center bg-slate-100 rounded-lg"><i class="fas fa-chevron-left"></i></button>
+                        <div class="relative">
+                            <div id="active-user-avatar" class="w-10 h-10 bg-slate-800 text-white rounded-xl flex items-center justify-center font-bold mr-3 hidden">?</div>
+                            <div id="chat-header-status" class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full hidden"></div>
+                        </div>
+                        <div>
+                            <span id="admin-chat-title" class="font-bold text-slate-800 block text-sm">User ကို ရွေးပါ</span>
+                            <p id="active-user-status-text" class="text-[10px] text-slate-400 font-medium"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="admin-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar"></div>
+
+                <!-- Admin Input Bar -->
+                <div id="admin-input-area" class="input-container p-3 hidden">
+                    <div class="flex items-center space-x-2">
+                        <button id="admin-record-btn" class="w-10 h-10 flex items-center justify-center text-slate-400 hover:text-red-500">
+                            <i class="fas fa-microphone"></i>
+                        </button>
+                        <input type="text" id="admin-input" placeholder="အကြောင်းပြန်စာ..." class="flex-1 bg-slate-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:bg-white focus:ring-2 focus:ring-blue-500/10 transition-all">
+                        <button id="admin-send-btn" class="bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-md active:scale-95">
+                            Send
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="noti-sound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" preload="auto"></audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAHe6r3knYL9VjnzVmRgp bZB8MFaJH Qvd8".replace(/\s/g, ''),
+            authDomain: "vc-chat-b9a42.firebaseapp.com",
+            projectId: "vc-chat-b9a42",
+            storageBucket: "vc-chat-b9a42.appspot.com",
+            messagingSenderId: "78188750996",
+            appId: "1:78188750996:web:3bc34993f9b37b0145b081"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        const ADMIN_PASS = "JueHtet19991";
+        let isAdminActive = false;
+        let selectedUID = null;
+        let originalTitle = document.title;
+        let notiTimer = null;
+        let currentView = 'user';
+        let uidToDelete = null;
+
+        let uid = localStorage.getItem('chat_uid');
+        if (!uid) {
+            uid = 'ID_' + Math.floor(10000 + Math.random() * 90000);
+            localStorage.setItem('chat_uid', uid);
+        }
+        document.getElementById('my-id').innerText = uid;
+
+        // Delete Functionality
+        window.openDeleteModal = (targetUid, event) => {
+            event.stopPropagation();
+            uidToDelete = targetUid;
+            document.getElementById('delete-modal').classList.remove('hidden');
+        };
+
+        window.closeDeleteModal = () => {
+            document.getElementById('delete-modal').classList.add('hidden');
+            uidToDelete = null;
+        };
+
+        document.getElementById('confirm-delete-btn').onclick = async () => {
+            if (!uidToDelete) return;
+            const target = uidToDelete;
+            closeDeleteModal();
+            try {
+                const msgsSnap = await getDocs(collection(db, "chats", target, "messages"));
+                const batch = writeBatch(db);
+                msgsSnap.forEach(d => batch.delete(d.ref));
+                await batch.commit();
+                await deleteDoc(doc(db, "chats", target));
+                if (selectedUID === target) {
+                    selectedUID = null;
+                    document.getElementById('admin-chat-title').innerText = "User ကို ရွေးပါ";
+                    document.getElementById('admin-messages').innerHTML = "";
+                    document.getElementById('admin-input-area').classList.add('hidden');
+                    document.getElementById('active-user-avatar').classList.add('hidden');
+                }
+            } catch (err) { console.error(err); }
+        };
+
+        // Presence Logic
+        const updateStatus = (status) => {
+            const path = isAdminActive && currentView === 'admin' ? 'admin_status' : uid;
+            setDoc(doc(db, "presence", path), { status, lastSeen: serverTimestamp() }, { merge: true });
+        };
+        window.addEventListener('focus', () => updateStatus('online'));
+        window.addEventListener('blur', () => updateStatus('offline'));
+        updateStatus('online');
+
+        onSnapshot(doc(db, "presence", "admin_status"), (d) => {
+            const data = d.data();
+            const dot = document.getElementById('admin-status-dot');
+            const text = document.getElementById('admin-status-text');
+            const isOnline = data?.status === 'online';
+            dot.className = `absolute bottom-0 right-0 w-3 h-3 border-2 border-blue-600 rounded-full ${isOnline?'status-online':'status-offline'}`;
+            text.innerText = isOnline ? "Online" : "Offline";
+        });
+
+        let presenceMap = {};
+        onSnapshot(collection(db, "presence"), snap => {
+            snap.forEach(d => presenceMap[d.id] = d.data().status);
+            refreshUserList();
+            if (selectedUID) updateActiveStatus();
+        });
+
+        window.switchView = (view) => {
+            currentView = view;
+            document.getElementById('user-view').classList.toggle('hidden', view === 'admin');
+            document.getElementById('admin-view').classList.toggle('hidden', view === 'user');
+            const uTab = document.getElementById('tab-user'), aTab = document.getElementById('tab-admin');
+            if(view === 'user') {
+                uTab.className = "text-xs font-bold px-4 py-1.5 rounded-md bg-white shadow-sm text-blue-600 transition-all";
+                aTab.className = "text-xs font-bold px-4 py-1.5 rounded-md text-slate-500 transition-all";
+            } else {
+                aTab.className = "text-xs font-bold px-4 py-1.5 rounded-md bg-white shadow-sm text-blue-600 transition-all";
+                uTab.className = "text-xs font-bold px-4 py-1.5 rounded-md text-slate-500 transition-all";
+                stopNoti();
+            }
+            updateStatus('online');
+        };
+
+        window.toggleSidebar = (show) => {
+            document.getElementById('admin-sidebar').classList.toggle('active', show);
+            document.getElementById('admin-chat-main').classList.toggle('active', !show);
+        };
+
+        document.getElementById('admin-login-btn').onclick = () => {
+            if(document.getElementById('admin-pass-input').value === ADMIN_PASS) {
+                document.getElementById('admin-login-overlay').classList.add('hidden');
+                document.getElementById('admin-content').classList.replace('opacity-0', 'opacity-100');
+                isAdminActive = true;
+                updateStatus('online');
+            } else { document.getElementById('login-error').classList.remove('hidden'); }
+        };
+
+        window.logoutAdmin = () => {
+            isAdminActive = false;
+            updateStatus('offline');
+            document.getElementById('admin-login-overlay').classList.remove('hidden');
+            document.getElementById('admin-content').classList.replace('opacity-100', 'opacity-0');
+            document.getElementById('admin-pass-input').value = "";
+        };
+
+        function startNoti() {
+            if(notiTimer) return;
+            notiTimer = setInterval(() => { document.title = document.title === "🔔 New Msg!" ? originalTitle : "🔔 New Msg!"; }, 1000);
+            document.getElementById('noti-sound').play().catch(()=>{});
+        }
+        function stopNoti() { clearInterval(notiTimer); notiTimer = null; document.title = originalTitle; }
+
+        async function send(sender, tid, content, type = 'text') {
+            await addDoc(collection(db, "chats", tid, "messages"), { sender, content, type, timestamp: serverTimestamp() });
+            await setDoc(doc(db, "chats", tid), { lastUpdate: serverTimestamp(), userId: tid, lastSender: sender, lastText: type==='text'?content:'Voice message' }, { merge: true });
+        }
+
+        // Message Listeners
+        onSnapshot(query(collection(db, "chats", uid, "messages"), orderBy("timestamp", "asc")), snap => {
+            const box = document.getElementById('user-messages');
+            box.innerHTML = '';
+            snap.forEach(d => {
+                const m = d.data();
+                const div = document.createElement('div');
+                div.className = `flex ${m.sender==='user'?'justify-end':'justify-start'}`;
+                if(m.type === 'text') div.innerHTML = `<div class="p-3 max-w-[85%] text-sm ${m.sender==='user'?'user-msg':'admin-msg'}">${m.content}</div>`;
+                else div.innerHTML = `<div class="p-2 ${m.sender==='user'?'user-msg':'admin-msg'} rounded-2xl"><audio controls src="${m.content}" class="max-w-[180px] h-8"></audio></div>`;
+                box.appendChild(div);
+            });
+            box.scrollTop = box.scrollHeight;
+        });
+
+        document.getElementById('user-send-btn').onclick = () => {
+            const el = document.getElementById('user-input');
+            if(el.value.trim()) { send('user', uid, el.value); el.value = ''; }
+        };
+
+        let chatDocs = [];
+        function refreshUserList() {
+            const list = document.getElementById('admin-user-list');
+            list.innerHTML = '';
+            chatDocs.forEach(u => {
+                const isOnline = presenceMap[u.userId] === 'online';
+                const div = document.createElement('div');
+                div.className = `group p-4 cursor-pointer border-b flex items-center bg-white transition-all ${selectedUID===u.userId?'active-user-card':'hover:bg-slate-50'}`;
+                div.innerHTML = `
+                    <div class="w-10 h-10 bg-slate-800 text-white rounded-xl flex items-center justify-center font-bold mr-3 relative shrink-0">
+                        ${u.userId.charAt(u.userId.length-1)}
+                        <div class="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${isOnline?'status-online':'status-offline'}"></div>
+                    </div>
+                    <div class="flex-1 overflow-hidden pr-2">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-[11px] truncate text-slate-700">${u.userId}</span>
+                            ${u.lastSender==='user'?'<div class="w-2 h-2 bg-blue-600 rounded-full animate-pulse"></div>':''}
+                        </div>
+                        <div class="text-[10px] text-slate-400 truncate mt-0.5">${u.lastText||'No messages'}</div>
+                    </div>
+                    <button onclick="openDeleteModal('${u.userId}', event)" class="w-8 h-8 flex items-center justify-center text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all md:opacity-0 group-hover:opacity-100">
+                        <i class="fas fa-trash-alt text-xs"></i>
+                    </button>
+                `;
+                div.onclick = () => { selectedUID = u.userId; if(window.innerWidth < 768) toggleSidebar(false); loadAdminChat(u.userId); };
+                list.appendChild(div);
+            });
+        }
+
+        function updateActiveStatus() {
+            const isOnline = presenceMap[selectedUID] === 'online';
+            const dot = document.getElementById('chat-header-status');
+            const text = document.getElementById('active-user-status-text');
+            dot.className = `absolute -bottom-1 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${isOnline?'status-online':'status-offline'}`;
+            text.innerText = isOnline ? 'Online Now' : 'Currently Offline';
+            dot.classList.remove('hidden');
+        }
+
+        let initialLoad = true;
+        onSnapshot(collection(db, "chats"), snap => {
+            chatDocs = snap.docs.map(d => d.data()).sort((a,b) => (b.lastUpdate?.seconds || 0) - (a.lastUpdate?.seconds || 0));
+            if(!initialLoad && isAdminActive && chatDocs[0]?.lastSender === 'user' && chatDocs[0]?.userId !== selectedUID) startNoti();
+            refreshUserList();
+            initialLoad = false;
+        });
+
+        let currentAdminSub = null;
+        function loadAdminChat(tid) {
+            stopNoti();
+            document.getElementById('admin-chat-title').innerText = tid;
+            document.getElementById('active-user-avatar').innerText = tid.charAt(tid.length-1);
+            document.getElementById('active-user-avatar').classList.remove('hidden');
+            document.getElementById('admin-input-area').classList.remove('hidden');
+            updateActiveStatus();
+
+            if(currentAdminSub) currentAdminSub();
+            currentAdminSub = onSnapshot(query(collection(db, "chats", tid, "messages"), orderBy("timestamp", "asc")), snap => {
+                const box = document.getElementById('admin-messages');
+                box.innerHTML = '';
+                snap.forEach(d => {
+                    const m = d.data();
+                    const div = document.createElement('div');
+                    div.className = `flex ${m.sender==='admin'?'justify-end':'justify-start'}`;
+                    const style = m.sender==='admin' ? 'user-msg' : 'admin-msg';
+                    if(m.type === 'text') div.innerHTML = `<div class="p-3 max-w-[85%] text-sm ${style}">${m.content}</div>`;
+                    else div.innerHTML = `<div class="p-2 ${style} rounded-2xl"><audio controls src="${m.content}" class="max-w-[180px] h-8"></audio></div>`;
+                    box.appendChild(div);
+                });
+                box.scrollTop = box.scrollHeight;
+                if(isAdminActive && currentView === 'admin') setDoc(doc(db, "chats", tid), { lastSender: 'admin' }, { merge: true });
+            });
+        }
+
+        document.getElementById('admin-send-btn').onclick = () => {
+            const el = document.getElementById('admin-input');
+            if(el.value.trim() && selectedUID) { send('admin', selectedUID, el.value); el.value = ''; }
+        };
+
+        // Voice Recording
+        const setupVoice = (btnId, type) => {
+            const btn = document.getElementById(btnId);
+            let rec; let chunks = [];
+            btn.onclick = async () => {
+                if(!rec || rec.state === 'inactive') {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        rec = new MediaRecorder(stream);
+                        chunks = [];
+                        rec.ondataavailable = e => chunks.push(e.data);
+                        rec.onstop = async () => {
+                            btn.classList.remove('text-red-500', 'animate-pulse');
+                            const blob = new Blob(chunks, { type: 'audio/webm' });
+                            const tid = type === 'user' ? uid : selectedUID;
+                            if(!tid) return;
+                            const sRef = ref(storage, `audio/${tid}/${Date.now()}.webm`);
+                            const up = await uploadBytes(sRef, blob);
+                            const url = await getDownloadURL(up.ref);
+                            send(type, tid, url, 'audio');
+                        };
+                        rec.start();
+                        btn.classList.add('text-red-500', 'animate-pulse');
+                    } catch (e) { alert("Microphone access denied"); }
+                } else { rec.stop(); }
+            };
+        };
+        setupVoice('user-record-btn', 'user');
+        setupVoice('admin-record-btn', 'admin');
+    </script>
+</body>
+</html>
+
