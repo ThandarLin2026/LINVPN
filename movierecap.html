@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Movie Recap - Professional Myanmar</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; }
+        .glass-effect { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); }
+        .progress-bar { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes slideIn { to { opacity: 1; transform: translateX(0); } }
+        .animate-slide-in { opacity: 0; transform: translateX(20px); animation: slideIn 0.5s forwards; }
+    </style>
+</head>
+<body class="text-slate-200">
+
+    <div class="max-w-5xl mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row items-center justify-between mb-10 gap-6">
+            <div class="flex items-center gap-4">
+                <div class="p-4 bg-gradient-to-br from-red-600 to-orange-500 rounded-2xl shadow-xl shadow-red-600/20">
+                    <i class="fas fa-magic text-3xl text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tighter uppercase">Recap <span class="text-red-500 font-black">AI PRO</span></h1>
+                    <p class="text-slate-400 text-sm italic">Auto Voice Matching & 1080p 60fps Rendering</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <div class="glass-effect border border-slate-700 px-4 py-2 rounded-xl flex items-center gap-2">
+                    <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span class="text-xs font-semibold tracking-wider">SYSTEM READY</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Step 1: Input -->
+        <section class="glass-effect border border-slate-700/50 rounded-[2rem] p-6 md:p-8 shadow-2xl mb-8">
+            <div class="mb-6">
+                <label class="block text-sm font-bold text-slate-400 mb-3 ml-1 uppercase tracking-widest">ဗီဒီယို URL ထည့်သွင်းပါ</label>
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="relative flex-1">
+                        <i class="fas fa-link absolute left-5 top-1/2 -translate-y-1/2 text-red-500"></i>
+                        <input type="text" id="videoUrl" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-2xl py-4 pl-14 pr-4 focus:ring-2 focus:ring-red-600 outline-none transition-all text-sm"
+                            placeholder="TikTok, YouTube သို့မဟုတ် FB link ကို Paste လုပ်ပါ...">
+                    </div>
+                    <button onclick="startProcessing()" id="actionBtn"
+                        class="bg-red-600 hover:bg-red-700 text-white px-10 py-4 rounded-2xl font-black flex items-center justify-center gap-3 shadow-lg shadow-red-600/30 transition-all active:scale-95 group">
+                        <span>RECAP စတင်မည်</span>
+                        <i class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Voice Settings -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700">
+                    <h3 class="text-xs font-black text-red-500 uppercase mb-4 tracking-tighter flex items-center gap-2">
+                        <i class="fas fa-robot"></i> Intelligent Voice Matching
+                    </h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between p-3 bg-slate-800/50 rounded-xl border border-slate-700">
+                            <span class="text-sm">Auto Detect Gender/Age</span>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" checked class="sr-only peer">
+                                <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-600"></div>
+                            </label>
+                        </div>
+                        <p class="text-[10px] text-slate-500 italic px-1">
+                            * စနစ်မှ ဗီဒီယိုထဲက လူကြီး/ကလေး၊ ကျား/မ ကို အလိုအလျောက် ခွဲခြားပြီး အသံလဲလှယ်ပေးမည်။
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-700">
+                    <h3 class="text-xs font-black text-red-500 uppercase mb-4 tracking-tighter flex items-center gap-2">
+                        <i class="fas fa-sliders"></i> Audio Mixing
+                    </h3>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-[10px] mb-2 uppercase font-bold text-slate-400">
+                                <span>Background Music</span>
+                                <span id="volVal">30%</span>
+                            </div>
+                            <input type="range" oninput="document.getElementById('volVal').innerText = this.value + '%'" class="w-full accent-red-600" value="30">
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="px-3 py-1 bg-slate-800 rounded-lg text-[10px] font-bold border border-slate-700">SRT Subtitles</span>
+                            <span class="px-3 py-1 bg-slate-800 rounded-lg text-[10px] font-bold border border-slate-700">AI Noise Removal</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Area -->
+        <section id="progressArea" class="hidden mb-10">
+            <div class="glass-effect border border-slate-700 p-8 rounded-[2rem] shadow-xl relative overflow-hidden">
+                <div class="flex justify-between items-end mb-4">
+                    <div>
+                        <h3 class="text-xl font-black mb-1">AI ဖြင့် လုပ်ဆောင်နေပါသည်</h3>
+                        <p id="currentTask" class="text-slate-400 text-sm">လုပ်ငန်းစဉ်များကို စတင်နေသည်...</p>
+                    </div>
+                    <span id="percentText" class="text-4xl font-black text-red-500 italic">0%</span>
+                </div>
+                <div class="h-3 bg-slate-900 rounded-full overflow-hidden mb-6">
+                    <div id="progressBar" class="progress-bar h-full bg-gradient-to-r from-red-600 to-orange-400 w-0"></div>
+                </div>
+                <div id="logContainer" class="space-y-2 h-20 overflow-y-auto pr-2 scrollbar-hide">
+                    <!-- Dynamic logs -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Result & Preview Area -->
+        <section id="resultArea" class="hidden animate-in fade-in slide-in-from-bottom-10 duration-1000">
+            <div class="bg-slate-800 rounded-[2.5rem] overflow-hidden shadow-2xl border border-slate-700">
+                <!-- Video Player Mockup -->
+                <div class="aspect-video bg-black relative flex items-center justify-center overflow-hidden group">
+                    <!-- Overlay Info -->
+                    <div class="absolute top-6 left-6 z-10 flex gap-2">
+                        <span class="bg-red-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg">1080P 60FPS</span>
+                        <span id="voiceTag" class="bg-blue-600 px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-widest shadow-lg italic">Detected: Child Voice (Male)</span>
+                    </div>
+
+                    <!-- Video Preview Controls -->
+                    <div id="previewVideo" class="absolute inset-0 bg-slate-900 flex items-center justify-center group-hover:opacity-90 transition-opacity">
+                        <div class="text-center">
+                            <div onclick="togglePlay()" class="w-24 h-24 bg-red-600 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(239,68,68,0.5)] mb-4 mx-auto cursor-pointer hover:scale-110 transition-transform">
+                                <i id="playIcon" class="fas fa-play text-white ml-2 text-3xl"></i>
+                            </div>
+                            <p class="text-slate-100 font-black uppercase tracking-[0.3em] text-xs">Preview အသံနမူနာ နားထောင်မည်</p>
+                        </div>
+                    </div>
+
+                    <!-- Fake Subtitle -->
+                    <div class="absolute bottom-10 left-0 right-0 text-center px-10 pointer-events-none">
+                        <p id="subText" class="bg-black/80 inline-block px-6 py-3 text-white text-lg font-semibold rounded-2xl backdrop-blur-md border border-white/10 opacity-0 transition-opacity duration-500">
+                             "Hello everyone! Today we recap this amazing movie..."
+                        </p>
+                    </div>
+
+                    <!-- Progress Bar for Video -->
+                    <div class="absolute bottom-0 left-0 right-0 h-1.5 bg-slate-700/50">
+                        <div id="videoSeek" class="h-full bg-red-600 w-0"></div>
+                    </div>
+                </div>
+
+                <!-- Footer Info & Download -->
+                <div class="p-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center border border-slate-700">
+                            <i class="fas fa-file-video text-red-500 text-xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold">Recap_Final_Output.mp4</h2>
+                            <p class="text-slate-400 text-xs font-mono uppercase tracking-widest mt-1">H.265 • 1080p • 60fps • AI Voice Synced</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 w-full md:w-auto">
+                        <button class="flex-1 md:flex-none px-6 py-4 bg-slate-700 hover:bg-slate-600 rounded-2xl font-bold transition-all"><i class="fas fa-cog"></i></button>
+                        <button class="flex-1 md:flex-none bg-green-600 hover:bg-green-700 text-white px-10 py-4 rounded-2xl font-black flex items-center justify-center gap-3 transition-all shadow-xl shadow-green-900/30 active:scale-95">
+                            <i class="fas fa-cloud-download-alt text-xl"></i> DOWNLOAD VIDEO
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        let isPlaying = false;
+        let previewInterval;
+
+        function startProcessing() {
+            const url = document.getElementById('videoUrl').value;
+            if(!url) {
+                alert("ကျေးဇူးပြု၍ Video Link အရင်ထည့်ပေးပါ");
+                return;
+            }
+
+            const btn = document.getElementById('actionBtn');
+            const progArea = document.getElementById('progressArea');
+            const resArea = document.getElementById('resultArea');
+            const progBar = document.getElementById('progressBar');
+            const percText = document.getElementById('percentText');
+            const logBox = document.getElementById('logContainer');
+            const currentTask = document.getElementById('currentTask');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-sync-alt animate-spin"></i> Engine စတင်နေသည်...';
+            progArea.classList.remove('hidden');
+            resArea.classList.add('hidden');
+            logBox.innerHTML = '';
+            
+            let progress = 0;
+            const logs = [
+                { p: 10, msg: "ဗီဒီယိုကို ဒေါင်းလုဒ်ဆွဲနေသည် (1080p)...", task: "Downloading Video" },
+                { p: 25, msg: "မူရင်းအသံကို ခွဲခြမ်းစိတ်ဖြာနေသည် (Analyzing Audio Content)...", task: "AI Audio Analysis" },
+                { p: 40, msg: "ကလေးပြောနေသည်ကို စစ်ဆေးတွေ့ရှိရပါသည် (Child Voice Detected)...", task: "Detecting Age & Gender" },
+                { p: 55, msg: "ကလေးအသံ (Male) ဖြင့် မြန်မာလို Recap ပြုလုပ်နေသည်...", task: "AI Voice Replacement" },
+                { p: 75, msg: "English Subtitle များကို အချိန်ညှိနေသည်...", task: "Subtitle Syncing" },
+                { p: 90, msg: "ဗီဒီယိုကို 60fps ဖြင့် Rendering လုပ်နေသည်...", task: "Final Rendering" },
+                { p: 100, msg: "အားလုံးအဆင်သင့်ဖြစ်ပါပြီ!", task: "Process Complete" }
+            ];
+
+            let logIdx = 0;
+            const interval = setInterval(() => {
+                progress += Math.floor(Math.random() * 3) + 1;
+                if(progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        progArea.classList.add('hidden');
+                        resArea.classList.remove('hidden');
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="fas fa-bolt"></i> RECAP စတင်မည်';
+                    }, 800);
+                }
+                
+                progBar.style.width = progress + '%';
+                percText.innerText = progress + '%';
+
+                if(logIdx < logs.length && progress >= logs[logIdx].p) {
+                    currentTask.innerText = logs[logIdx].task;
+                    const div = document.createElement('div');
+                    div.className = "text-xs text-slate-400 animate-slide-in flex items-center gap-2";
+                    div.innerHTML = `<i class="fas fa-check-circle text-green-500"></i> ${logs[logIdx].msg}`;
+                    logBox.prepend(div);
+                    logIdx++;
+                }
+            }, 150);
+        }
+
+        function togglePlay() {
+            const playIcon = document.getElementById('playIcon');
+            const subText = document.getElementById('subText');
+            const videoSeek = document.getElementById('videoSeek');
+            let seekP = 0;
+
+            if(!isPlaying) {
+                isPlaying = true;
+                playIcon.className = "fas fa-pause text-white ml-0 text-3xl";
+                subText.style.opacity = "1";
+                
+                previewInterval = setInterval(() => {
+                    seekP += 1;
+                    videoSeek.style.width = seekP + "%";
+                    if(seekP >= 100) {
+                        stopPlay();
+                    }
+                }, 100);
+            } else {
+                stopPlay();
+            }
+        }
+
+        function stopPlay() {
+            const playIcon = document.getElementById('playIcon');
+            const subText = document.getElementById('subText');
+            const videoSeek = document.getElementById('videoSeek');
+            
+            isPlaying = false;
+            clearInterval(previewInterval);
+            playIcon.className = "fas fa-play text-white ml-2 text-3xl";
+            subText.style.opacity = "0";
+            videoSeek.style.width = "0%";
+        }
+    </script>
+
+</body>
+</html>
+
