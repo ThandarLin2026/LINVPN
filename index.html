@@ -203,13 +203,13 @@
             border: 1px solid var(--border);
             border-radius: 1.5rem;
             padding: 0.75rem;
-            min-width: 200px;
+            min-width: 220px;
             z-index: 60;
             box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
             display: none;
             flex-direction: column;
             gap: 0.5rem;
-            max-height: 80vh;  /* increased to show all items without scroll */
+            max-height: 80vh;
             overflow-y: auto;
         }
         .menu-content.show {
@@ -235,11 +235,40 @@
             width: 1.2rem;
             text-align: center;
         }
+
+        /* Floating Chat Button (new) */
+        .chat-fab {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            z-index: 100;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background: #25D366;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+        .chat-fab:hover {
+            transform: scale(1.05);
+            background: #128C7E;
+        }
     </style>
 </head>
 <body class="theme-light min-h-screen pb-32">
 
     <div id="notification" class="fixed top-24 right-4 bg-slate-900 text-white px-6 py-4 rounded-2xl shadow-2xl z-[110] hidden animate-in border-l-4 border-amber-500"></div>
+
+    <!-- Floating Chat Button (NEW) -->
+    <a href="https://linvpn.site/chat.html" target="_blank" class="chat-fab" aria-label="Chat">
+        <i class="fas fa-comment-dots text-2xl"></i>
+    </a>
 
     <!-- Theme Menu - FULL 50+ THEMES -->
     <div id="theme-menu" class="theme-menu">
@@ -320,6 +349,10 @@
                         <a id="menu-contact-link" href="https://linvpn.site/contact.html" target="_blank" class="menu-item">
                             <i class="fas fa-paper-plane"></i> Contact
                         </a>
+                        <!-- NEW: Sub Domain Finder -->
+                        <a href="https://linvpn.site/subdomain.html" target="_blank" class="menu-item">
+                            <i class="fas fa-globe"></i> Sub Domain Finder
+                        </a>
                         <div onclick="toggleModal('donate-modal', true)" class="menu-item">
                             <i class="fas fa-heart"></i> Donate
                         </div>
@@ -347,7 +380,6 @@
                         <a href="https://linvpn.site/uuid.html" target="_blank" class="menu-item">
                             <i class="fas fa-id-card"></i> UUID Generator
                         </a>
-                        <!-- NEW: Email Generator (Temp Mail) -->
                         <a href="https://linvpn.site/mail.html" target="_blank" class="menu-item">
                             <i class="fas fa-envelope"></i> Email Generator (Temp Mail)
                         </a>
@@ -765,7 +797,6 @@
             const isAdmin = localStorage.getItem('jkvpn_admin_session') === 'active';
             document.getElementById('admin-view').classList.toggle('hidden', !isAdmin);
             document.getElementById('user-view').classList.toggle('hidden', isAdmin);
-            // toggle menu login/logout items
             const menuLogin = document.getElementById('menu-login-btn');
             const menuLogout = document.getElementById('menu-logout-btn');
             if (menuLogin && menuLogout) {
@@ -817,17 +848,11 @@
                 document.getElementById('d-name-2').innerText = d.dname2 || "WAVE PAY";
                 document.getElementById('d-acc-2').innerText = d.dacc2 || "09xxxxxxxxx";
                 document.getElementById('d-logo-2').src = d.dlogo2 || "";
-                // Update menu contact link from socialLink
                 const socialLink = d.socialLink || "https://linvpn.site/contact.html";
                 const menuContact = document.getElementById('menu-contact-link');
                 if(menuContact) menuContact.href = socialLink;
-                // populate fields for admin
                 document.getElementById('set-marquee-single').value = d.marquee || "";
                 document.getElementById('set-social-link').value = socialLink;
-                // Also populate original fields if they exist (for backward compatibility)
-                if(document.getElementById('set-marquee')) document.getElementById('set-marquee').value = d.marquee || "";
-                if(document.getElementById('set-contact')) document.getElementById('set-contact').value = socialLink;
-                // Bank fields
                 document.getElementById('admin-dlogo1').value = d.dlogo1 || "";
                 document.getElementById('admin-dname1').value = d.dname1 || "";
                 document.getElementById('admin-dacc1').value = d.dacc1 || "";
@@ -846,14 +871,12 @@
             if(countEl) countEl.innerText = total.toLocaleString();
         }
 
-        // Separate save for running text
         document.getElementById('save-marquee-btn').onclick = async () => {
             const newMarquee = document.getElementById('set-marquee-single').value;
             await setDoc(settingsDoc, { marquee: newMarquee }, { merge: true });
             showNotify("Running text saved!");
         };
 
-        // Save bank + social link (main)
         document.getElementById('save-settings-btn').onclick = async () => {
             const payload = {
                 dlogo1: document.getElementById('admin-dlogo1').value,
@@ -1010,7 +1033,6 @@
             });
         }
 
-        // Notifications management
         let notifs = [];
         function renderNotifications(){
             const adminListDiv = document.getElementById('admin-notif-list');
