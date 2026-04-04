@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Voice & Media Chat Support</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; height: 100dvh; display: flex; flex-direction: column; background: #f8fafc; overflow: hidden; }
+        .user-msg { background: #2563eb; color: white; border-radius: 18px 18px 0 18px; box-shadow: 0 2px 4px rgba(37,99,235,0.2); }
+        .admin-msg { background: #ffffff; color: #1e293b; border-radius: 18px 18px 18px 0; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #2563eb; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        @media (max-width: 768px) {
+            .sidebar { position: absolute; inset: 0; z-index: 50; display: none; background: white; }
+            .sidebar.show { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Tab Navigation -->
+    <nav class="bg-white border-b px-4 py-2 flex justify-between items-center z-50 shadow-sm">
+        <div class="flex items-center space-x-2 text-blue-600 font-bold">
+            <i class="fas fa-comment-dots text-xl"></i>
+            <span>SUPPORT</span>
+        </div>
+        <div class="flex bg-slate-100 p-1 rounded-xl">
+            <button onclick="switchMode('user')" id="tab-user" class="text-xs font-bold px-4 py-1.5 rounded-lg bg-white shadow text-blue-600">User</button>
+            <button onclick="switchMode('admin')" id="tab-admin" class="text-xs font-bold px-4 py-1.5 rounded-lg text-slate-500">Admin</button>
+        </div>
+    </nav>
+
+    <!-- USER INTERFACE -->
+    <main id="ui-user" class="flex-1 flex flex-col max-w-xl mx-auto w-full bg-white relative shadow-lg overflow-hidden border-x">
+        <div class="bg-blue-600 p-4 text-white flex justify-between items-center shrink-0">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold">CS</div>
+                <div>
+                    <p class="text-sm font-bold">Admin Support</p>
+                    <p id="u-status" class="text-[10px] flex items-center opacity-80">
+                        <span class="status-dot bg-slate-400 mr-1" id="u-status-dot"></span>
+                        <span id="u-status-text">Connecting...</span>
+                    </p>
+                </div>
+            </div>
+            <div id="u-my-id" class="text-[10px] bg-black/20 px-2 py-1 rounded font-mono italic">ID: Loading...</div>
+        </div>
+
+        <div id="u-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50 custom-scrollbar"></div>
+
+        <!-- Progress Overlay -->
+        <div id="u-progress" class="hidden absolute inset-0 bg-white/80 z-50 flex flex-col items-center justify-center">
+            <div class="loader mb-2"></div>
+            <p class="text-xs font-bold text-blue-600" id="u-progress-label">Uploading...</p>
+        </div>
+
+        <div class="p-3 border-t bg-white flex items-center space-x-2">
+            <input type="file" id="u-file-input" class="hidden" accept="image/*,video/*">
+            <button onclick="document.getElementById('u-file-input').click()" class="w-10 h-10 text-slate-400 hover:text-blue-600"><i class="fas fa-plus-circle text-xl"></i></button>
+            <button id="u-mic-btn" class="w-10 h-10 text-slate-400 hover:text-red-500 transition-all"><i class="fas fa-microphone text-xl"></i></button>
+            <input type="text" id="u-input" placeholder="Message..." class="flex-1 bg-slate-100 rounded-full px-4 py-2 text-sm outline-none border border-transparent focus:border-blue-400">
+            <button id="u-send-btn" class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-lg active:scale-90"><i class="fas fa-paper-plane text-xs"></i></button>
+        </div>
+    </main>
+
+    <!-- ADMIN INTERFACE -->
+    <main id="ui-admin" class="hidden flex-1 flex overflow-hidden">
+        <!-- Login -->
+        <div id="admin-lock" class="absolute inset-0 bg-slate-100 z-[100] flex items-center justify-center p-6">
+            <div class="bg-white p-8 rounded-3xl shadow-xl w-full max-w-xs text-center border">
+                <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4"><i class="fas fa-user-shield"></i></div>
+                <h2 class="font-bold text-xl mb-4">Admin Access</h2>
+                <input type="password" id="admin-pass" placeholder="Password" class="w-full border rounded-xl px-4 py-3 mb-4 text-center outline-none focus:ring-2 focus:ring-blue-500">
+                <button id="admin-login-btn" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg">Login</button>
+                <p id="admin-err" class="text-red-500 text-xs mt-3 hidden">Invalid Password</p>
+            </div>
+        </div>
+
+        <div class="flex-1 flex overflow-hidden">
+            <aside id="a-sidebar" class="sidebar show w-80 border-r flex flex-col bg-white shrink-0">
+                <div class="p-4 font-bold border-b bg-slate-50 flex justify-between items-center text-slate-700">
+                    <span>Recent Chats</span>
+                    <button onclick="location.reload()" class="text-slate-400 hover:text-red-500"><i class="fas fa-power-off"></i></button>
+                </div>
+                <div id="a-user-list" class="flex-1 overflow-y-auto"></div>
+            </aside>
+
+            <section class="flex-1 flex flex-col bg-slate-50 relative">
+                <div class="p-4 bg-white border-b flex items-center shadow-sm">
+                    <button onclick="toggleSidebar(true)" class="md:hidden mr-3 text-slate-500"><i class="fas fa-bars"></i></button>
+                    <div id="a-chat-title" class="font-bold text-slate-800">Select a User</div>
+                </div>
+                <div id="a-messages" class="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar"></div>
+                
+                <!-- Admin Upload Overlay -->
+                <div id="a-progress" class="hidden absolute inset-0 bg-white/60 flex flex-col items-center justify-center z-50">
+                    <div class="loader"></div>
+                    <p class="text-xs font-bold mt-2 text-blue-600">Uploading...</p>
+                </div>
+
+                <div id="a-input-area" class="hidden p-3 bg-white border-t flex items-center space-x-2">
+                    <input type="file" id="a-file-input" class="hidden" accept="image/*,video/*">
+                    <button onclick="document.getElementById('a-file-input').click()" class="text-slate-400 px-2 hover:text-blue-600"><i class="fas fa-image text-xl"></i></button>
+                    <button id="a-mic-btn" class="text-slate-400 px-2 hover:text-red-500"><i class="fas fa-microphone text-xl"></i></button>
+                    <input type="text" id="a-input" placeholder="Type a reply..." class="flex-1 bg-slate-100 rounded-xl px-4 py-2 text-sm outline-none border border-transparent focus:border-blue-400">
+                    <button id="a-send-btn" class="bg-blue-600 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md">Send</button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <audio id="noti-sound" src="https://assets.mixkit.co/active_storage/sfx/2354/2354-preview.mp3" preload="auto"></audio>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+        // Your Exact Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCk1lqE9pWKaD7DrKyYE-pnrYvQCujphFw",
+            authDomain: "voice-chat-a4f5d.firebaseapp.com",
+            projectId: "voice-chat-a4f5d",
+            storageBucket: "voice-chat-a4f5d.firebasestorage.app",
+            messagingSenderId: "1001020875267",
+            appId: "1:1001020875267:web:87027307139f9124fba436",
+            measurementId: "G-6PH4B9H7CB"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        const ADMIN_PWD = "JueHtet19991";
+        let myUID = localStorage.getItem('vc_uid_v4') || ('ID-' + Math.floor(Math.random()*90000+10000));
+        localStorage.setItem('vc_uid_v4', myUID);
+        document.getElementById('u-my-id').innerText = "UID: " + myUID;
+
+        let activeAdminChat = null;
+        let isUserMode = true;
+
+        // Presence Logic
+        const setOnlineStatus = (status) => {
+            const path = isUserMode ? myUID : 'admin_main';
+            setDoc(doc(db, "presence", path), { status, lastSeen: serverTimestamp() }, { merge: true }).catch(e => console.error(e));
+        };
+        window.onfocus = () => setOnlineStatus('online');
+        window.onblur = () => setOnlineStatus('offline');
+        setOnlineStatus('online');
+
+        // Admin Online Status for User
+        onSnapshot(doc(db, "presence", "admin_main"), (d) => {
+            const online = d.data()?.status === 'online';
+            document.getElementById('u-status-dot').className = `status-dot ${online ? 'bg-green-500' : 'bg-slate-400'} mr-1`;
+            document.getElementById('u-status-text').innerText = online ? 'Online' : 'Offline';
+        });
+
+        // View Switcher
+        window.switchMode = (m) => {
+            isUserMode = (m === 'user');
+            document.getElementById('ui-user').classList.toggle('hidden', !isUserMode);
+            document.getElementById('ui-admin').classList.toggle('hidden', isUserMode);
+            document.getElementById('tab-user').className = isUserMode ? "text-xs font-bold px-4 py-1.5 rounded-lg bg-white shadow text-blue-600" : "text-xs font-bold px-4 py-1.5 rounded-lg text-slate-500";
+            document.getElementById('tab-admin').className = !isUserMode ? "text-xs font-bold px-4 py-1.5 rounded-lg bg-white shadow text-blue-600" : "text-xs font-bold px-4 py-1.5 rounded-lg text-slate-500";
+            setOnlineStatus('online');
+        };
+
+        // Message Rendering
+        const renderMsg = (m, role) => {
+            const isMe = m.sender === role;
+            const wrap = `flex ${isMe ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-1`;
+            const css = isMe ? 'user-msg' : 'admin-msg';
+            
+            let html = '';
+            if(m.type === 'text') html = `<div class="p-3 text-sm ${css}">${m.content}</div>`;
+            if(m.type === 'img') html = `<div class="max-w-[200px] border-2 border-white rounded-xl shadow-md overflow-hidden"><img src="${m.content}" class="w-full" onclick="window.open('${m.content}')"></div>`;
+            if(m.type === 'vdo') html = `<div class="max-w-[200px] border-2 border-white rounded-xl shadow-md overflow-hidden bg-black"><video src="${m.content}" controls class="w-full"></video></div>`;
+            if(m.type === 'mic') html = `<div class="p-2 rounded-2xl ${css} shadow-sm"><audio src="${m.content}" controls class="h-8 max-w-[160px]"></audio></div>`;
+
+            return `<div class="${wrap}">${html}</div>`;
+        };
+
+        // Core Send Function
+        async function sendPayload(targetUID, sender, data, type = 'text') {
+            const pLayer = sender === 'user' ? 'u-progress' : 'a-progress';
+            if(type !== 'text') document.getElementById(pLayer).classList.remove('hidden');
+
+            try {
+                let finalContent = data;
+                if(type !== 'text') {
+                    // data is File/Blob
+                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}`;
+                    const storageRef = ref(storage, `chats/${targetUID}/${fileName}`);
+                    const uploadResult = await uploadBytes(storageRef, data);
+                    finalContent = await getDownloadURL(uploadResult.ref);
+                }
+
+                const msgData = {
+                    sender, content: finalContent, type, timestamp: serverTimestamp()
+                };
+
+                await addDoc(collection(db, "chat_data", targetUID, "messages"), msgData);
+
+                await setDoc(doc(db, "chat_data", targetUID), {
+                    lastMsg: type === 'text' ? finalContent : `Sent a ${type}`,
+                    lastUpdate: serverTimestamp(),
+                    lastSender: sender,
+                    uid: targetUID
+                }, { merge: true });
+
+            } catch (err) {
+                console.error("UPLOAD ERROR:", err);
+                alert("Upload Failed! Firebase Storage Rules ကို စစ်ဆေးပါ။\nError: " + err.message);
+            }
+            document.getElementById(pLayer).classList.add('hidden');
+        }
+
+        // Voice Recorder Logic
+        function setupMic(btnId, sender, getTID) {
+            const btn = document.getElementById(btnId);
+            let mediaRecorder = null;
+            let audioChunks = [];
+
+            btn.onclick = async () => {
+                const tid = getTID();
+                if(!tid) return;
+
+                if(!mediaRecorder || mediaRecorder.state === 'inactive') {
+                    try {
+                        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                        mediaRecorder = new MediaRecorder(stream);
+                        audioChunks = [];
+                        
+                        mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+                        mediaRecorder.onstop = () => {
+                            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                            if(audioBlob.size > 1000) sendPayload(tid, sender, audioBlob, 'mic');
+                            stream.getTracks().forEach(t => t.stop());
+                            btn.classList.remove('text-red-500', 'animate-pulse');
+                        };
+
+                        mediaRecorder.start();
+                        btn.classList.add('text-red-500', 'animate-pulse');
+                    } catch (e) { alert("Microphone access is denied."); }
+                } else {
+                    mediaRecorder.stop();
+                }
+            };
+        }
+
+        // --- USER ACTIONS ---
+        document.getElementById('u-send-btn').onclick = () => {
+            const input = document.getElementById('u-input');
+            if(input.value.trim()) { sendPayload(myUID, 'user', input.value); input.value = ''; }
+        };
+        document.getElementById('u-file-input').onchange = (e) => {
+            const f = e.target.files[0];
+            if(f) sendPayload(myUID, 'user', f, f.type.startsWith('image/') ? 'img' : 'vdo');
+            e.target.value = '';
+        };
+        setupMic('u-mic-btn', 'user', () => myUID);
+
+        onSnapshot(query(collection(db, "chat_data", myUID, "messages"), orderBy("timestamp", "asc")), snap => {
+            const box = document.getElementById('u-messages');
+            box.innerHTML = '';
+            snap.forEach(d => box.innerHTML += renderMsg(d.data(), 'user'));
+            box.scrollTo(0, box.scrollHeight);
+        });
+
+        // --- ADMIN ACTIONS ---
+        document.getElementById('admin-login-btn').onclick = () => {
+            if(document.getElementById('admin-pass').value === ADMIN_PWD) {
+                document.getElementById('admin-lock').classList.add('hidden');
+                document.getElementById('admin-content').classList.replace('opacity-0', 'opacity-100');
+            } else { document.getElementById('admin-err').classList.remove('hidden'); }
+        };
+
+        let activePresences = {};
+        onSnapshot(collection(db, "presence"), snap => snap.forEach(d => activePresences[d.id] = d.data().status));
+
+        onSnapshot(collection(db, "chat_data"), snap => {
+            const list = document.getElementById('a-user-list');
+            list.innerHTML = '';
+            const items = snap.docs.map(d => d.data()).sort((a,b) => (b.lastUpdate?.seconds || 0) - (a.lastUpdate?.seconds || 0));
+            
+            items.forEach(u => {
+                const isOnline = activePresences[u.uid] === 'online';
+                const div = document.createElement('div');
+                div.className = `p-4 border-b cursor-pointer flex items-center transition ${activeAdminChat===u.uid?'bg-blue-50 border-l-4 border-l-blue-600':'hover:bg-slate-50'}`;
+                div.innerHTML = `
+                    <div class="relative mr-3 shrink-0">
+                        <div class="w-10 h-10 bg-slate-800 text-white rounded-xl flex items-center justify-center font-bold font-mono">${u.uid.slice(-2)}</div>
+                        <div class="absolute -bottom-1 -right-1 w-3.5 h-3.5 border-2 border-white rounded-full ${isOnline?'bg-green-500':'bg-slate-400'}"></div>
+                    </div>
+                    <div class="flex-1 overflow-hidden">
+                        <div class="flex justify-between items-center"><span class="font-bold text-xs text-slate-700">${u.uid}</span></div>
+                        <p class="text-[10px] text-slate-400 truncate">${u.lastMsg || '...'}</p>
+                    </div>
+                `;
+                div.onclick = () => selectAdminChat(u.uid);
+                list.appendChild(div);
+            });
+        });
+
+        let currentAdminUnsub = null;
+        function selectAdminChat(uid) {
+            activeAdminChat = uid;
+            document.getElementById('a-chat-title').innerText = "Chatting with: " + uid;
+            document.getElementById('a-input-area').classList.remove('hidden');
+            if(window.innerWidth < 768) toggleSidebar(false);
+
+            if(currentAdminUnsub) currentAdminUnsub();
+            currentAdminUnsub = onSnapshot(query(collection(db, "chat_data", uid, "messages"), orderBy("timestamp", "asc")), snap => {
+                const box = document.getElementById('a-messages');
+                box.innerHTML = '';
+                snap.forEach(d => box.innerHTML += renderMsg(d.data(), 'admin'));
+                box.scrollTo(0, box.scrollHeight);
+            });
+        }
+
+        document.getElementById('a-send-btn').onclick = () => {
+            const input = document.getElementById('a-input');
+            if(input.value.trim() && activeAdminChat) { sendPayload(activeAdminChat, 'admin', input.value); input.value = ''; }
+        };
+        document.getElementById('a-file-input').onchange = (e) => {
+            const f = e.target.files[0];
+            if(f && activeAdminChat) sendPayload(activeAdminChat, 'admin', f, f.type.startsWith('image/') ? 'img' : 'vdo');
+            e.target.value = '';
+        };
+        setupMic('a-mic-btn', 'admin', () => activeAdminChat);
+
+        window.toggleSidebar = (show) => document.getElementById('a-sidebar').classList.toggle('show', show);
+
+    </script>
+</body>
+</html>
+
