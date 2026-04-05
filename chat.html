@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JK-VPN SUPPORT </title>
+    <title>JK-VPN SUPPORT CHAT - Messenger Style Video</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -32,9 +32,13 @@
         video, .video-msg { max-width: 240px; max-height: 200px; border-radius: 12px; }
         .delete-chat-btn { opacity: 0.6; transition: 0.2s; }
         .delete-chat-btn:hover { opacity: 1; transform: scale(1.05); }
-        .loading-spinner { width: 20px; height: 20px; border: 2px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.6s linear infinite; display: inline-block; margin-right: 6px; }
+        .video-thumbnail { position: relative; cursor: pointer; border-radius: 12px; overflow: hidden; background: #000; max-width: 240px; }
+        .video-thumbnail img { width: 100%; display: block; }
+        .play-icon-overlay { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.6); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+        .uploading-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-size: 12px; gap: 8px; }
+        .spinner { width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .upload-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #1e293b; color: white; padding: 8px 16px; border-radius: 40px; font-size: 12px; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.2); pointer-events: none; transition: opacity 0.2s; }
+        .temp-message { opacity: 0.8; }
     </style>
 </head>
 <body>
@@ -94,7 +98,6 @@
         </div>
     </div>
 </div>
-<div id="upload-toast" class="upload-toast hidden">⏳ Uploading media...</div>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, updateDoc, deleteDoc, getDocs, writeBatch } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -103,28 +106,55 @@
     const CLOUD_NAME = "dmy3slhoh";
     const UPLOAD_PRESET = "JK-chat";
     
-    async function uploadToCloudinary(file, resourceType = "auto") {
+    // Upload with timeout (2 minutes)
+    async function uploadToCloudinary(file, resourceType = "auto", timeoutMs = 120000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
         const formData = new FormData();
         formData.append("file", file);
         formData.append("upload_preset", UPLOAD_PRESET);
         const url = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/${resourceType}/upload`;
-        const response = await fetch(url, { method: "POST", body: formData });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Cloudinary upload failed: ${errorText}`);
+        try {
+            const response = await fetch(url, { method: "POST", body: formData, signal: controller.signal });
+            clearTimeout(timeoutId);
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Cloudinary error (${response.status}): ${errorText.substring(0, 100)}`);
+            }
+            const data = await response.json();
+            return data.secure_url;
+        } catch (err) {
+            clearTimeout(timeoutId);
+            if (err.name === 'AbortError') throw new Error("Upload timeout (over 2 minutes)");
+            throw err;
         }
-        const data = await response.json();
-        return data.secure_url;
     }
     
-    // Toast helper
-    let toastTimeout = null;
-    function showToast(msg, duration = 3000) {
-        const toast = document.getElementById('upload-toast');
-        toast.innerText = msg;
-        toast.classList.remove('hidden');
-        if (toastTimeout) clearTimeout(toastTimeout);
-        toastTimeout = setTimeout(() => toast.classList.add('hidden'), duration);
+    // Generate video thumbnail from file
+    function createVideoThumbnail(file, maxWidth = 240) {
+        return new Promise((resolve, reject) => {
+            const video = document.createElement('video');
+            const url = URL.createObjectURL(file);
+            video.preload = 'metadata';
+            video.src = url;
+            video.onloadedmetadata = () => {
+                video.currentTime = 1; // seek to 1 sec
+            };
+            video.onseeked = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.7);
+                URL.revokeObjectURL(url);
+                resolve(thumbnailUrl);
+            };
+            video.onerror = (e) => {
+                URL.revokeObjectURL(url);
+                reject(e);
+            };
+        });
     }
     
     const firebaseConfig = {
@@ -175,7 +205,6 @@
         if (isAdmin) await updatePresence(ADMIN_PRESENCE_ID, false);
     });
     
-    // Admin presence listener for USER mode (fixed: shows correct online/offline)
     function listenAdminPresenceForUser() {
         if (adminPresenceListener) adminPresenceListener();
         adminPresenceListener = onSnapshot(doc(db, "presence", ADMIN_PRESENCE_ID), (snap) => {
@@ -321,6 +350,9 @@
         const q = query(collection(db, "chats", id, "messages"), orderBy("time", "asc"));
         chatUnsub = onSnapshot(q, snap => {
             const box = document.getElementById('chat-box');
+            // Clear only non-temporary messages? We'll re-render all messages each time.
+            // But temporary messages are not stored in DB, so they will disappear on snapshot.
+            // That's fine: temporary message is only shown until upload finishes.
             box.innerHTML = '';
             if (snap.empty && !isAdmin) box.innerHTML = '<div class="text-center mt-20 opacity-20"><i class="fas fa-comment-dots text-6xl"></i><p class="text-xs mt-2">Start conversation</p></div>';
             snap.forEach(docSnap => {
@@ -337,6 +369,10 @@
                 div.appendChild(bubble);
                 box.appendChild(div);
             });
+            // If there's a pending temporary video message (stored in window), we add it back
+            if (window._tempVideoElement && window._tempVideoElement.parentElement === null) {
+                box.appendChild(window._tempVideoElement);
+            }
             box.scrollTop = box.scrollHeight;
         });
     };
@@ -353,41 +389,93 @@
         const files = Array.from(input.files);
         for (let file of files) {
             if (!file.type.startsWith('image/')) continue;
-            showToast(`📸 Uploading image...`, 2000);
             try {
                 const url = await uploadToCloudinary(file, "image");
                 await sendMessage('image', url);
-                showToast(`✅ Image sent!`, 1500);
             } catch (err) { console.error("Image upload error", err); alert("Image upload failed: " + err.message); }
         }
         input.value = '';
     };
     
+    // Messenger-style video upload with thumbnail + loading state
     window.handleVideoUpload = async (input) => {
         const file = input.files[0];
         if (!file) return;
         if (!file.type.startsWith('video/')) { alert("Please select a video file"); input.value = ''; return; }
+        
+        // Check duration and file size
         const videoElem = document.createElement('video');
         videoElem.preload = 'metadata';
-        const url = URL.createObjectURL(file);
-        videoElem.src = url;
+        const objectUrl = URL.createObjectURL(file);
+        videoElem.src = objectUrl;
+        
         videoElem.onloadedmetadata = async () => {
-            URL.revokeObjectURL(url);
+            URL.revokeObjectURL(objectUrl);
             const durationSec = videoElem.duration;
-            if (durationSec > 600) {  // 10 minutes max
+            if (durationSec > 600) {
                 alert(`Video too long (${Math.round(durationSec)} sec). Max 10 minutes (600 sec).`);
                 input.value = '';
                 return;
             }
-            showToast(`🎬 Uploading video (${Math.round(durationSec)} sec)...`, 3000);
+            if (file.size > 100 * 1024 * 1024) {
+                alert("Video too large (max 100MB) due to Cloudinary free tier limits.");
+                input.value = '';
+                return;
+            }
+            
+            // Generate thumbnail
+            let thumbnailUrl = '';
+            try {
+                thumbnailUrl = await createVideoThumbnail(file);
+            } catch (err) {
+                thumbnailUrl = ''; // fallback
+            }
+            
+            // Create temporary message bubble in chat box
+            const box = document.getElementById('chat-box');
+            const tempDiv = document.createElement('div');
+            tempDiv.className = `flex w-full justify-end fade-in temp-message`;
+            tempDiv.setAttribute('data-temp-id', Date.now());
+            const bubble = document.createElement('div');
+            bubble.className = `msg-bubble msg-user`;
+            bubble.style.padding = '4px';
+            bubble.innerHTML = `
+                <div class="video-thumbnail" style="max-width: 200px;">
+                    ${thumbnailUrl ? `<img src="${thumbnailUrl}" style="width:100%;">` : '<div style="width:200px;height:112px;background:#333;display:flex;align-items:center;justify-content:center;color:white;">Loading preview...</div>'}
+                    <div class="uploading-overlay">
+                        <div class="spinner"></div>
+                        <span>Uploading video (${Math.round(durationSec)} sec)...</span>
+                    </div>
+                </div>
+            `;
+            tempDiv.appendChild(bubble);
+            box.appendChild(tempDiv);
+            box.scrollTop = box.scrollHeight;
+            
+            // Start Cloudinary upload
             try {
                 const videoUrl = await uploadToCloudinary(file, "video");
+                // Remove temp message
+                tempDiv.remove();
+                // Send actual video message
                 await sendMessage('video', videoUrl);
-                showToast(`✅ Video sent!`, 1500);
-            } catch (err) { console.error("Video upload error", err); alert("Video upload failed: " + err.message); }
+            } catch (err) {
+                console.error("Video upload error", err);
+                // Change temp message to error, then remove after 3 sec
+                const overlay = bubble.querySelector('.uploading-overlay');
+                if (overlay) {
+                    overlay.innerHTML = `<div style="background:red; padding:4px 8px; border-radius:20px; font-size:12px;">❌ Failed: ${err.message.substring(0,50)}</div>`;
+                    setTimeout(() => {
+                        if (tempDiv.parentElement) tempDiv.remove();
+                    }, 3000);
+                } else {
+                    tempDiv.remove();
+                    alert("Video upload failed: " + err.message);
+                }
+            }
             input.value = '';
         };
-        videoElem.onerror = () => { URL.revokeObjectURL(url); alert("Cannot read video"); input.value = ''; };
+        videoElem.onerror = () => { URL.revokeObjectURL(objectUrl); alert("Cannot read video"); input.value = ''; };
     };
     
     window.sendText = () => {
@@ -406,11 +494,9 @@
             mediaRecorder.onstop = async () => {
                 const blob = new Blob(chunks, { type: 'audio/webm' });
                 const file = new File([blob], "voice.webm", { type: "audio/webm" });
-                showToast(`🎙️ Uploading voice...`, 2000);
                 try {
                     const audioUrl = await uploadToCloudinary(file, "auto");
                     await sendMessage('voice', audioUrl);
-                    showToast(`✅ Voice sent!`, 1500);
                 } catch (err) {
                     console.error("Voice upload error", err);
                     alert("Voice upload failed: " + err.message);
@@ -448,7 +534,7 @@
             startChat(myId);
             document.getElementById('sidebar').classList.remove('open');
             document.getElementById('overlay').classList.remove('active');
-            listenAdminPresenceForUser();  // ensure user sees admin status
+            listenAdminPresenceForUser();
         }
     };
     
