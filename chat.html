@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Support V14 - Audio Fixed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Pyidaungsu', sans-serif, system-ui; height: 100dvh; display: flex; flex-direction: column; background: #f1f5f9; overflow: hidden; }
+        .msg-bubble { max-width: 80%; padding: 12px; border-radius: 18px; font-size: 14px; margin-bottom: 8px; position: relative; animation: fadeIn 0.2s ease-out; }
+        .msg-user { background: #2563eb; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+        .msg-admin { background: white; color: #1e293b; align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Waveform Animation for Recording */
+        .wave-container { display: flex; align-items: center; gap: 3px; height: 20px; }
+        .wave-bar { width: 3px; height: 100%; background: #ef4444; border-radius: 10px; animation: wave 0.5s ease-in-out infinite; }
+        .wave-bar:nth-child(2) { animation-delay: 0.1s; }
+        .wave-bar:nth-child(3) { animation-delay: 0.2s; }
+        @keyframes wave { 0%, 100% { height: 5px; } 50% { height: 15px; } }
+
+        audio { height: 35px; width: 210px; border-radius: 30px; outline: none; }
+        audio::-webkit-media-controls-enclosure { background-color: #f1f5f9; border-radius: 30px; }
+
+        #sidebar { position: fixed; inset: 0; right: 20%; z-index: 100; transform: translateX(-100%); transition: 0.3s ease; background: white; border-right: 1px solid #e2e8f0; }
+        #sidebar.open { transform: translateX(0); }
+        .overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.4); z-index: 90; display: none; }
+        .overlay.active { display: block; }
+    </style>
+</head>
+<body>
+
+    <div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Header -->
+    <header class="bg-white border-b px-4 py-3 flex justify-between items-center z-50">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center"><i class="fas fa-bars text-slate-600"></i></button>
+            <div>
+                <h1 class="text-sm font-bold text-slate-800">SUPPORT V14</h1>
+                <div class="flex items-center gap-1">
+                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span id="current-id" class="text-[10px] text-slate-400 font-mono">Connecting...</span>
+                </div>
+            </div>
+        </div>
+        <div class="bg-slate-100 p-1 rounded-full flex border">
+            <button id="btn-user" onclick="setMode('user')" class="px-3 py-1 text-[10px] font-bold rounded-full bg-white shadow-sm text-blue-600">USER</button>
+            <button id="btn-admin" onclick="showLogin()" class="px-3 py-1 text-[10px] font-bold rounded-full text-slate-400">ADMIN</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col relative overflow-hidden">
+        <!-- Sidebar -->
+        <aside id="sidebar" class="flex flex-col">
+            <div class="p-4 border-b font-bold text-slate-700 bg-slate-50 flex justify-between">
+                <span>INBOX</span>
+                <span id="chat-count" class="bg-blue-100 text-blue-600 px-2 rounded-full text-xs">0</span>
+            </div>
+            <div id="user-list" class="flex-1 overflow-y-auto"></div>
+        </aside>
+
+        <!-- Recording Indicator -->
+        <div id="recording-overlay" class="hidden bg-red-50 border-b p-2 flex items-center justify-center gap-3">
+            <div class="wave-container">
+                <div class="wave-bar"></div><div class="wave-bar"></div><div class="wave-bar"></div>
+            </div>
+            <span class="text-[11px] font-black text-red-600">အသံဖမ်းနေသည်...</span>
+        </div>
+
+        <!-- Chat History -->
+        <div id="chat-box" class="flex-1 overflow-y-auto p-4 flex flex-col space-y-3">
+            <div class="text-center mt-20 opacity-20">
+                <i class="fas fa-comment-dots text-6xl"></i>
+                <p class="text-xs mt-2">No messages yet</p>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 bg-white border-t">
+            <div class="flex items-end gap-2 max-w-4xl mx-auto">
+                <button onclick="document.getElementById('img-input').click()" class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500">
+                    <i class="fas fa-image"></i>
+                </button>
+                <input type="file" id="img-input" class="hidden" accept="image/*" onchange="handleImage(this)">
+                
+                <div class="flex-1 bg-slate-100 rounded-2xl p-1 border">
+                    <textarea id="text-input" rows="1" placeholder="စာရိုက်ပါ..." class="w-full bg-transparent p-2 text-sm outline-none resize-none"></textarea>
+                </div>
+                
+                <button id="record-btn" class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-500 touch-none active:bg-red-500 active:text-white transition-colors">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                
+                <button onclick="sendText()" class="w-12 h-12 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-lg active:scale-95">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Login -->
+    <div id="login-modal" class="hidden fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-6">
+        <div class="bg-white p-6 rounded-3xl w-full max-w-xs shadow-2xl">
+            <h2 class="text-center font-bold mb-4">ADMIN ACCESS</h2>
+            <input type="password" id="pass" class="w-full border p-3 rounded-xl mb-4 text-center" placeholder="PIN CODE">
+            <div class="flex gap-2">
+                <button onclick="hideLogin()" class="flex-1 py-2 text-slate-400 text-sm">Cancel</button>
+                <button onclick="login()" class="flex-1 py-2 bg-blue-600 text-white rounded-xl text-sm font-bold">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCk1lqE9pWKaD7DrKyYE-pnrYvQCujphFw",
+            authDomain: "voice-chat-a4f5d.firebaseapp.com",
+            projectId: "voice-chat-a4f5d",
+            storageBucket: "voice-chat-a4f5d.firebasestorage.app",
+            messagingSenderId: "1001020875267",
+            appId: "1:1001020875267:web:87027307139f9124fba436"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let myId = localStorage.getItem('CHAT_UID') || ('USER-' + Math.floor(Math.random()*10000));
+        localStorage.setItem('CHAT_UID', myId);
+        document.getElementById('current-id').innerText = myId;
+
+        let isAdmin = false, activeChat = myId, chatUnsub = null;
+        let mediaRecorder = null, chunks = [];
+
+        window.toggleSidebar = () => {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        };
+
+        window.showLogin = () => document.getElementById('login-modal').classList.remove('hidden');
+        window.hideLogin = () => document.getElementById('login-modal').classList.add('hidden');
+
+        window.login = () => {
+            if(document.getElementById('pass').value === "JueHtet19991") {
+                isAdmin = true;
+                setMode('admin');
+                hideLogin();
+                loadAdminList();
+                toggleSidebar();
+            } else alert("Error");
+        };
+
+        window.setMode = (m) => {
+            isAdmin = (m === 'admin');
+            document.getElementById('btn-user').className = !isAdmin ? "px-3 py-1 text-[10px] font-bold rounded-full bg-white shadow-sm text-blue-600" : "px-3 py-1 text-[10px] font-bold rounded-full text-slate-400";
+            document.getElementById('btn-admin').className = isAdmin ? "px-3 py-1 text-[10px] font-bold rounded-full bg-white shadow-sm text-blue-600" : "px-3 py-1 text-[10px] font-bold rounded-full text-slate-400";
+            if(!isAdmin) startChat(myId);
+        };
+
+        window.startChat = (id) => {
+            activeChat = id;
+            if(isAdmin) updateDoc(doc(db, "chat_list", id), { unread: false });
+            if(chatUnsub) chatUnsub();
+            
+            const q = query(collection(db, "chats", id, "messages"), orderBy("time", "asc"));
+            chatUnsub = onSnapshot(q, snap => {
+                const box = document.getElementById('chat-box');
+                box.innerHTML = '';
+                snap.forEach(d => {
+                    const m = d.data();
+                    const isMe = isAdmin ? (m.sender === 'admin') : (m.sender === 'user');
+                    const div = document.createElement('div');
+                    div.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
+                    
+                    const content = document.createElement('div');
+                    content.className = `msg-bubble ${isMe ? 'msg-user' : 'msg-admin'}`;
+                    
+                    if(m.type === 'text') content.innerText = m.content;
+                    else if(m.type === 'image') content.innerHTML = `<img src="${m.content}" class="w-full rounded-lg max-w-[200px]" onclick="window.open('${m.content}')">`;
+                    else if(m.type === 'voice') {
+                        content.innerHTML = `<div class="flex items-center gap-2"><audio controls controlsList="nodownload"><source src="${m.content}" type="audio/webm"></audio></div>`;
+                    }
+                    
+                    div.appendChild(content);
+                    box.appendChild(div);
+                });
+                box.scrollTop = box.scrollHeight;
+            });
+        };
+
+        async function send(type, data) {
+            const sender = isAdmin ? 'admin' : 'user';
+            await addDoc(collection(db, "chats", activeChat, "messages"), { sender, type, content: data, time: serverTimestamp() });
+            await setDoc(doc(db, "chat_list", activeChat), {
+                id: activeChat, last: type==='text'?data:`Sent a ${type}`, time: serverTimestamp(), unread: !isAdmin
+            }, { merge: true });
+        }
+
+        window.sendText = () => {
+            const inp = document.getElementById('text-input');
+            if(inp.value.trim()) { send('text', inp.value); inp.value = ''; }
+        };
+
+        window.handleImage = (input) => {
+            const file = input.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = e => send('image', e.target.result);
+            reader.readAsDataURL(file);
+        };
+
+        // Audio Logic Fixed
+        const recBtn = document.getElementById('record-btn');
+        const recOverlay = document.getElementById('recording-overlay');
+
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                chunks = [];
+                mediaRecorder.ondataavailable = e => chunks.push(e.data);
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'audio/webm;codecs=opus' });
+                    const reader = new FileReader();
+                    reader.onload = e => send('voice', e.target.result);
+                    reader.readAsDataURL(blob);
+                    stream.getTracks().forEach(t => t.stop());
+                };
+                mediaRecorder.start();
+                recOverlay.classList.remove('hidden');
+            } catch (err) { alert("Mic Error: " + err); }
+        }
+
+        function stopRecording() {
+            if(mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+                recOverlay.classList.add('hidden');
+            }
+        }
+
+        recBtn.onmousedown = startRecording;
+        recBtn.onmouseup = stopRecording;
+        recBtn.ontouchstart = (e) => { e.preventDefault(); startRecording(); };
+        recBtn.ontouchend = stopRecording;
+
+        function loadAdminList() {
+            const q = query(collection(db, "chat_list"), orderBy("time", "desc"));
+            onSnapshot(q, snap => {
+                const list = document.getElementById('user-list');
+                list.innerHTML = '';
+                document.getElementById('chat-count').innerText = snap.size;
+                snap.forEach(d => {
+                    const u = d.data();
+                    const item = document.createElement('div');
+                    item.className = `p-4 border-b ${activeChat === u.id ? 'bg-blue-50' : ''} flex justify-between`;
+                    item.onclick = () => startChat(u.id);
+                    item.innerHTML = `<div><p class="text-xs font-bold">${u.id}</p><p class="text-[10px] text-slate-400">${u.last || ''}</p></div>
+                                    ${u.unread ? '<div class="w-2 h-2 bg-blue-600 rounded-full"></div>' : ''}`;
+                    list.appendChild(item);
+                });
+            });
+        }
+
+        startChat(myId);
+    </script>
+</body>
+</html>
+
