@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Support V12 - Permanent ID & Status</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; height: 100dvh; display: flex; flex-direction: column; background: #f8fafc; overflow: hidden; }
+        .msg-user { background: #2563eb; color: white; border-radius: 18px 18px 2px 18px; align-self: flex-end; box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2); }
+        .msg-admin { background: white; color: #1e293b; border-radius: 18px 18px 18px 2px; border: 1px solid #e2e8f0; align-self: flex-start; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; border: 2px solid white; }
+        .online { background: #22c55e; box-shadow: 0 0 8px #22c55e; }
+        .offline { background: #94a3b8; }
+        .collapsed { transform: translateX(-100%); }
+        #toast { visibility: hidden; min-width: 280px; background-color: #1e293b; color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 100; left: 50%; top: 20px; transform: translateX(-50%); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        #toast.show { visibility: visible; animation: slide-down 0.5s, slide-up 0.5s 2.5s; }
+        @keyframes slide-down { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+        @keyframes slide-up { from { top: 20px; opacity: 1; } to { top: -50px; opacity: 0; } }
+    </style>
+</head>
+<body>
+
+    <div id="toast">🔔 စာအသစ်ဝင်လာပါသည်</div>
+    <audio id="noti-sound" src="https://assets.mixkit.co/active_storage/sfx/2358/2358-preview.mp3" preload="auto"></audio>
+
+    <header class="bg-white border-b p-3 flex justify-between items-center shadow-sm z-50">
+        <div class="flex items-center gap-3">
+            <button class="p-2 text-slate-500 md:hidden" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+            <div class="flex flex-col">
+                <div class="font-bold text-blue-600 flex items-center gap-1 text-sm"><i class="fas fa-headset"></i> SUPPORT V12</div>
+                <div class="flex items-center gap-1">
+                    <span id="status-light" class="status-dot offline"></span>
+                    <span id="status-text" class="text-[10px] text-slate-500 font-medium uppercase tracking-wider">Connecting...</span>
+                </div>
+            </div>
+        </div>
+        <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <button id="tab-u" class="px-4 py-1.5 text-[11px] font-bold rounded-lg bg-white shadow-sm text-blue-600 transition-all" onclick="switchView('user')">USER</button>
+            <button id="tab-a" class="px-4 py-1.5 text-[11px] font-bold rounded-lg text-slate-500 hover:bg-white/50 transition-all" onclick="switchView('admin')">ADMIN</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        <aside id="sidebar" class="absolute md:relative inset-y-0 left-0 w-72 bg-white border-r z-40 transition-transform duration-300 collapsed md:transform-none hidden flex-col">
+            <div class="p-4 border-b flex justify-between items-center">
+                <span class="font-bold text-[11px] text-slate-400 uppercase tracking-widest">Inbox</span>
+                <span id="user-count" class="bg-blue-100 text-blue-600 px-2 py-0.5 rounded text-[10px] font-bold">0</span>
+            </div>
+            <div id="admin-list" class="flex-1 overflow-y-auto divide-y divide-slate-50"></div>
+        </aside>
+
+        <section class="flex-1 flex flex-col bg-slate-50">
+            <div class="p-3 bg-white/80 backdrop-blur-md border-b flex justify-between items-center sticky top-0 z-10">
+                <div class="flex items-center gap-2">
+                    <div id="chat-status-indicator" class="status-dot offline"></div>
+                    <div id="chat-title" class="font-bold text-xs text-slate-700">အော်တိုစနစ်ဖြင့် ချိတ်ဆက်နေသည်...</div>
+                </div>
+                <div id="loading-spinner" class="hidden text-blue-600 animate-spin text-sm"><i class="fas fa-spinner"></i></div>
+            </div>
+
+            <div id="chat-box" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+                <!-- Messages will load here -->
+            </div>
+
+            <div class="p-4 bg-white border-t border-slate-100">
+                <div class="flex items-center gap-2 max-w-4xl mx-auto">
+                    <input type="file" id="img-input" class="hidden" accept="image/*">
+                    <button onclick="document.getElementById('img-input').click()" class="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-slate-100 transition-colors"><i class="fas fa-image text-lg"></i></button>
+                    <button id="audio-btn" class="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"><i class="fas fa-microphone text-lg"></i></button>
+                    <div class="flex-1 flex items-center bg-slate-100 rounded-2xl px-4 border border-slate-200 focus-within:border-blue-400 focus-within:bg-white transition-all shadow-inner">
+                        <input type="text" id="text-input" placeholder="စာရိုက်ပါ..." class="flex-1 bg-transparent py-3 outline-none text-sm">
+                        <button id="send-btn" class="text-blue-600 p-2 hover:scale-110 transition-transform"><i class="fas fa-paper-plane text-lg"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 w-full max-w-sm shadow-2xl scale-in transform transition-all">
+            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 text-2xl shadow-sm"><i class="fas fa-lock"></i></div>
+            <h2 class="font-bold text-xl mb-2 text-center text-slate-800">Admin Login</h2>
+            <p class="text-xs text-slate-400 text-center mb-6 font-medium">လျှို့ဝှက်နံပါတ်ထည့်သွင်းပါ</p>
+            <input type="password" id="pass-field" placeholder="••••••••" class="w-full border-2 border-slate-100 p-4 rounded-2xl mb-6 text-center text-xl tracking-widest outline-none focus:border-blue-500 transition-all">
+            <div class="flex gap-3">
+                <button onclick="document.getElementById('login-modal').classList.add('hidden')" class="flex-1 bg-slate-100 text-slate-600 py-4 rounded-2xl font-bold hover:bg-slate-200 transition-all">Cancel</button>
+                <button id="login-btn" class="flex-2 bg-blue-600 text-white py-4 px-8 rounded-2xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-all">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCk1lqE9pWKaD7DrKyYE-pnrYvQCujphFw",
+            authDomain: "voice-chat-a4f5d.firebaseapp.com",
+            projectId: "voice-chat-a4f5d",
+            storageBucket: "voice-chat-a4f5d.firebasestorage.app",
+            messagingSenderId: "1001020875267",
+            appId: "1:1001020875267:web:87027307139f9124fba436"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // --- Permanent User ID System ---
+        let myId = localStorage.getItem('SUPPORT_USER_ID_V12');
+        if (!myId) {
+            myId = 'USR-' + Date.now().toString().slice(-6) + '-' + Math.floor(Math.random()*1000);
+            localStorage.setItem('SUPPORT_USER_ID_V12', myId);
+        }
+
+        let isAdmin = false, currentChat = myId, chatUnsub = null, isFirstLoad = true;
+        let originalTitle = document.title;
+        let flashInterval = null;
+
+        // --- Tab Noti Flashing ---
+        function startTabFlash() {
+            if (flashInterval) return;
+            flashInterval = setInterval(() => {
+                document.title = document.title === originalTitle ? "📩 စာအသစ်ရောက်နေသည်!" : originalTitle;
+            }, 1000);
+        }
+
+        function stopTabFlash() {
+            clearInterval(flashInterval);
+            flashInterval = null;
+            document.title = originalTitle;
+        }
+
+        window.onclick = stopTabFlash;
+
+        window.toggleSidebar = () => {
+            const side = document.getElementById('sidebar');
+            side.classList.toggle('collapsed');
+        };
+
+        window.switchView = (view) => {
+            const tabU = document.getElementById('tab-u');
+            const tabA = document.getElementById('tab-a');
+            if(view === 'admin') {
+                document.getElementById('login-modal').classList.remove('hidden');
+            } else {
+                isAdmin = false; 
+                currentChat = myId;
+                tabU.className = "px-4 py-1.5 text-[11px] font-bold rounded-lg bg-white shadow-sm text-blue-600";
+                tabA.className = "px-4 py-1.5 text-[11px] font-bold rounded-lg text-slate-500 hover:bg-white/50";
+                document.getElementById('sidebar').classList.add('hidden');
+                loadChat(myId);
+                updatePresence();
+            }
+        };
+
+        document.getElementById('login-btn').onclick = () => {
+            if(document.getElementById('pass-field').value === "JueHtet19991") {
+                isAdmin = true;
+                const tabU = document.getElementById('tab-u');
+                const tabA = document.getElementById('tab-a');
+                tabA.className = "px-4 py-1.5 text-[11px] font-bold rounded-lg bg-white shadow-sm text-blue-600";
+                tabU.className = "px-4 py-1.5 text-[11px] font-bold rounded-lg text-slate-500 hover:bg-white/50";
+                document.getElementById('login-modal').classList.add('hidden');
+                document.getElementById('sidebar').classList.remove('hidden', 'collapsed');
+                loadAdminList();
+            } else alert("လျှို့ဝှက်နံပါတ် မှားယွင်းနေပါသည်။");
+        };
+
+        function showToast(msg) {
+            const t = document.getElementById("toast");
+            t.innerText = msg;
+            t.className = "show";
+            const sound = document.getElementById('noti-sound');
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log("Sound error:", e));
+            startTabFlash();
+            setTimeout(() => { t.className = t.className.replace("show", ""); }, 3000);
+        }
+
+        // --- Status (Presence) System ---
+        async function updatePresence() {
+            const ref = doc(db, "presence", myId);
+            await setDoc(ref, { last_seen: serverTimestamp(), online: true }, { merge: true });
+            
+            document.getElementById('status-light').className = "status-dot online";
+            document.getElementById('status-text').innerText = "Online";
+
+            // Update status every 60 seconds
+            setInterval(async () => {
+                await updateDoc(ref, { last_seen: serverTimestamp() });
+            }, 60000);
+
+            // Set offline when leaving
+            window.addEventListener('beforeunload', () => {
+                setDoc(ref, { online: false }, { merge: true });
+            });
+        }
+
+        function loadChat(chatId) {
+            currentChat = chatId;
+            document.getElementById('chat-title').innerText = (isAdmin ? "CUSTOMER ID: " : "MY ID: ") + chatId;
+            if(chatUnsub) chatUnsub();
+            isFirstLoad = true;
+
+            // Load User Status
+            onSnapshot(doc(db, "presence", chatId), (d) => {
+                const data = d.data();
+                const indicator = document.getElementById('chat-status-indicator');
+                if(data && data.online) {
+                    indicator.className = "status-dot online";
+                } else {
+                    indicator.className = "status-dot offline";
+                }
+            });
+
+            const q = query(collection(db, "chats", chatId, "messages"), orderBy("time", "asc"));
+            chatUnsub = onSnapshot(q, (snap) => {
+                const box = document.getElementById('chat-box');
+                box.innerHTML = '';
+                snap.forEach(d => {
+                    const m = d.data();
+                    const isMe = isAdmin ? m.sender === 'admin' : m.sender === 'user';
+                    
+                    if(!isFirstLoad && !isMe) showToast("📩 စာအသစ်ဝင်လာပါသည်");
+
+                    const div = document.createElement('div');
+                    div.className = `p-3 text-sm max-w-[85%] ${isMe ? 'msg-user' : 'msg-admin'}`;
+                    
+                    if(m.type === 'text') div.innerText = m.content;
+                    else if(m.type === 'image') div.innerHTML = `<img src="${m.content}" class="rounded-lg max-w-full cursor-pointer" onclick="window.open('${m.content}')">`;
+                    else if(m.type === 'voice') {
+                        const audio = document.createElement('audio');
+                        audio.src = m.content;
+                        audio.controls = true;
+                        audio.className = "h-9 w-48 mt-1";
+                        div.innerHTML = `<div class="text-[9px] mb-1 opacity-60 flex items-center gap-1"><i class="fas fa-volume-up"></i> VOICE MESSAGE</div>`;
+                        div.appendChild(audio);
+                    }
+                    
+                    const wrap = document.createElement('div');
+                    wrap.className = `flex w-full mb-2 ${isMe ? 'justify-end' : 'justify-start'}`;
+                    wrap.appendChild(div);
+                    box.appendChild(wrap);
+                });
+                box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+                isFirstLoad = false;
+            });
+        }
+
+        async function send(type, content) {
+            const target = currentChat;
+            document.getElementById('loading-spinner').classList.remove('hidden');
+            try {
+                await addDoc(collection(db, "chats", target, "messages"), {
+                    sender: isAdmin ? 'admin' : 'user', type, content, time: serverTimestamp()
+                });
+                await setDoc(doc(db, "chat_list", target), {
+                    id: target, 
+                    last: type === 'text' ? content : `Sent ${type}`, 
+                    time: serverTimestamp(),
+                    unread: !isAdmin
+                }, { merge: true });
+            } catch(e) { console.error(e); }
+            document.getElementById('loading-spinner').classList.add('hidden');
+        }
+
+        document.getElementById('send-btn').onclick = () => {
+            const input = document.getElementById('text-input');
+            if(input.value.trim()) { send('text', input.value); input.value = ''; }
+        };
+
+        document.getElementById('text-input').onkeypress = (e) => {
+            if(e.key === 'Enter') document.getElementById('send-btn').click();
+        }
+
+        document.getElementById('img-input').onchange = (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let w = img.width, h = img.height;
+                    const max = 800;
+                    if(w > max) { h *= max/w; w = max; }
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    send('image', canvas.toDataURL('image/jpeg', 0.6));
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        let rec, chunks = [];
+        document.getElementById('audio-btn').onclick = async () => {
+            if(!rec || rec.state === 'inactive') {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    const options = { mimeType: 'audio/webm;codecs=opus' };
+                    if (!MediaRecorder.isTypeSupported(options.mimeType)) options.mimeType = 'audio/ogg;codecs=opus';
+                    
+                    rec = new MediaRecorder(stream, options);
+                    chunks = [];
+                    rec.ondataavailable = e => chunks.push(e.data);
+                    rec.onstop = () => {
+                        const blob = new Blob(chunks, { type: rec.mimeType });
+                        const reader = new FileReader();
+                        reader.onload = (e) => send('voice', e.target.result);
+                        reader.readAsDataURL(blob);
+                    };
+                    rec.start();
+                    document.getElementById('audio-btn').classList.add('text-red-500', 'animate-pulse');
+                    document.getElementById('audio-btn').innerHTML = '<i class="fas fa-stop-circle text-2xl"></i>';
+                } catch(e) { alert("Mic error!"); }
+            } else {
+                rec.stop();
+                document.getElementById('audio-btn').classList.remove('text-red-500', 'animate-pulse');
+                document.getElementById('audio-btn').innerHTML = '<i class="fas fa-microphone text-lg"></i>';
+            }
+        };
+
+        function loadAdminList() {
+            onSnapshot(query(collection(db, "chat_list"), orderBy("time", "desc")), (snap) => {
+                const list = document.getElementById('admin-list');
+                list.innerHTML = '';
+                document.getElementById('user-count').innerText = snap.size;
+                snap.forEach(d => {
+                    const u = d.data();
+                    const item = document.createElement('div');
+                    item.className = `p-4 cursor-pointer hover:bg-slate-50 transition-colors flex justify-between items-center group ${currentChat === u.id ? 'bg-blue-50 border-r-4 border-blue-600' : ''}`;
+                    item.innerHTML = `<div class="flex-1 overflow-hidden" onclick="loadChat('${u.id}'); toggleSidebar();">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="font-bold text-[11px] text-slate-700">${u.id}</span>
+                            ${u.unread ? '<span class="w-2 h-2 bg-blue-600 rounded-full"></span>' : ''}
+                        </div>
+                        <div class="text-[10px] text-slate-400 truncate w-48">${u.last}</div>
+                    </div>
+                    <button onclick="event.stopPropagation(); if(confirm('Delete?')) deleteDoc(doc(db, 'chat_list', '${u.id}'))" class="text-slate-200 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity p-2"><i class="fas fa-trash-alt"></i></button>`;
+                    list.appendChild(item);
+                });
+            });
+        }
+
+        // --- Start Up ---
+        loadChat(myId);
+        updatePresence();
+
+    </script>
+</body>
+</html>
+
