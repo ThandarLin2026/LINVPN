@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Support System V8 - Admin Fix</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body { font-family: sans-serif; height: 100dvh; display: flex; flex-direction: column; background: #f8fafc; overflow: hidden; }
+        .msg-user { background: #2563eb; color: white; border-radius: 18px 18px 0 18px; align-self: flex-end; }
+        .msg-admin { background: #ffffff; color: #1e293b; border-radius: 18px 18px 18px 0; border: 1px solid #e2e8f0; align-self: flex-start; }
+        .loader { border: 2px solid #f3f3f3; border-top: 2px solid #2563eb; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #admin-sidebar.collapsed { transform: translateX(-100%); }
+        .active-user { background-color: #eff6ff !important; border-right: 4px solid #2563eb; }
+    </style>
+</head>
+<body>
+
+    <header class="bg-white border-b p-3 flex justify-between items-center shrink-0 shadow-sm z-50">
+        <div class="flex items-center gap-3">
+            <button id="menu-toggle" class="hidden text-slate-500 p-2" onclick="toggleSidebar()">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="font-bold text-blue-600 flex items-center gap-2 text-sm">
+                <i class="fas fa-headset text-xl"></i> <span>SUPPORT</span>
+            </div>
+        </div>
+        <div class="flex bg-slate-100 p-1 rounded-xl">
+            <button id="tab-u" class="px-4 py-1.5 text-[10px] font-bold rounded-lg bg-white shadow text-blue-600" onclick="switchView('user')">User</button>
+            <button id="tab-a" class="px-4 py-1.5 text-[10px] font-bold rounded-lg text-slate-500" onclick="switchView('admin')">Admin</button>
+        </div>
+    </header>
+
+    <main class="flex-1 flex overflow-hidden relative">
+        <!-- Sidebar for Admin -->
+        <aside id="admin-sidebar" class="absolute md:relative inset-y-0 left-0 w-72 bg-white border-r z-40 transition-transform duration-300 collapsed md:transform-none hidden flex-col shadow-lg md:shadow-none">
+            <div class="p-4 font-bold text-[10px] text-slate-400 border-b flex justify-between items-center">
+                <span>ACTIVE CHATS</span>
+                <button onclick="toggleSidebar()" class="md:hidden p-2 text-slate-400"><i class="fas fa-times"></i></button>
+            </div>
+            <div id="admin-list" class="flex-1 overflow-y-auto divide-y bg-white"></div>
+        </aside>
+
+        <!-- Chat Area -->
+        <section class="flex-1 flex flex-col bg-slate-50">
+            <div class="p-3 bg-white border-b flex justify-between items-center z-10">
+                <div class="flex flex-col">
+                    <div id="display-id" class="font-bold text-xs text-slate-700">Loading...</div>
+                    <div class="text-[9px] text-green-500 font-bold flex items-center gap-1">
+                        <span class="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Online
+                    </div>
+                </div>
+                <div id="status-loading" class="hidden flex items-center gap-2 text-[10px] text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                    <div class="loader"></div> <span>ပို့နေသည်...</span>
+                </div>
+            </div>
+
+            <div id="chat-msgs" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
+                <div class="h-full flex items-center justify-center text-slate-300 text-xs">စကားပြောရန် User ကို ရွေးချယ်ပါ</div>
+            </div>
+
+            <div class="p-4 bg-white border-t">
+                <div class="flex items-center gap-2">
+                    <input type="file" id="file-pick" class="hidden" accept="image/*">
+                    <button onclick="document.getElementById('file-pick').click()" class="w-10 h-10 text-slate-400"><i class="fas fa-image text-lg"></i></button>
+                    <button id="mic-btn" class="w-10 h-10 text-slate-400"><i class="fas fa-microphone text-lg"></i></button>
+                    <div class="flex-1 flex items-center bg-slate-50 p-1 rounded-2xl border border-slate-200">
+                        <input type="text" id="text-input" placeholder="စာရိုက်ပါ..." class="flex-1 bg-transparent outline-none px-3 text-sm h-10">
+                        <button id="send-btn" class="w-10 h-10 bg-blue-600 text-white rounded-xl flex items-center justify-center"><i class="fas fa-paper-plane text-xs"></i></button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Admin Login Modal -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-xs text-center shadow-xl">
+            <h2 class="font-bold mb-4">Admin Login</h2>
+            <input type="password" id="admin-pass" placeholder="Password" class="w-full border p-3 rounded-xl mb-4 text-center outline-none focus:ring-2 focus:ring-blue-500">
+            <button id="do-login" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold">Login</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp, setDoc, doc, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCk1lqE9pWKaD7DrKyYE-pnrYvQCujphFw",
+            authDomain: "voice-chat-a4f5d.firebaseapp.com",
+            projectId: "voice-chat-a4f5d",
+            storageBucket: "voice-chat-a4f5d.firebasestorage.app",
+            messagingSenderId: "1001020875267",
+            appId: "1:1001020875267:web:87027307139f9124fba436"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const myId = localStorage.getItem('MY_SUPP_ID_V8') || 'ID-' + Math.floor(Math.random()*90000+10000);
+        localStorage.setItem('MY_SUPP_ID_V8', myId);
+
+        let isAdmin = false;
+        let activeChat = myId;
+        let unsub = null;
+
+        window.toggleSidebar = () => {
+            const sidebar = document.getElementById('admin-sidebar');
+            sidebar.classList.toggle('collapsed');
+        };
+
+        window.switchView = (view) => {
+            if(view === 'admin') {
+                document.getElementById('login-modal').classList.remove('hidden');
+            } else {
+                isAdmin = false;
+                activeChat = myId;
+                document.getElementById('admin-sidebar').classList.add('hidden');
+                document.getElementById('menu-toggle').classList.add('hidden');
+                document.getElementById('tab-u').className = "px-4 py-1.5 text-[10px] font-bold rounded-lg bg-white shadow text-blue-600";
+                document.getElementById('tab-a').className = "px-4 py-1.5 text-[10px] font-bold rounded-lg text-slate-500";
+                loadChat(myId);
+            }
+        };
+
+        document.getElementById('do-login').onclick = () => {
+            if(document.getElementById('admin-pass').value === "JueHtet19991") {
+                isAdmin = true;
+                document.getElementById('login-modal').classList.add('hidden');
+                document.getElementById('admin-sidebar').classList.remove('hidden', 'collapsed');
+                document.getElementById('menu-toggle').classList.remove('hidden');
+                document.getElementById('tab-a').className = "px-4 py-1.5 text-[10px] font-bold rounded-lg bg-white shadow text-blue-600";
+                document.getElementById('tab-u').className = "px-4 py-1.5 text-[10px] font-bold rounded-lg text-slate-500";
+                loadAdminList();
+            } else { alert("မှားနေပါတယ်!"); }
+        };
+
+        window.loadChat = (chatId) => {
+            activeChat = chatId;
+            document.getElementById('display-id').innerText = (isAdmin ? "TALKING TO: " : "MY ID: ") + chatId;
+            
+            // Highlight active user in sidebar
+            const listItems = document.querySelectorAll('#admin-list > div');
+            listItems.forEach(el => {
+                if(el.getAttribute('data-id') === chatId) el.classList.add('active-user');
+                else el.classList.remove('active-user');
+            });
+
+            if(unsub) unsub();
+            
+            unsub = onSnapshot(query(collection(db, "chats", chatId, "messages"), orderBy("time", "asc")), (snap) => {
+                const box = document.getElementById('chat-msgs');
+                box.innerHTML = '';
+                if(snap.empty) {
+                    box.innerHTML = '<div class="h-full flex items-center justify-center text-slate-300 text-xs">No messages yet.</div>';
+                }
+                snap.forEach(d => {
+                    const m = d.data();
+                    const isMe = isAdmin ? m.sender === 'admin' : m.sender === 'user';
+                    const div = document.createElement('div');
+                    div.className = `p-3 text-sm max-w-[85%] shadow-sm ${isMe ? 'msg-user' : 'msg-admin'}`;
+                    
+                    if(m.type === 'text') div.innerText = m.content;
+                    else if(m.type === 'image') div.innerHTML = `<img src="${m.content}" class="rounded-lg max-h-60" loading="lazy">`;
+                    else if(m.type === 'voice') div.innerHTML = `<audio src="${m.content}" controls class="h-8 w-48"></audio>`;
+                    
+                    const wrap = document.createElement('div');
+                    wrap.className = `flex w-full ${isMe ? 'justify-end' : 'justify-start'}`;
+                    wrap.appendChild(div);
+                    box.appendChild(wrap);
+                });
+                box.scrollTo({ top: box.scrollHeight, behavior: 'smooth' });
+            });
+        };
+
+        async function postMsg(type, content) {
+            const cid = isAdmin ? activeChat : myId;
+            if(!cid) return;
+            try {
+                await addDoc(collection(db, "chats", cid, "messages"), {
+                    sender: isAdmin ? 'admin' : 'user',
+                    type, content, time: serverTimestamp()
+                });
+                await setDoc(doc(db, "chat_list", cid), {
+                    id: cid, last: type === 'text' ? content : `Sent ${type}`, time: serverTimestamp()
+                }, { merge: true });
+            } catch(e) { console.error(e); }
+        }
+
+        document.getElementById('send-btn').onclick = () => {
+            const input = document.getElementById('text-input');
+            if(input.value.trim()) { postMsg('text', input.value); input.value = ''; }
+        };
+
+        document.getElementById('file-pick').onchange = (e) => {
+            const file = e.target.files[0]; if(!file) return;
+            document.getElementById('status-loading').classList.remove('hidden');
+            const reader = new FileReader();
+            reader.onload = async (ev) => {
+                await postMsg('image', ev.target.result);
+                document.getElementById('status-loading').classList.add('hidden');
+                e.target.value = '';
+            };
+            reader.readAsDataURL(file);
+        };
+
+        let rec, chunks = [];
+        document.getElementById('mic-btn').onclick = async () => {
+            if(!rec || rec.state === 'inactive') {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                    rec = new MediaRecorder(stream); chunks = [];
+                    rec.ondataavailable = e => chunks.push(e.data);
+                    rec.onstop = () => {
+                        const reader = new FileReader();
+                        reader.onload = async (ev) => {
+                            document.getElementById('status-loading').classList.remove('hidden');
+                            await postMsg('voice', ev.target.result);
+                            document.getElementById('status-loading').classList.add('hidden');
+                        };
+                        reader.readAsDataURL(new Blob(chunks));
+                        document.getElementById('mic-btn').classList.remove('text-red-500');
+                    };
+                    rec.start(); document.getElementById('mic-btn').classList.add('text-red-500');
+                } catch(e) { alert("Mic error!"); }
+            } else { rec.stop(); }
+        };
+
+        // Improved Delete Logic
+        window.deleteUserChat = async (uid, event) => {
+            event.stopPropagation(); // Prevents loading chat while deleting
+            if(!confirm(`User ${uid} ၏ Chat ကို လုံးဝဖျက်မှာလား?`)) return;
+            
+            try {
+                // Delete the chat list entry
+                await deleteDoc(doc(db, "chat_list", uid));
+                
+                // If it's the current active chat, reset the view
+                if(activeChat === uid) {
+                    if(unsub) unsub();
+                    document.getElementById('chat-msgs').innerHTML = '<div class="h-full flex items-center justify-center text-slate-300 text-xs">စကားပြောရန် User ကို ရွေးချယ်ပါ</div>';
+                    document.getElementById('display-id').innerText = "Select a Chat";
+                    activeChat = null;
+                }
+            } catch(e) { alert("Error deleting chat list!"); }
+        };
+
+        function loadAdminList() {
+            onSnapshot(query(collection(db, "chat_list"), orderBy("time", "desc")), (snap) => {
+                const list = document.getElementById('admin-list');
+                list.innerHTML = '';
+                snap.forEach(d => {
+                    const u = d.data();
+                    const div = document.createElement('div');
+                    div.setAttribute('data-id', u.id);
+                    div.className = `p-4 cursor-pointer border-b flex justify-between items-center transition-all bg-white hover:bg-slate-50 ${activeChat === u.id ? 'active-user' : ''}`;
+                    
+                    div.innerHTML = `
+                        <div class="flex-1 overflow-hidden" onclick="loadChat('${u.id}'); if(window.innerWidth < 768) toggleSidebar();">
+                            <div class="font-bold text-xs text-slate-800">${u.id}</div>
+                            <div class="text-[10px] text-slate-400 truncate mt-1">${u.last}</div>
+                        </div>
+                        <button onclick="deleteUserChat('${u.id}', event)" class="w-10 h-10 flex items-center justify-center text-slate-300 hover:text-red-500 rounded-full hover:bg-red-50">
+                            <i class="fas fa-trash-alt text-xs"></i>
+                        </button>
+                    `;
+                    list.appendChild(div);
+                });
+            });
+        }
+
+        loadChat(myId);
+    </script>
+</body>
+</html>
+
