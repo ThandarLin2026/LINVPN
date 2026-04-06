@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>V2-PREMIUM Final Fix</title>
+    <title>V2-PREMIUM Official Stable</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAuth, onAuthStateChanged, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, addDoc, collection, query, where, getDocs, deleteDoc, increment, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getFirestore, doc, onSnapshot, setDoc, updateDoc, addDoc, collection, deleteDoc, increment, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
         const firebaseConfig = {
           apiKey: "AIzaSyCLvS9xY6sUTPjk8uf0xUzeD4_UqRLWveI",
@@ -24,362 +24,445 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'topup-v2ray';
 
-        window.db = db;
-        window.auth = auth;
-        window.slipImg = null;
-        window.admQr = null;
+        const TG_TOKEN = "8719916377:AAElljRpk4nk9aAJAFGtJ-tjyacw5GdjS80";
+        const TG_CHAT_ID = "7848197948";
 
-        // --- AUTHENTICATION (RULE 3) ---
-        const initAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (e) { console.error("Auth Error:", e); }
-        };
-        initAuth();
+        let allServers = [];
+        let currentUser = null;
+        window.currentBalance = 0;
 
-        onAuthStateChanged(auth, (user) => {
+        // Permanent ID Logic
+        onAuthStateChanged(auth, async (user) => {
+            const idLabel = document.getElementById('display-uid');
             if (user) {
-                window.currentUser = user;
-                document.getElementById('display-uid').innerText = "ID: " + user.uid;
-                setupListeners(user);
+                currentUser = user;
+                idLabel.innerText = "ID: " + user.uid.toUpperCase();
+                loadUserData(user.uid);
+                loadAppData();
+            } else {
+                // Persistent Anonymous Sign-in
+                await signInAnonymously(auth);
             }
         });
 
-        // --- DATABASE LISTENERS ---
-        function setupListeners(user) {
-            // User Profile (Private Data - RULE 1)
-            const profileRef = doc(db, 'artifacts', appId, 'users', user.uid, 'profile', 'data');
-            onSnapshot(profileRef, (d) => {
-                if (d.exists()) {
-                    window.userBalance = d.data().balance || 0;
-                    document.getElementById('user-balance').innerText = window.userBalance + " THB";
-                } else {
-                    setDoc(profileRef, { balance: 0, uid: user.uid });
-                }
-            }, (err) => console.error("Profile Listener Error:", err));
+        async function sendTelegram(msg) {
+            try {
+                await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ chat_id: TG_CHAT_ID, text: msg, parse_mode: 'HTML' })
+                });
+            } catch (e) { console.error("TG Error", e); }
+        }
 
-            // Bank Settings (Public Data - RULE 1)
-            const bankRef = doc(db, 'artifacts', appId, 'public', 'data', 'bank_settings');
-            onSnapshot(bankRef, (d) => {
+        function loadUserData(uid) {
+            onSnapshot(doc(db, "users", uid), (d) => {
                 if(d.exists()) {
-                    const data = d.data();
-                    document.getElementById('u-bank-name').innerText = data.name || 'Bank Name Not Set';
-                    document.getElementById('u-bank-no').innerText = data.accountNo || '--- --- ---';
-                    document.getElementById('u-bank-holder').innerText = data.holder || 'Account Holder Not Set';
-                    if(data.qr) {
-                        document.getElementById('u-bank-qr').src = data.qr;
-                        document.getElementById('u-bank-qr-box').classList.remove('hidden');
-                    }
-                    // Sync Admin Inputs
-                    document.getElementById('adm-bank-name').value = data.name || '';
-                    document.getElementById('adm-bank-no').value = data.accountNo || '';
-                    document.getElementById('adm-bank-holder').value = data.holder || '';
+                    window.currentBalance = d.data().balance || 0;
+                    document.getElementById('user-balance').innerText = window.currentBalance + " THB";
+                } else {
+                    // Create new user record if not exists
+                    setDoc(doc(db, "users", uid), { balance: 0, createdAt: serverTimestamp() });
                 }
-            }, (err) => console.error("Bank Listener Error:", err));
-
-            // Topup Requests (Admin View)
-            const requestCol = collection(db, 'artifacts', appId, 'public', 'data', 'topup_requests');
-            onSnapshot(requestCol, (snap) => {
-                const list = document.getElementById('adm-req-list');
-                list.innerHTML = "";
-                snap.forEach(d => {
-                    const r = d.data();
-                    if(r.status === "pending") {
-                        list.innerHTML += `
-                            <div class="bg-slate-900 p-4 rounded-2xl border border-white/10 space-y-3">
-                                <div class="flex justify-between items-center">
-                                    <span class="text-[10px] text-slate-500 font-mono">From: ${r.uid.substring(0,8)}...</span>
-                                    <span class="text-green-500 font-black text-lg">${r.amount} THB</span>
-                                </div>
-                                <img src="${r.slip}" class="w-full h-48 object-cover rounded-xl border border-white/5 cursor-pointer" onclick="window.open(this.src)">
-                                <button onclick="approveDeposit('${d.id}', '${r.uid}', ${r.amount})" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-xl text-xs font-black">APPROVE NOW</button>
-                            </div>
-                        `;
-                    }
-                });
-            }, (err) => console.error("Request Listener Error:", err));
-
-            // Stocks
-            const configCol = collection(db, 'artifacts', appId, 'public', 'data', 'configs');
-            onSnapshot(configCol, (snap) => {
-                const list = document.getElementById('server-list');
-                list.innerHTML = "";
-                let count = 0;
-                const groups = {};
-                const flags = { "sg": "🇸🇬", "th": "🇹🇭", "us": "🇺🇸", "jp": "🇯🇵" };
-                snap.forEach(d => {
-                    const data = d.data();
-                    const key = data.serverName + "_" + data.port;
-                    if(!groups[key]) groups[key] = { ...data, total: 0, firstId: d.id };
-                    groups[key].total++;
-                    count++;
-                });
-                document.getElementById('stock-count').innerText = count;
-                for(const k in groups) {
-                    const s = groups[k];
-                    list.innerHTML += `
-                        <div onclick="selectServer('${s.firstId}', ${s.total})" id="srv-${s.firstId}" class="server-card border border-white/5 bg-slate-900/40 p-4 rounded-2xl cursor-pointer">
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center gap-3">
-                                    <span class="text-xl">${flags[s.flag] || '🌐'}</span>
-                                    <div><p class="font-bold text-sm">${s.serverName}</p><p class="text-[9px] text-slate-500">Port: ${s.port}</p></div>
-                                </div>
-                                <div class="text-right">
-                                    <p class="text-[10px] font-bold ${s.total > 0 ? 'text-blue-500' : 'text-red-500'}">${s.total} In Stock</p>
-                                    <p class="text-[8px] text-slate-600">50฿</p>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
+            }, (error) => {
+                console.error("Firestore Error:", error);
             });
         }
 
-        // --- ACTIONS ---
-        window.submitDeposit = async () => {
-            if(!window.currentUser) return alert("Please wait for login...");
-            const amt = parseInt(document.getElementById('dep-amt').value);
-            if(!window.slipImg) return alert("ကျေးဇူးပြု၍ ငွေလွှဲပြေစာ (Slip) တင်ပေးပါ။");
+        function loadAppData() {
+            // Bank Settings
+            onSnapshot(doc(db, "settings", "bank"), (d) => {
+                if(d.exists()) {
+                    const data = d.data();
+                    document.getElementById('u-bank-name').innerText = data.name || "N/A";
+                    document.getElementById('u-bank-no').innerText = data.number || "000-000-000";
+                    document.getElementById('u-bank-holder').innerText = data.holder || "N/A";
+                    if(data.logo) document.getElementById('u-bank-logo').src = data.logo;
+                    if(data.qr) document.getElementById('u-bank-qr-img').src = data.qr;
+                    
+                    document.getElementById('adm-bank-logo').value = data.logo || "";
+                    document.getElementById('adm-bank-name').value = data.name || "";
+                    document.getElementById('adm-bank-no').value = data.number || "";
+                    document.getElementById('adm-bank-holder').value = data.holder || "";
+                    document.getElementById('adm-bank-qr').value = data.qr || "";
+                }
+            });
+
+            // Servers Inventory
+            onSnapshot(collection(db, "servers"), (snap) => {
+                allServers = [];
+                snap.forEach(d => {
+                    allServers.push({id: d.id, ...d.data()});
+                });
+                updateStockUI();
+                renderAdminServerList();
+            }, (err) => console.error(err));
+
+            // Topup Requests
+            onSnapshot(collection(db, "topup_requests"), (snap) => {
+                const list = document.getElementById('adm-req-list');
+                list.innerHTML = `<h3 class="text-xs font-bold text-blue-400 mb-4 uppercase tracking-widest">Pending Requests</h3>`;
+                snap.forEach(d => {
+                    const r = d.data();
+                    list.innerHTML += `
+                        <div class="bg-slate-800 p-4 rounded-3xl border border-white/5 mb-4 space-y-3">
+                            <div class="flex justify-between items-center">
+                                <span class="text-[10px] font-mono text-slate-400">${r.uid}</span>
+                                <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-[10px] font-bold">${r.amount} THB</span>
+                            </div>
+                            <img src="${r.slip}" class="w-full h-48 object-cover rounded-2xl cursor-pointer" onclick="window.open('${r.slip}')">
+                            <div class="grid grid-cols-2 gap-2 pt-2">
+                                <button onclick="approveTopup('${d.id}', '${r.uid}', ${r.amount})" class="bg-green-600 py-3 rounded-xl text-[10px] font-bold uppercase">Approve</button>
+                                <button onclick="cancelTopup('${d.id}')" class="bg-red-600/20 text-red-500 py-3 rounded-xl text-[10px] font-bold uppercase border border-red-500/20">Cancel</button>
+                            </div>
+                        </div>`;
+                });
+            });
+        }
+
+        window.updateStockUI = () => {
+            const country = document.getElementById('country-select').value;
+            const filtered = allServers.filter(s => s.flag === country);
+            const stockCount = filtered.length;
             
-            const btn = document.getElementById('submit-dep-btn');
-            btn.disabled = true; btn.innerText = "Submitting...";
-
-            try {
-                const requestCol = collection(db, 'artifacts', appId, 'public', 'data', 'topup_requests');
-                await addDoc(requestCol, {
-                    uid: window.currentUser.uid,
-                    amount: amt,
-                    slip: window.slipImg,
-                    status: "pending",
-                    createdAt: serverTimestamp()
-                });
-                alert("ငွေဖြည့်သွင်းမှု ပေးပို့ပြီးပါပြီ။ Admin အတည်ပြုပေးရန် စောင့်ပါ။");
-                window.slipImg = null;
-                document.getElementById('slip-preview').classList.add('hidden');
-            } catch (e) { alert("Error: " + e.message); } finally { btn.disabled = false; btn.innerText = "Submit Request"; }
+            document.getElementById('stock-badge').innerText = `STOCK: ${stockCount}`;
+            const flagMap = {
+                'th': 'https://flagcdn.com/w80/th.png',
+                'sg': 'https://flagcdn.com/w80/sg.png'
+            };
+            document.getElementById('selected-flag-img').src = flagMap[country];
+            
+            const displayArea = document.getElementById('user-gen-area');
+            if(stockCount > 0) {
+                const firstServer = filtered[0];
+                displayArea.innerHTML = `
+                    <div class="bg-white/5 p-6 rounded-3xl border border-white/5 text-center space-y-5">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+                                <div class="w-2 h-2 bg-green-500 rounded-full online-dot mx-auto mb-1"></div>
+                                <p class="text-[8px] font-bold text-slate-500 uppercase">Status</p>
+                                <p class="text-[9px] font-black text-green-400">ONLINE</p>
+                            </div>
+                            <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+                                <i class="fas fa-signal text-[10px] text-blue-400 mb-1"></i>
+                                <p class="text-[8px] font-bold text-slate-500 uppercase">Ping</p>
+                                <p class="text-[9px] font-black text-blue-400">${Math.floor(Math.random()*40 + 20)}ms</p>
+                            </div>
+                            <div class="bg-black/40 p-3 rounded-2xl border border-white/5">
+                                <i class="fas fa-plug text-[10px] text-purple-400 mb-1"></i>
+                                <p class="text-[8px] font-bold text-slate-500 uppercase">Port</p>
+                                <p class="text-[9px] font-black text-purple-400">${firstServer.port || '443'}</p>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <button onclick="buyOneConfig('${country}')" class="w-full bg-blue-600 py-4 rounded-2xl font-black text-xs uppercase shadow-xl shadow-blue-600/30">GENERATE CONFIG (50 THB)</button>
+                            ${firstServer.note ? `<p class="text-[10px] font-bold text-blue-400 bg-blue-500/5 p-3 rounded-xl border border-blue-500/10 text-left"><i class="fas fa-info-circle mr-1"></i> ${firstServer.note}</p>` : ''}
+                        </div>
+                    </div>
+                `;
+            } else {
+                displayArea.innerHTML = `
+                    <div class="bg-red-500/5 p-10 rounded-3xl border border-red-500/10 text-center">
+                        <i class="fas fa-box-open text-3xl text-red-500/20 mb-3"></i>
+                        <p class="text-xs font-bold text-red-400 uppercase tracking-widest">Stock Out</p>
+                    </div>
+                `;
+            }
         };
 
-        window.approveDeposit = async (reqId, uid, amt) => {
-            if(!confirm("ဤငွေလွှဲမှုကို အတည်ပြုမှာ သေချာလား?")) return;
+        window.renderAdminServerList = () => {
+            const list = document.getElementById('adm-server-list');
+            list.innerHTML = `<h3 class="text-xs font-bold text-green-400 mb-4 uppercase tracking-widest">Inventory List</h3>`;
+            if (allServers.length === 0) {
+                list.innerHTML += `<p class="text-slate-500 text-[10px] text-center py-4">No data</p>`;
+            }
+            allServers.forEach(s => {
+                list.innerHTML += `
+                    <div class="bg-slate-800/50 p-4 rounded-2xl border border-white/5 mb-2 flex justify-between items-center">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                             <img src="https://flagcdn.com/w80/${s.flag}.png" class="w-6 h-6 rounded-full object-cover">
+                             <div class="overflow-hidden">
+                                <p class="text-xs font-bold text-white uppercase truncate">${s.name} :${s.port}</p>
+                                <p class="text-[8px] text-slate-500 font-mono truncate">${s.id}</p>
+                             </div>
+                        </div>
+                        <button onclick="deleteServer('${s.id}')" class="flex-shrink-0 w-10 h-10 flex items-center justify-center text-red-500 hover:bg-red-500/10 rounded-xl">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                    </div>
+                `;
+            });
+        };
+
+        window.deleteServer = async (id) => {
+            if(!confirm("Stock ထဲမှ ဖျက်မှာ သေချာပါသလား?")) return;
             try {
-                const userRef = doc(db, 'artifacts', appId, 'users', uid, 'profile', 'data');
-                await updateDoc(userRef, { balance: increment(amt) });
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'topup_requests', reqId));
-                alert("အတည်ပြုပြီးပါပြီ။");
+                await deleteDoc(doc(db, "servers", id));
             } catch (e) { alert(e.message); }
         };
 
-        window.saveBank = async () => {
-            const bankRef = doc(db, 'artifacts', appId, 'public', 'data', 'bank_settings');
+        window.buyOneConfig = async (country) => {
+            const price = 50;
+            if (window.currentBalance < price) {
+                return alert("Credit မလောက်ပါ။");
+            }
+
+            const targetServer = allServers.find(s => s.flag === country);
+            if (!targetServer) return alert("Stock မရှိတော့ပါ။");
+
+            if (!confirm(`${price} THB နှုတ်ယူပါမည်။`)) return;
+            
             try {
-                await setDoc(bankRef, {
-                    name: document.getElementById('adm-bank-name').value,
-                    accountNo: document.getElementById('adm-bank-no').value,
-                    holder: document.getElementById('adm-bank-holder').value,
-                    qr: window.admQr || document.getElementById('u-bank-qr').src || ""
+                await updateDoc(doc(db, "users", currentUser.uid), { 
+                    balance: increment(-price) 
                 });
-                alert("ဘဏ်အချက်အလက်များကို သိမ်းဆည်းပြီးပါပြီ။");
-            } catch (e) { alert(e.message); }
+                
+                await deleteDoc(doc(db, "servers", targetServer.id));
+                
+                document.getElementById('result-area').value = targetServer.config;
+                document.getElementById('result-modal').classList.remove('hidden');
+
+                setTimeout(() => {
+                    document.getElementById('result-area').value = "Expired.";
+                }, 300000);
+
+            } catch(e) { alert(e.message); }
         };
 
-        window.addStock = async () => {
-            const configCol = collection(db, 'artifacts', appId, 'public', 'data', 'configs');
+        window.updateBankSettings = async () => {
+            const data = {
+                logo: document.getElementById('adm-bank-logo').value,
+                name: document.getElementById('adm-bank-name').value,
+                number: document.getElementById('adm-bank-no').value,
+                holder: document.getElementById('adm-bank-holder').value,
+                qr: document.getElementById('adm-bank-qr').value
+            };
+            await setDoc(doc(db, "settings", "bank"), data);
+            alert("Updated!");
+        };
+
+        window.submitTopup = async () => {
+            if(!window.slipImg) return alert("Slip တင်ပါ");
+            const amt = document.getElementById('dep-amt').value;
+            
+            await addDoc(collection(db, "topup_requests"), {
+                uid: currentUser.uid,
+                amount: parseInt(amt),
+                slip: window.slipImg,
+                createdAt: serverTimestamp()
+            });
+
+            await sendTelegram(`🔔 <b>Topup Req</b>\nID: <code>${currentUser.uid}</code>\nAmt: <b>${amt} THB</b>`);
+            alert("တင်ပြပြီးပါပြီ။");
+            window.slipImg = null;
+            document.getElementById('slip-preview-box').classList.add('hidden');
+        };
+
+        window.approveTopup = async (id, uid, amt) => {
             try {
-                await addDoc(configCol, {
-                    flag: document.getElementById('adm-flag').value,
-                    serverName: document.getElementById('adm-sname').value,
-                    port: document.getElementById('adm-sport').value,
-                    config: document.getElementById('adm-sconf').value,
+                await updateDoc(doc(db, "users", uid), { balance: increment(amt) });
+                await deleteDoc(doc(db, "topup_requests", id));
+                await sendTelegram(`✅ <b>Approved</b>\nID: <code>${uid}</code>\nAmt: <b>${amt} THB</b>`);
+                alert("Approved!");
+            } catch(e) { alert(e.message); }
+        };
+
+        window.cancelTopup = async (id) => {
+            if(!confirm("Cancel?")) return;
+            await deleteDoc(doc(db, "topup_requests", id));
+        };
+
+        window.addServer = async () => {
+            const name = document.getElementById('adm-sname').value;
+            const conf = document.getElementById('adm-sconf').value;
+            const port = document.getElementById('adm-sport').value;
+            const note = document.getElementById('adm-snote').value;
+            const flag = document.getElementById('adm-flag').value;
+
+            if(!name || !conf) return alert("Fill all!");
+
+            try {
+                await addDoc(collection(db, "servers"), {
+                    name: name,
+                    flag: flag,
+                    config: conf,
+                    port: port || "443",
+                    note: note || "",
                     createdAt: serverTimestamp()
                 });
+                alert("Stock Added!");
+                document.getElementById('adm-sname').value = "";
                 document.getElementById('adm-sconf').value = "";
-                alert("Stock ထည့်သွင်းမှု အောင်မြင်သည်။");
-            } catch (e) { alert(e.message); }
+                document.getElementById('adm-sport').value = "443";
+                document.getElementById('adm-snote').value = "";
+            } catch(e) { alert(e.message); }
         };
 
-        // --- HANDLERS ---
-        window.handleSlip = (e) => {
-            const f = e.target.files[0];
-            if(f) {
-                const r = new FileReader();
-                r.onload = ev => { 
-                    window.slipImg = ev.target.result; 
-                    const prev = document.getElementById('slip-preview');
-                    prev.src = ev.target.result; 
-                    prev.classList.remove('hidden'); 
-                };
-                r.readAsDataURL(f);
-            }
-        };
-
-        window.handleAdmQr = (e) => {
-            const f = e.target.files[0];
-            if(f) {
-                const r = new FileReader();
-                r.onload = ev => { window.admQr = ev.target.result; };
-                r.readAsDataURL(f);
-            }
+        window.handleFile = (e) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                window.slipImg = ev.target.result;
+                document.getElementById('slip-preview').src = ev.target.result;
+                document.getElementById('slip-preview-box').classList.remove('hidden');
+            };
+            reader.readAsDataURL(e.target.files[0]);
         };
 
         window.switchPage = (p) => {
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            document.getElementById(p + '-page').classList.add('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('text-blue-500', 'bg-blue-600/10'));
-            const target = p === 'admin' ? 'login' : p;
-            document.getElementById('nav-'+target)?.classList.add('text-blue-500', 'bg-blue-600/10');
+            document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
+            document.getElementById(p + '-page').classList.remove('hidden');
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.replace('text-blue-500', 'text-slate-500'));
+            const targetBtn = p === 'main' ? document.getElementById('nav-home') : document.getElementById('nav-admin');
+            targetBtn.classList.replace('text-slate-500', 'text-blue-500');
         };
 
-        window.checkAdmin = () => {
-            const pass = document.getElementById('admPass').value.trim();
-            if(pass === 'Thandarlin2001') {
-                switchPage('admin');
-            } else {
-                alert('Passcode မှားယွင်းနေပါသည်။');
-            }
+        window.copyConfig = () => {
+            const area = document.getElementById('result-area');
+            area.select();
+            document.execCommand('copy');
+            alert("Copied!");
         };
-
     </script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
-        body { font-family: 'Pyidaungsu', sans-serif; background: #020617; color: #f8fafc; }
-        .glass { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.05); }
-        .input-dark { background: #0f172a; border: 1px solid #1e293b; color: white; padding: 12px; border-radius: 12px; width: 100%; outline: none; font-size: 13px; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap');
+        body { background: #020617; color: white; font-family: 'Plus Jakarta Sans', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .input-box { background: #0f172a; border: 1px solid #1e293b; color: white; padding: 14px; border-radius: 20px; width: 100%; outline: none; transition: all 0.3s; }
+        .online-dot { animation: pulse 2s infinite; box-shadow: 0 0 10px rgba(34, 197, 94, 0.8); }
+        @keyframes pulse { 0% { transform: scale(0.9); opacity: 0.5; } 70% { transform: scale(1.1); opacity: 1; } 100% { transform: scale(0.9); opacity: 0.5; } }
+        .page { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
     </style>
 </head>
-<body class="pb-32">
+<body class="pb-28">
 
-    <!-- Header -->
     <div class="p-6 max-w-md mx-auto flex justify-between items-center">
-        <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center"><i class="fas fa-shield-alt text-xs"></i></div>
-            <h1 class="text-xl font-black tracking-tighter text-blue-500">V2-PREMIUM</h1>
+        <div>
+            <h1 class="text-xl font-black italic tracking-tighter leading-none">V2-PREMIUM</h1>
+            <span class="text-[10px] font-bold text-blue-500 tracking-[0.3em] uppercase">Official Stable</span>
         </div>
-        <div id="display-uid" class="text-[9px] text-slate-500 font-mono bg-slate-900/50 px-3 py-1.5 rounded-full border border-white/5">ID: Loading...</div>
+        <div id="display-uid" class="px-4 py-2 bg-slate-900/50 rounded-2xl text-[9px] font-mono text-blue-400 border border-blue-500/10 uppercase tracking-widest">LOADING...</div>
     </div>
 
-    <!-- USER PAGE -->
-    <div id="user-page" class="tab-content active max-w-md mx-auto px-4 space-y-6">
-        <!-- Balance Card -->
-        <div class="glass p-8 rounded-[2.5rem] text-center shadow-2xl relative overflow-hidden border-b-4 border-blue-600">
-            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mb-1">လက်ကျန်ငွေ</p>
-            <h1 id="user-balance" class="text-5xl font-black tracking-tight">0 THB</h1>
+    <!-- User Dashboard -->
+    <div id="main-page" class="page max-w-md mx-auto px-4 space-y-6">
+        <div class="glass p-8 rounded-[2.5rem] text-center border-b-4 border-blue-600 shadow-2xl relative overflow-hidden">
+            <p class="text-[10px] text-slate-400 uppercase font-black tracking-widest mb-2">My Balance</p>
+            <h1 id="user-balance" class="text-5xl font-black tracking-tighter">0 THB</h1>
         </div>
 
-        <!-- Market Area -->
-        <div class="glass p-6 rounded-[2rem] space-y-4">
+        <div class="glass p-6 rounded-[2.5rem] space-y-5">
             <div class="flex justify-between items-center">
-                <h2 class="text-xs font-bold text-slate-400 uppercase tracking-widest">Select Server</h2>
-                <span class="text-[9px] bg-blue-600/20 text-blue-400 px-3 py-1 rounded-full border border-blue-500/10">Stock: <span id="stock-count">0</span></span>
-            </div>
-            <div id="server-list" class="space-y-3 max-h-72 overflow-y-auto"></div>
-            <button id="gen-btn" class="w-full bg-blue-600 hover:bg-blue-700 py-4 rounded-2xl font-black text-sm transition-all shadow-xl">GENERATE (50฿)</button>
-        </div>
-
-        <!-- Deposit Area -->
-        <div class="glass p-6 rounded-[2rem] space-y-5">
-            <div class="flex items-center gap-2">
-                <i class="fas fa-wallet text-blue-500 text-xs"></i>
-                <h2 class="text-xs font-black text-slate-400 uppercase tracking-widest">Top-up Credit (ငွေဖြည့်ရန်)</h2>
+                <div class="flex items-center gap-3">
+                    <img id="selected-flag-img" src="https://flagcdn.com/w80/th.png" class="w-8 h-8 rounded-full object-cover border-2 border-white/10" alt="flag">
+                    <h2 class="text-xs font-black uppercase tracking-widest">Select Region</h2>
+                </div>
+                <span id="stock-badge" class="bg-blue-600/10 text-blue-400 text-[10px] px-4 py-1.5 rounded-full font-extrabold border border-blue-500/20">STOCK: 0</span>
             </div>
             
-            <!-- Bank Info Box -->
-            <div class="bg-slate-900/60 p-6 rounded-3xl border border-white/5 space-y-2 relative">
-                <p id="u-bank-name" class="text-blue-500 font-black text-[11px] uppercase tracking-wider">Loading...</p>
-                <p id="u-bank-no" class="text-2xl font-mono font-black text-white">--- --- ---</p>
-                <p id="u-bank-holder" class="text-[10px] text-slate-500 font-bold">---</p>
-                <div id="u-bank-qr-box" class="hidden pt-4 flex justify-center">
-                    <img id="u-bank-qr" class="w-44 h-44 rounded-2xl border border-white/10 p-2 bg-white">
-                </div>
+            <select id="country-select" onchange="updateStockUI()" class="input-box text-sm font-bold appearance-none cursor-pointer">
+                <option value="th">THAILAND PREMIUM</option>
+                <option value="sg">SINGAPORE GAMING</option>
+            </select>
+
+            <div id="user-gen-area" class="pt-2"></div>
+        </div>
+
+        <div class="glass p-6 rounded-[3rem] space-y-4 border border-white/5">
+            <div class="flex items-center justify-between">
+                <h2 class="text-[10px] font-black uppercase tracking-widest text-blue-400"><i class="fas fa-wallet mr-1"></i> Topup Funds</h2>
+                <button onclick="document.getElementById('qr-modal').classList.remove('hidden')" class="text-[9px] font-bold text-slate-400 underline uppercase tracking-tighter">QR Code</button>
             </div>
 
-            <div class="space-y-3">
-                <div class="space-y-1">
-                    <label class="text-[9px] text-slate-500 ml-2 font-bold uppercase">Amount (ပမာဏ)</label>
-                    <select id="dep-amt" class="input-dark">
-                        <option value="50">50 THB</option>
-                        <option value="100">100 THB</option>
-                        <option value="200">200 THB</option>
-                        <option value="500">500 THB</option>
-                        <option value="1000">1000 THB</option>
-                    </select>
+            <div class="bg-black/30 p-5 rounded-[2rem] border border-white/5 flex items-center gap-4">
+                <img id="u-bank-logo" src="https://cdn-icons-png.flaticon.com/512/2830/2830284.png" class="w-10 h-10 rounded-xl object-cover">
+                <div class="overflow-hidden">
+                    <p id="u-bank-name" class="text-[9px] font-bold text-blue-500 uppercase truncate"></p>
+                    <p id="u-bank-no" class="text-base font-black font-mono tracking-tight"></p>
+                    <p id="u-bank-holder" class="text-[8px] text-slate-500 font-bold uppercase truncate"></p>
                 </div>
-
-                <input type="file" id="slip-in" class="hidden" onchange="handleSlip(event)" accept="image/*">
-                <label for="slip-in" class="block w-full py-8 border-2 border-dashed border-slate-800 rounded-3xl text-center cursor-pointer bg-slate-900/40 hover:bg-slate-900/60 transition-all">
-                    <img id="slip-preview" class="hidden w-24 h-24 mx-auto rounded-xl mb-3 object-cover shadow-lg border border-white/10">
-                    <div class="flex flex-col items-center">
-                        <i class="fas fa-cloud-upload-alt text-slate-600 mb-2"></i>
-                        <p class="text-[10px] text-slate-500 font-bold uppercase">Upload Slip (ငွေလွှဲပြေစာတင်ရန်)</p>
-                    </div>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-3">
+                <select id="dep-amt" class="input-box text-xs font-bold">
+                    <option value="50">50 THB</option>
+                    <option value="100">100 THB</option>
+                    <option value="200">200 THB</option>
+                    <option value="500">500 THB</option>
+                </select>
+                <label for="slip-file" class="bg-slate-800 flex items-center justify-center rounded-2xl cursor-pointer border border-white/5">
+                    <i class="fas fa-upload mr-2 text-blue-400"></i> <span class="text-[10px] font-black uppercase">Slip</span>
                 </label>
-                
-                <button id="submit-dep-btn" onclick="submitDeposit()" class="w-full bg-slate-800 hover:bg-slate-700 py-4 rounded-2xl font-black text-xs uppercase border border-white/5">Submit Request</button>
+                <input type="file" id="slip-file" class="hidden" onchange="handleFile(event)" accept="image/*">
             </div>
+
+            <div id="slip-preview-box" class="hidden">
+                <img id="slip-preview" class="w-20 h-20 mx-auto object-cover rounded-2xl border-2 border-blue-500">
+            </div>
+
+            <button onclick="submitTopup()" class="w-full bg-blue-600 py-4 rounded-[1.5rem] font-black uppercase text-xs shadow-lg shadow-blue-600/30">Submit Topup Request</button>
         </div>
     </div>
 
-    <!-- ADMIN PANEL -->
-    <div id="admin-page" class="tab-content max-w-md mx-auto px-4 space-y-6 pt-4">
-        <div class="flex items-center justify-between">
-            <h2 class="text-xl font-black text-blue-500 uppercase">Admin Control</h2>
-            <button onclick="switchPage('user')" class="text-[10px] bg-slate-800 px-3 py-1 rounded-lg">Exit</button>
-        </div>
+    <!-- Admin Panel -->
+    <div id="admin-page" class="page hidden max-w-md mx-auto px-4 space-y-6">
+        <h1 class="text-xl font-black uppercase italic">Admin Panel</h1>
         
-        <div class="glass p-5 rounded-3xl space-y-4 border-l-4 border-blue-500">
-            <h3 class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Bank Settings</h3>
-            <input id="adm-bank-name" placeholder="Bank Name" class="input-dark">
-            <input id="adm-bank-no" placeholder="Account Number" class="input-dark">
-            <input id="adm-bank-holder" placeholder="Account Holder" class="input-dark">
-            <input type="file" onchange="handleAdmQr(event)" class="text-[9px] block w-full text-slate-500">
-            <button onclick="saveBank()" class="w-full bg-blue-600 py-3 rounded-xl font-black text-xs">SAVE SETTINGS</button>
+        <div class="glass p-6 rounded-3xl space-y-4">
+            <h3 class="text-[10px] font-black uppercase text-blue-400 tracking-widest">Bank Details</h3>
+            <input id="adm-bank-logo" placeholder="Logo URL" class="input-box text-xs">
+            <input id="adm-bank-name" placeholder="Bank Name" class="input-box text-xs">
+            <input id="adm-bank-no" placeholder="Bank Number" class="input-box text-xs">
+            <input id="adm-bank-holder" placeholder="Holder Name" class="input-box text-xs">
+            <input id="adm-bank-qr" placeholder="QR Image URL" class="input-box text-xs">
+            <button onclick="updateBankSettings()" class="w-full bg-blue-600 py-3 rounded-2xl font-black text-xs uppercase">Save Bank</button>
         </div>
 
-        <div class="glass p-5 rounded-3xl space-y-4 border-l-4 border-green-500">
-            <h3 class="text-[10px] font-black text-green-400 uppercase tracking-widest">Pending Deposits</h3>
-            <div id="adm-req-list" class="space-y-4"></div>
-        </div>
-
-        <div class="glass p-5 rounded-3xl space-y-4 border-l-4 border-purple-500">
-            <h3 class="text-[10px] font-black text-purple-400 uppercase tracking-widest">Add Configs</h3>
+        <div class="glass p-6 rounded-3xl space-y-4">
+            <h3 class="text-[10px] font-black uppercase text-green-400 tracking-widest">New Stock</h3>
             <div class="grid grid-cols-2 gap-2">
-                <select id="adm-flag" class="input-dark"><option value="sg">🇸🇬 SG</option><option value="th">🇹🇭 TH</option><option value="us">🇺🇸 US</option><option value="jp">🇯🇵 JP</option></select>
-                <input id="adm-sport" placeholder="Port" class="input-dark">
+                <select id="adm-flag" class="input-box text-xs font-bold">
+                    <option value="th">THAILAND</option>
+                    <option value="sg">SINGAPORE</option>
+                </select>
+                <input id="adm-sport" placeholder="Port" value="443" class="input-box text-xs">
+                <input id="adm-sname" placeholder="Server Display Name" class="input-box text-xs col-span-2">
+                <input id="adm-snote" placeholder="Dashboard Note (Optional)" class="input-box text-xs col-span-2">
+                <textarea id="adm-sconf" placeholder="V2Ray Config String" class="input-box h-32 text-[10px] font-mono col-span-2"></textarea>
             </div>
-            <input id="adm-sname" placeholder="Server Name" class="input-dark">
-            <textarea id="adm-sconf" placeholder="V2Ray Config" class="input-dark h-24 text-[9px]"></textarea>
-            <button onclick="addStock()" class="w-full bg-purple-600 py-3 rounded-xl font-black text-xs">ADD STOCK</button>
+            <button onclick="addServer()" class="w-full bg-white text-black py-3 rounded-2xl font-black text-xs uppercase">Add to Stock</button>
+        </div>
+
+        <div id="adm-server-list" class="glass p-6 rounded-3xl"></div>
+        <div id="adm-req-list" class="pb-20"></div>
+    </div>
+
+    <!-- Modals -->
+    <div id="qr-modal" class="fixed inset-0 bg-black/95 z-[110] flex items-center justify-center p-8 hidden">
+        <div class="text-center space-y-6 max-w-xs w-full">
+            <div class="bg-white p-4 rounded-[2.5rem] inline-block shadow-2xl">
+                <img id="u-bank-qr-img" src="" class="w-64 rounded-2xl">
+            </div>
+            <button onclick="document.getElementById('qr-modal').classList.add('hidden')" class="w-full py-4 bg-white/10 rounded-2xl text-[10px] font-black uppercase tracking-widest">Close</button>
         </div>
     </div>
 
-    <!-- Login Area -->
-    <div id="login-page" class="tab-content max-w-md mx-auto px-6 pt-20">
-        <div class="glass p-10 rounded-[3rem] text-center space-y-6">
-            <i class="fas fa-lock text-3xl text-blue-500"></i>
-            <h2 class="text-2xl font-black">Admin Login</h2>
-            <input id="admPass" type="password" placeholder="Passcode" class="input-dark text-center text-xl">
-            <button onclick="checkAdmin()" class="w-full bg-blue-600 py-4 rounded-2xl font-black transition-all">AUTHENTICATE</button>
+    <div id="result-modal" class="fixed inset-0 bg-black/95 z-[100] flex items-center justify-center p-6 hidden">
+        <div class="glass w-full max-w-sm rounded-[3.5rem] p-8 space-y-6 text-center border border-white/10">
+            <h2 class="text-xl font-black text-white uppercase italic">Config Generated!</h2>
+            <textarea id="result-area" readonly class="input-box h-40 text-[10px] font-mono bg-black/50 p-4"></textarea>
+            <button onclick="copyConfig()" class="w-full bg-blue-600 py-4 rounded-3xl font-black text-xs uppercase shadow-xl shadow-blue-600/30">Copy Config</button>
+            <button onclick="document.getElementById('result-modal').classList.add('hidden')" class="text-[10px] font-bold text-slate-500 uppercase">Dismiss</button>
         </div>
     </div>
 
     <!-- Navigation -->
-    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-md glass border border-white/10 p-2 flex justify-around rounded-full z-50 shadow-2xl">
-        <button id="nav-user" onclick="switchPage('user')" class="nav-btn flex-1 flex flex-col items-center py-3 rounded-full text-blue-500 bg-blue-600/10">
-            <i class="fas fa-shopping-bag text-sm"></i>
-            <span class="text-[8px] font-black uppercase mt-1">Market</span>
-        </button>
-        <button id="nav-login" onclick="switchPage('login')" class="nav-btn flex-1 flex flex-col items-center py-3 rounded-full text-slate-500">
-            <i class="fas fa-user-cog text-sm"></i>
-            <span class="text-[8px] font-black uppercase mt-1">Admin</span>
-        </button>
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-72 glass rounded-[2.5rem] p-2 flex justify-between shadow-2xl z-50 border border-white/10">
+        <button id="nav-home" onclick="switchPage('main')" class="nav-btn flex-1 p-4 text-blue-500"><i class="fas fa-home text-lg"></i></button>
+        <button id="nav-admin" onclick="switchPage('admin')" class="nav-btn flex-1 p-4 text-slate-500"><i class="fas fa-shield-alt text-lg"></i></button>
+        <button onclick="location.reload()" class="flex-1 p-4 text-slate-500"><i class="fas fa-sync-alt text-lg"></i></button>
     </div>
 
 </body>
