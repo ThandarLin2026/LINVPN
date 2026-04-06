@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JK-V2RAY </title>
+    <title>JK-V2RAY | Premium Service</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -25,6 +25,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // Telegram Bot Configuration
         const TG_TOKEN = "8719916377:AAElljRpk4nk9aAJAFGtJ-tjyacw5GdjS80";
         const TG_CHAT_ID = "7848197948";
         const ADMIN_PASS = "JueHtet19991";
@@ -59,6 +60,46 @@
                 }
             } catch (e) {
                 console.log("Ping failed");
+            }
+        }
+
+        // Send Notification to Telegram
+        async function sendTelegramNotify(uid, amount, slipUrl) {
+            const message = `🔔 *New Topup Request*\n\n` +
+                            `👤 User ID: \`${uid}\`\n` +
+                            `💰 Amount: *${amount} THB*\n` +
+                            `📅 Time: ${new Date().toLocaleString()}\n\n` +
+                            `⚡ Please check admin panel for approval.`;
+            
+            try {
+                // Send Text Message
+                await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendMessage`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TG_CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+
+                // Send Slip Photo
+                if (slipUrl && slipUrl.startsWith('data:image')) {
+                    // Convert base64 to Blob to send as file
+                    const base64Data = slipUrl.split(',')[1];
+                    const blob = await fetch(`data:image/png;base64,${base64Data}`).then(res => res.blob());
+                    const formData = new FormData();
+                    formData.append('chat_id', TG_CHAT_ID);
+                    formData.append('photo', blob, 'slip.png');
+                    formData.append('caption', `Receipt from ID: ${uid}`);
+
+                    await fetch(`https://api.telegram.org/bot${TG_TOKEN}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+            } catch (error) {
+                console.error("Telegram notify error:", error);
             }
         }
 
@@ -236,16 +277,46 @@
         window.submitTopup = async () => {
             if(!window.slipImg) return alert("Upload Slip!");
             const amt = document.getElementById('dep-amt').value;
-            await addDoc(collection(db, "topup_requests"), { uid: currentUser.uid, amount: parseInt(amt), slip: window.slipImg, createdAt: serverTimestamp() });
-            alert("Submitted!");
-            window.slipImg = null;
-            document.getElementById('slip-preview-box').classList.add('hidden');
+            const btn = document.getElementById('submit-topup-btn');
+            
+            try {
+                btn.disabled = true;
+                btn.innerText = "SUBMITTING...";
+                
+                // Add to Firestore
+                await addDoc(collection(db, "topup_requests"), { 
+                    uid: currentUser.uid, 
+                    amount: parseInt(amt), 
+                    slip: window.slipImg, 
+                    createdAt: serverTimestamp() 
+                });
+
+                // Send Telegram Notification
+                await sendTelegramNotify(currentUser.uid, amt, window.slipImg);
+
+                alert("ငွေဖြည့်မှု တောင်းဆိုချက် ပို့ပြီးပါပြီ။ ခေတ္တစောင့်ဆိုင်းပေးပါ။");
+                
+                window.slipImg = null;
+                document.getElementById('slip-preview-box').classList.add('hidden');
+            } catch (error) {
+                alert("Error: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "Submit Topup Request";
+            }
         };
 
         window.approveTopup = async (id, uid, amt) => {
             await updateDoc(doc(db, "users", uid), { balance: increment(amt) });
             await deleteDoc(doc(db, "topup_requests", id));
             alert("Approved!");
+        };
+
+        window.cancelTopup = async (id) => {
+            if(confirm("Cancel လုပ်မှာ သေချာလား?")) {
+                await deleteDoc(doc(db, "topup_requests", id));
+                alert("Cancelled!");
+            }
         };
 
         window.renderAdminServerList = () => {
@@ -282,8 +353,13 @@
 
         window.switchPage = (p) => {
             if (p === 'admin' && !isAdminAuthenticated) {
-                if (prompt("Admin Password:") === ADMIN_PASS) isAdminAuthenticated = true;
-                else return;
+                const pass = prompt("Admin Password:");
+                if (pass === ADMIN_PASS) {
+                    isAdminAuthenticated = true;
+                } else {
+                    if(pass !== null) alert("Password မှားယွင်းနေပါသည်။");
+                    return;
+                }
             }
             document.querySelectorAll('.page').forEach(el => el.classList.add('hidden'));
             document.getElementById(p + '-page').classList.remove('hidden');
@@ -295,7 +371,7 @@
             const area = document.getElementById('result-area');
             area.select();
             document.execCommand('copy');
-            alert("Copied!");
+            alert("Config Copied!");
             document.getElementById('result-modal').classList.add('hidden');
         };
     </script>
@@ -327,26 +403,30 @@
         .gold-text { background: linear-gradient(to right, #fde047, #eab308); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .online-dot { animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
+        
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body class="pb-32">
 
     <div class="p-6 max-w-md mx-auto flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-black italic tracking-tighter text-blue-500">V2-PREMIUM</h1>
-            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Stable v5.5</span>
+            <h1 class="text-xl font-black italic tracking-tighter text-blue-500">JK-V2RAY</h1>
+            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Stable v5.5 Premium</span>
         </div>
         <div id="display-uid" class="px-4 py-2 bg-slate-900 rounded-2xl text-[10px] font-mono text-blue-400 border border-blue-500/10 tracking-widest shadow-inner">ID: LOADING...</div>
     </div>
 
     <!-- Main Page -->
     <div id="main-page" class="page max-w-md mx-auto px-4 space-y-6">
+        <!-- Balance Section -->
         <div class="glass p-10 rounded-[2.5rem] text-center shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-3xl -translate-y-1/2 translate-x-1/2"></div>
             <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest mb-2">My Balance</p>
             <h1 id="user-balance" class="text-5xl font-black tracking-tighter">0 THB</h1>
         </div>
 
+        <!-- Server Selection Section -->
         <div class="glass p-6 rounded-[2.5rem] space-y-5">
             <div class="flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -356,12 +436,13 @@
                 <span id="stock-badge" class="bg-blue-500/10 text-blue-400 text-[10px] px-4 py-1.5 rounded-full font-black uppercase shadow-inner">STOCK: 0</span>
             </div>
             <select id="country-select" onchange="updateStockUI()" class="input-box text-sm font-bold bg-slate-900 border-none appearance-none">
-                <option value="th">THAILAND PREMIUM VIP</option>
-                <option value="sg">SINGAPORE GAMING VIP</option>
+                <option value="th">THAILAND SERVER VIP</option>
+                <option value="sg">SINGAPORE SERVER VIP</option>
             </select>
             <div id="user-gen-area"></div>
         </div>
 
+        <!-- Payment Section -->
         <div class="space-y-4">
             <div class="flex justify-between items-center px-2">
                 <h2 class="text-[10px] font-black uppercase tracking-widest text-slate-400">Payment Information</h2>
@@ -394,6 +475,7 @@
                 </div>
             </div>
 
+            <!-- Topup Request Form -->
             <div class="glass p-6 rounded-[2.5rem] space-y-4 shadow-xl">
                 <div class="grid grid-cols-2 gap-3">
                     <select id="dep-amt" class="input-box text-xs font-bold bg-slate-900 border-none">
@@ -407,14 +489,17 @@
                     <input type="file" id="slip-file" class="hidden" onchange="handleFile(event)" accept="image/*">
                 </div>
                 <div id="slip-preview-box" class="hidden text-center"><img id="slip-preview" class="w-32 h-32 mx-auto object-cover rounded-2xl border border-white/5 shadow-2xl"></div>
-                <button onclick="submitTopup()" class="w-full bg-blue-600 py-4 rounded-[1.5rem] font-black uppercase text-xs shadow-lg shadow-blue-600/20 active:scale-[0.98] transition-transform">Submit Topup Request</button>
+                <button id="submit-topup-btn" onclick="submitTopup()" class="w-full bg-blue-600 py-4 rounded-[1.5rem] font-black uppercase text-xs shadow-lg shadow-blue-600/20 active:scale-[0.98] transition-transform">Submit Topup Request</button>
             </div>
         </div>
     </div>
 
     <!-- Admin Page -->
     <div id="admin-page" class="page hidden max-w-md mx-auto px-4 space-y-6">
-        <h1 class="text-xl font-black uppercase tracking-tighter text-red-500 flex items-center gap-2"><i class="fas fa-user-shield"></i> Admin Control</h1>
+        <div class="flex justify-between items-center">
+            <h1 class="text-xl font-black uppercase tracking-tighter text-red-500 flex items-center gap-2"><i class="fas fa-user-shield"></i> Admin Control</h1>
+            <button onclick="isAdminAuthenticated=false; switchPage('main')" class="text-[9px] font-bold text-slate-500 border border-slate-800 px-3 py-1 rounded-xl uppercase">Logout</button>
+        </div>
         
         <div class="glass p-6 rounded-3xl space-y-4">
             <h3 class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Bank Management</h3>
