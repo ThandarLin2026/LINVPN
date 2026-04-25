@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinVPN Temp Mail</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Pyidaungsu:wght@400;700&display=swap');
+        body { font-family: 'Pyidaungsu', sans-serif; }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+
+    <div class="max-w-2xl mx-auto py-12 px-4">
+        <!-- Logo & Title -->
+        <div class="text-center mb-10">
+            <div class="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-[2.5rem] shadow-2xl shadow-blue-200 mb-6 rotate-3 transform hover:rotate-0 transition-transform duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+            </div>
+            <h1 class="text-5xl font-black text-slate-800 tracking-tighter">LinVPN <span class="text-blue-600">Mail</span></h1>
+            <p class="text-slate-400 font-bold text-[11px] uppercase tracking-[0.3em] mt-3">လုံခြုံစိတ်ချရသော ခေတ္တသုံး အီးမေးလ်</p>
+        </div>
+
+        <!-- Address Card -->
+        <div class="glass-effect rounded-[3rem] shadow-2xl p-10 mb-8 border border-white">
+            <div class="space-y-6">
+                <div class="relative">
+                    <input id="emailDisplay" readonly class="w-full p-6 bg-slate-50 border-2 border-blue-50 rounded-[1.5rem] font-mono text-2xl text-center text-blue-700 outline-none shadow-inner group-hover:border-blue-200 transition-all" value="Loading...">
+                    <div class="absolute -top-3 left-8 bg-blue-600 text-white text-[10px] px-4 py-1.5 rounded-full font-black uppercase tracking-widest shadow-lg">Your Email Address</div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <button onclick="copyToClipboard()" id="copyBtn" class="flex items-center justify-center gap-3 bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-[1.5rem] shadow-xl shadow-blue-100 transition-all active:scale-95">
+                        Copy လုပ်မည်
+                    </button>
+                    <button onclick="refreshEmail()" class="flex items-center justify-center gap-3 bg-slate-100 hover:bg-slate-200 text-slate-600 font-black py-5 rounded-[1.5rem] transition-all active:scale-95">
+                        အသစ်လဲမည်
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inbox Card -->
+        <div class="bg-white/80 backdrop-blur-md rounded-[3rem] shadow-xl border border-white overflow-hidden">
+            <div class="px-10 py-6 border-b border-slate-50 flex justify-between items-center bg-white/50">
+                <div class="flex items-center gap-3">
+                    <span class="flex h-3 w-3 relative">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <h2 class="font-black text-slate-700 text-xs uppercase tracking-[0.2em]">စာဝင်ပုံး (Inbox)</h2>
+                </div>
+                <button onclick="fetchInbox()" class="text-blue-600 text-xs font-black hover:bg-blue-50 px-4 py-2 rounded-full transition-colors uppercase tracking-widest">Update</button>
+            </div>
+            
+            <div id="inbox" class="divide-y divide-slate-50 min-h-[400px]">
+                <div class="flex flex-col items-center justify-center py-32 text-slate-300">
+                    စာစောင့်နေဆဲ...
+                </div>
+            </div>
+        </div>
+
+        <p class="text-center mt-10 text-slate-400 text-[10px] font-black uppercase tracking-[0.4em]">Powered by LinVPN Cloud Infrastructure</p>
+    </div>
+
+    <script>
+        const API_BASE = 'https://linvpn-tempmail.linvpn2026.workers.dev';
+        const DOMAIN = 'linvpn.site';
+
+        let myEmail = localStorage.getItem('linvpn_mail_addr') || createNewMail();
+        document.getElementById('emailDisplay').value = myEmail;
+
+        function createNewMail() {
+            const id = Math.random().toString(36).substring(2, 10);
+            const addr = `${id}@${DOMAIN}`;
+            localStorage.setItem('linvpn_mail_addr', addr);
+            return addr;
+        }
+
+        function refreshEmail() {
+            if(confirm("အီးမေးလ်အသစ် လဲမလား? အရင်စာတွေ ပျက်သွားနိုင်ပါတယ်။")) {
+                myEmail = createNewMail();
+                document.getElementById('emailDisplay').value = myEmail;
+                fetchInbox();
+            }
+        }
+
+        function copyToClipboard() {
+            const input = document.getElementById('emailDisplay');
+            input.select();
+            document.execCommand('copy');
+            alert("Copied: " + input.value);
+        }
+
+        // strip dangerous HTML tags & keep links clickable
+        function formatEmailBody(html) {
+            if (!html) return "";
+            html = html
+                .replace(/<script[\s\S]*?<\/script>/gi, "")
+                .replace(/<style[\s\S]*?<\/style>/gi, "")
+                .replace(/<\/p>/gi, "\n")
+                .replace(/<\/div>/gi, "\n")
+                .replace(/<br\s*\/?>/gi, "\n");
+            html = html.replace(
+                /(https?:\/\/[^\s]+)/g,
+                '<a href="$1" target="_blank" style="color:#2563eb;text-decoration:underline;">$1</a>'
+            );
+            html = html.replace(/<(?!\/?a(?=>|\s.*>))\/?.*?>/gi, "");
+            return html;
+        }
+
+        function escapeHtml(text) {
+            return String(text || "")
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        async function fetchInbox() {
+            const inboxEl = document.getElementById('inbox');
+            try {
+                const res = await fetch(`${API_BASE}/api/messages?email=${encodeURIComponent(myEmail)}`);
+                const data = await res.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    inboxEl.innerHTML = `<div class="p-20 text-center text-slate-300 font-bold italic text-xs tracking-widest">စာမရှိသေးပါ။</div>`;
+                    return;
+                }
+
+                inboxEl.innerHTML = data.reverse().map(msg => {
+                    const cleanFrom = escapeHtml(msg.from || "Unknown");
+                    const cleanSubject = escapeHtml(msg.subject || "(No Subject)");
+                    const cleanTime = msg.time ? new Date(msg.time).toLocaleTimeString() : "";
+                    const cleanBody = formatEmailBody(msg.body || "");
+
+                    return `
+                        <div class="p-10 hover:bg-blue-50/50 transition-all cursor-pointer border-l-4 border-transparent hover:border-blue-600 group">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-[10px] font-black text-blue-600 bg-blue-50 px-4 py-1.5 rounded-full uppercase tracking-widest">From: ${cleanFrom}</span>
+                                <span class="text-[10px] text-slate-400 font-bold">${cleanTime}</span>
+                            </div>
+                            <h3 class="font-black text-slate-800 text-xl mb-4 group-hover:text-blue-600 transition-colors">${cleanSubject}</h3>
+                            <div class="text-sm text-slate-500 font-mono leading-relaxed bg-white/50 p-6 rounded-[1.5rem] border border-slate-100 whitespace-pre-wrap shadow-sm">
+                                ${cleanBody}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+            } catch(err) {
+                console.error("Fetch error:", err);
+                inboxEl.innerHTML = `<div class="p-20 text-center text-red-400 font-bold italic text-xs tracking-widest">Inbox fetch မအောင်မြင်ပါ။ API URL စစ်ပါ။</div>`;
+            }
+        }
+
+        setInterval(fetchInbox, 6000);
+        fetchInbox();
+    </script>
+</body>
+</html>
